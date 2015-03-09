@@ -10,9 +10,9 @@
 为
 ```html
 <ul>
-  <li ms-skip id="sfdsfd" >aaa</li>
-  <li ms-skip id="xxdfsdf">aaa</li>
-  <li ms-skip id="sdfdsf">aaa</li>
+  <li ms-skip>aaa</li>
+  <li ms-skip>aaa</li>
+  <li ms-skip>aaa</li>
   <script>
    new function(){
      var nodes = document.getElementsByTagName("script")
@@ -23,7 +23,7 @@
   </script>
 </ul>
 ```
-
+<hr/>
 后端处理
 ```html
 <ul ms-each="array">
@@ -46,3 +46,43 @@
    }
  </script>
 ```
+ms-with同理
+<hr/>
+ms-text与ms-html照样输出
+对于插值表达式
+```html
+<p>{{xxx}}+{{yyy}}={{xxx+yyy}}</p>
+
+```
+转换为
+```
+<span ms-skip>111</span><script>
+ new function(){
+     var nodes = document.getElementsByTagName("script")
+     var node = nodes[repeats.length-1]
+     var target = node.previousSibling
+     var dom = document.createTextNode("{{xxx}}")
+     target.parentNode.replace(dom, target)
+  }
+</script><span ms-skip>222</span><script>
+ new function(){
+     var nodes = document.getElementsByTagName("script")
+     var node = nodes[repeats.length-1]
+     var target = node.previousSibling
+     var dom = document.createTextNode("{{yyy}}")
+     target.parentNode.replace(dom, target)
+  }
+</script>=<span ms-skip>333</span><script>
+ new function(){
+     var nodes = document.getElementsByTagName("script")
+     var node = nodes[repeats.length-1]
+     var target = node.previousSibling
+     var dom = document.createTextNode("{{xxx+yyy}}")
+     target.parentNode.replace(dom, target)
+  }
+</script>
+
+```
+
+
+
