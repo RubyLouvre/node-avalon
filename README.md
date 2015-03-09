@@ -55,7 +55,7 @@ ms-text与ms-html照样输出
 
 ```
 转换为
-```
+```html
 <span ms-skip>111</span><script>
  new function(){
      var nodes = document.getElementsByTagName("script")
@@ -81,8 +81,49 @@ ms-text与ms-html照样输出
      target.parentNode.replace(dom, target)
   }
 </script>
-
 ```
-
-
+对于使用了html过滤的插值表达式，如
+```html
+        <div ms-controller="test">
+            {{aaa|html}}
+        </div>
+        <script type="text/javascript">
+            var vm = avalon.define({
+                $id: 'test',
+                aaa: "<span>dddd</span><span>dddd</span><span>dddd</span>"
+            })
+        </script>
+```
+变成
+```html
+ <div ms-controller="test">
+    <!--ms-html123423432--><span>dddd</span><span>dddd</span><span>dddd</span><script>
+   new function(){
+     var nodes = document.getElementsByTagName("script")
+     var node = nodes[repeats.length-1]
+     var array = [], target
+     while(target = node.previousSibling){
+         if(target.nodeType !== 8 && targetNodeValue !== "ms-html123423432"){
+             array.push(target)
+         }else{
+             var comment = target
+             break
+         }
+     }
+     var parent = node.parentNode
+     while(target = array.shift()){
+         parent.removeChild(target)
+     }
+     var dom = document.createTextNode("{{aaa|html}}")
+     parent.replace(dom, comment)
+  }    
+            </script>
+        </div>
+        <script type="text/javascript">
+            var vm = avalon.define({
+                $id: 'test',
+                aaa: "<span>dddd</span><span>dddd</span><span>dddd</span>"
+            })
+        </script>
+```
 
