@@ -1,13 +1,22 @@
 # node-avalon
-在后端渲染avalon
+在后端PhantomJS运行一个特殊版本的avalon
+1. 它不会移除ms-controller, ms-attr等所有绑定属性
+2. 它会在ms-each, ms-repeat, ms-with， ms-include, ms-if, ms-visible, ms-attr, ms-text, ms-html, {{}}
+   做特殊处理，动态模板当成静态模板，动态生成的内容尽可能添加ms-skip， 并且后面跟着一个script标签，用
+   ID来识别定位，将原元素的内容再复制一下，插在适当位置，让前端avalon再渲染
+3. 它不会处理ms-data, ms-on, ms-widget, ms-css, ms-hover, ms-active绑定
+4. 它将ms-visible与ms-if视为同一种逻辑
+5. ms-each, ms-repeat, ms-with内部不会再生成script标签
 
-后端处理
+<hr/>
+<h3>各ms-*在node-avalon的特殊处理</h3>
+<h4>ms-repeat</h4>
 ```html
 <ul>
    <li ms-repeat="array">{{el}}</li>
 </ul>
 ```
-为
+转换成
 ```html
 <ul>
   <li ms-skip>aaa</li>
@@ -21,14 +30,13 @@
   </script>
 </ul>
 ```
-<hr/>
-后端处理
+<h4>ms-each, ms-with</h4>
 ```html
 <ul ms-each="array">
    <li>{{el}}</li>
 </ul>
 ```
-为
+转换成
 ```html
 <ul ms-skip>
   <li>aaa</li>
