@@ -51,10 +51,7 @@
    }
  </script>
 ```
-ms-with同理
-<hr/>
-ms-text与ms-html照样输出
-对于插值表达式
+<h4>{{prop}} 及 {{prop|html}}</h4>
 ```html
 <p>{{xxx}}+{{yyy}}={{xxx+yyy}}</p>
 
@@ -84,7 +81,7 @@ ms-text与ms-html照样输出
   }
 </script>
 ```
-对于使用了html过滤的插值表达式，如
+
 ```html
         <div ms-controller="test">
             {{aaa|html}}
@@ -129,12 +126,11 @@ ms-text与ms-html照样输出
 ```
 <p>这样会导致在循环绑定生产生大量script标签,因此在node-avalon中,绑定绑定里面的绑定不会再产生绑定</p>
 <hr/>
-
-ms-if
+<h4>ms-if及ms-visible</h4>
 ```html
 <span>aaa</span><span ms-if="toggle">{{xxx}}</span><span>bbb</span>
 ```
-生成
+转换成
 ```html
 <span>aaa</span><script id="node-avalon334323">
  new function(){
