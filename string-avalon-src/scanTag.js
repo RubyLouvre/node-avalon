@@ -6,12 +6,18 @@ function scanTag(elem, vmodels) {
         if (!DOM.getAttribute(elem, "ms-skip-ctrl")) {
             var ctrl = DOM.getAttribute(elem, "ms-important")
             if (ctrl) {
-                elem.attrs.push({name: "ms-skip-ctrl", value: "true"})
+                elem.attrs.push({
+                    name: "ms-skip-ctrl",
+                    value: "true"
+                })
                 var isImporant = true
             } else {
                 ctrl = DOM.getAttribute(elem, "ms-controller")
                 if (ctrl) {
-                    elem.attrs.push({name: "ms-skip-ctrl", value: "true"})
+                    elem.attrs.push({
+                        name: "ms-skip-ctrl",
+                        value: "true"
+                    })
                 }
             }
             if (ctrl) {
@@ -23,9 +29,9 @@ function scanTag(elem, vmodels) {
             }
         }
         scanAttr(elem, vmodels)
-    } else if (elem.nodeName === "#document") {//如果是文档
+    } else if (elem.nodeName === "#document") { //如果是文档
         scanNodeArray(elem.childNodes, vmodels)
-    } else if (elem.nodeName === "#document-fragment") {//如果是文档文型
+    } else if (elem.nodeName === "#document-fragment") { //如果是文档文型
         scanNodeArray(elem.childNodes, vmodels)
     }
 }

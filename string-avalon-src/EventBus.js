@@ -2,7 +2,7 @@
  *                            事件总线                               *
  **********************************************************************/
 var EventBus = {
-    $watch: function (type, callback) {
+    $watch: function(type, callback) {
         if (typeof callback === "function") {
             var callbacks = this.$events[type]
             if (callbacks) {
@@ -15,7 +15,7 @@ var EventBus = {
         }
         return this
     },
-    $unwatch: function (type, callback) {
+    $unwatch: function(type, callback) {
         var n = arguments.length
         if (n === 0) { //让此VM的所有$watch回调无效化
             this.$watch.backup = this.$events
@@ -33,7 +33,7 @@ var EventBus = {
         }
         return this
     },
-    $fire: function (type) {
+    $fire: function(type) {
         var special, i, v, callback
         if (/^(\w+)!(\S+)$/.test(type)) {
             special = RegExp.$1
@@ -56,11 +56,11 @@ var EventBus = {
         } else {
             var callbacks = events[type] || []
             var all = events.$all || []
-            for (i = 0; callback = callbacks[i++]; ) {
+            for (i = 0; callback = callbacks[i++];) {
                 if (isFunction(callback))
                     callback.apply(this, args)
             }
-            for (i = 0; callback = all[i++]; ) {
+            for (i = 0; callback = all[i++];) {
                 if (isFunction(callback))
                     callback.apply(this, arguments)
             }
