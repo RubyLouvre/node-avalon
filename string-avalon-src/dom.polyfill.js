@@ -100,3 +100,6 @@ var DOM = {
         return elem
     }
 }
+avalon.parseHTML = function(html){
+   return parser.parseFragment(html)
+}

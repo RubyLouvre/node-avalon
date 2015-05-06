@@ -9,8 +9,24 @@ var vm = avalon.define({
     aaa: "司徒正美",
     bbb:"风之大陆"
 })
-
-var dom = parser.parse('<!DOCTYPE html><html ms-controller="test"><head></head><body><div>{{aaa}}|{{aaa}}</div><div ms-text="bbb"></div></body></html>')
+function heredoc(fn) {
+    return fn.toString().replace(/^[^\/]+\/\*!?\s?/, '').replace(/\*\/[^\/]+$/, '')
+}
+var text = heredoc(function(){
+    /*
+<!DOCTYPE html>
+<html ms-controller="test">
+    <head>
+        <title>测试text绑定的后端渲染</title>
+    </head>
+    <body>
+        <div>{{aaa}}|{{aaa}}</div>
+        <div ms-text="bbb"></div>
+    </body>
+</html>
+     */
+})
+var dom = parser.parse(text)
 avalon.scan(dom, vm)
 
 var str = serializer.serialize(dom);
