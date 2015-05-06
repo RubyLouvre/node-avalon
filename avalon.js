@@ -5,7 +5,7 @@
  http://weibo.com/jslouvre/
  
  Released under the MIT license
- avalon.js 1.43 built in 2015.5.6
+ avalon.js 1.43 built in 2015.5.7
  用于后端渲染
  */
 (function(){
@@ -505,14 +505,22 @@ var DOM = {
             }
         ]
     },
-    innerHTML: function (elem, html) {
+    innerHTML: function (parent, html) {
         var fragment = parser.parseFragment(html)
         var nodes = fragment.childNodes
         for (var i = 0, node; node = nodes[i++]; ) {
-            node.nodeType = DOM.nodeType(elem)
-            node.parentNode = elem
+            node.nodeType = DOM.nodeType(node)
+            node.parentNode = parent
         }
-        elem.childNodes = nodes
+        parent.childNodes = nodes
+    },
+    appendChild: function(parent, html){
+        var nodes = [].concat(html)
+        for (var i = 0, node; node = nodes[i++]; ) {
+            node.parentNode = parent
+            node.nodeType = DOM.nodeType(node)
+            parent.childNodes.push(node)
+        }
     },
     replaceChild: function (newNode, oldNode) {
         var parent = oldNode.parentNode
@@ -556,7 +564,7 @@ avalon.innerHTML = function (parent, html) {
         DOM.innerHTML(parent, html)
 }
 avalon.clearHTML = function (parent) {
-    parent.childNodes = []
+    parent.childNodes.length = 0
 }
 /*********************************************************************
  *                        avalon的原型方法定义区                        *
@@ -1763,37 +1771,40 @@ bindingExecutors.html = function (val, elem, data) {
     var parent = isHtmlFilter ? elem.parentNode : elem
     if (!parent)
         return
-    if (DOM.nodeType(val) === 11) { //将val转换为文档碎片
-        var fragment = val.childNodes
-    } else if (DOM.nodeType(val) === 1) {
-        fragment = val.childNodes
-    } else {
-        fragment = avalon.parseHTML(val).childNodes
-    }
-    //插入占位符, 如果是过滤器,需要有节制地移除指定的数量,如果是html指令,直接清空
-    var comment = DOM.createComment("ms-html")
-    if (isHtmlFilter) {
-        var children = parent.childNodes
-        var index = children.indexOf(elem)
-        children.splice(index, data.group, comment)
-        comment.parentNode = parent
-        data.element = comment //防止被CG
-    } else {
-        comment.parentNode = parent
-        parent.childNodes = [comment]
-    }
-    if (isHtmlFilter) {
-        data.group = fragment.length || 1
-    }
-    nodes = avalon.slice(fragment)
-    if (nodes[0]) {
-        if (comment.parentNode)
-            DOM.replaceChild(fragment, comment)
-        if (isHtmlFilter) {
-            data.element = nodes[0]
+    if (typeof val === "string") {
+        var fragment = avalon.parseHTML(val).childNodes
+    } else if (val) {
+        if (DOM.nodeType(val) === 11) { //将val转换为文档碎片
+            fragment = val.childNodes
+        } else if (DOM.nodeType(val) === 1) {
+            fragment = val.childNodes
+        } else {
+            fragment = []
         }
     }
-    scanNodeArray(nodes, data.vmodels)
+
+    if (!fragment.length) {
+        fragment.push(DOM.createComment("ms-html"))
+    }
+    var args = fragment.map(function (el) {
+        el.parentNode = parent
+        return el
+    })
+    var children = parent.childNodes
+    //插入占位符, 如果是过滤器,需要有节制地移除指定的数量,如果是html指令,直接清空
+    if (isHtmlFilter) {
+        var newGroup = fragment.length
+        var newElement = fragment[0]
+        var index = children.indexOf(elem)
+        args.unshift(index, data.group)
+        Array.prototype.splice.apply(children, args)
+        data.group = newGroup
+        data.element = newElement
+    } else {
+        args.unshift(index, children.length)
+        Array.prototype.splice.apply(children, args)
+    }
+    scanNodeArray(fragment, data.vmodels)
 }
 
 })()

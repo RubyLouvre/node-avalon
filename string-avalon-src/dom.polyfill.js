@@ -65,14 +65,22 @@ var DOM = {
             }
         ]
     },
-    innerHTML: function (elem, html) {
+    innerHTML: function (parent, html) {
         var fragment = parser.parseFragment(html)
         var nodes = fragment.childNodes
         for (var i = 0, node; node = nodes[i++]; ) {
-            node.nodeType = DOM.nodeType(elem)
-            node.parentNode = elem
+            node.nodeType = DOM.nodeType(node)
+            node.parentNode = parent
         }
-        elem.childNodes = nodes
+        parent.childNodes = nodes
+    },
+    appendChild: function(parent, html){
+        var nodes = [].concat(html)
+        for (var i = 0, node; node = nodes[i++]; ) {
+            node.parentNode = parent
+            node.nodeType = DOM.nodeType(node)
+            parent.childNodes.push(node)
+        }
     },
     replaceChild: function (newNode, oldNode) {
         var parent = oldNode.parentNode
@@ -116,5 +124,5 @@ avalon.innerHTML = function (parent, html) {
         DOM.innerHTML(parent, html)
 }
 avalon.clearHTML = function (parent) {
-    parent.childNodes = []
+    parent.childNodes.length = 0
 }
