@@ -98,8 +98,23 @@ var DOM = {
         if (~index)
             children.splice(index, 1)
         return elem
+    },
+    createComment: function(data){
+        return {
+            parentNode: null,
+            nodeType: 8,
+            nodeName: "#comment",
+            data: data
+        }
     }
 }
-avalon.parseHTML = function(html){
-   return parser.parseFragment(html)
+avalon.parseHTML = function (html) {
+    return parser.parseFragment(html)
+}
+avalon.innerHTML = function (parent, html) {
+    if (parent.tagName)
+        DOM.innerHTML(parent, html)
+}
+avalon.clearHTML = function (parent) {
+    parent.childNodes = []
 }
