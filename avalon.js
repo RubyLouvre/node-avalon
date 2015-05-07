@@ -923,7 +923,7 @@ function scanTag(elem, vmodels) {
     }
 }
 function scanNodeArray(nodes, vmodels) {
-    for (var i = 0, node; node = nodes[i++];) {
+    for (var i = 0, node; node = nodes[i++]; ) {
         scanNode(node, vmodels)
     }
 }
@@ -935,8 +935,10 @@ function scanNode(node, vmodels) {
             scanText(node, vmodels)
             break
         case 8: //如果是注释节点
-            node.nodeType = 8
-            scanText(node, vmodels)
+            if (kernel.commentInterpolate) {
+                node.nodeType = 8
+                scanText(node, vmodels)
+            }
             break
         case 1: //如果是元素节点
             node.nodeType = 1

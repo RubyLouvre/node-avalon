@@ -27,7 +27,7 @@ var text = heredoc(function(){
         <p><a ms-src="{{aaa}}ss/{{bbb}}.html">link</a></p>
         <select><option ms-selected="ccc">aaa</option></select>
         |<div ms-include=aaa></div>|
-        <div ms-include=bbb data-include-replace='true'>222</div>111
+        <div ms-include=bbb data-include-replace='true'>222</div>
     </body>
 </html>
      */
