@@ -26,21 +26,22 @@ bindingHandlers.attr = function (data, vmodels) {
         data.includeRendered = getBindingCallback(elem, "data-include-rendered", vmodels)
         data.includeLoaded = getBindingCallback(elem, "data-include-loaded", vmodels)
         var outer = data.includeReplace = !!avalon(elem).data("includeReplace")
-
         if (avalon(elem).data("includeCache")) {
             data.templateCache = {}
         }
         data.startInclude = DOM.createComment("ms-include")
         data.endInclude = DOM.createComment("ms-include-end")
-        data.startInclude.parentNodde = elem.parentNode
-        data.endInclude.parentNodde = elem.parentNode
-        var children = elem.childNodes
-        var index = children.indexOf(elem)
+        DOM.removeAttribute(elem, data.name)
         if (outer) {
+            var parent = elem.parentNode
+            data.startInclude.parentNode = data.endInclude.parentNode = parent
+            var children = parent.childNodes
+            var index = children.indexOf(elem)
             data.element = data.startInclude
-            children.splice(index - 1, 0, data.startInclude)
-            children.splice(index + 1, 0, data.nextSibling)
+            children.splice(index, 1, data.startInclude, elem, data.endInclude)
         } else {
+            data.startInclude.parentNode = data.endInclude.parentNode = elem
+            var children = elem.childNodes
             children.unshift(data.startInclude)
             children.push(data.endInclude)
         }
@@ -68,6 +69,7 @@ bindingExecutors.attr = function (val, elem, data) {
         }
         DOM.setAttribute(elem, attrName, val)
     } else if (method === "include" && val) {
+        return
         var vmodels = data.vmodels
         var rendered = data.includeRendered
         var loaded = data.includeLoaded

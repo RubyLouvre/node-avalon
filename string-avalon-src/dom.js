@@ -67,7 +67,7 @@ avalon.fn.mix({
                 return parseData(val)
             case 0:
                 var ret = {}
-                ap.forEach.call(this[0].attributes, function (attr) {
+               this[0].attrs.forEach(function (attr) {
                     if (attr) {
                         name = attr.name
                         if (!name.indexOf("data-")) {
