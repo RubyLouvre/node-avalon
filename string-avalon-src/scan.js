@@ -39,3 +39,14 @@ var obsoleteAttrs = oneObject("value,title,alt,checked,selected,disabled,readonl
     function bindingSorter(a, b) {
         return a.priority - b.priority
     }
+    
+var getBindingCallback = function(elem, name, vmodels) {
+    var callback = DOM.getAttribute(elem,name)
+    if (callback) {
+        for (var i = 0, vm; vm = vmodels[i++]; ) {
+            if (vm.hasOwnProperty(callback) && typeof vm[callback] === "function") {
+                return vm[callback]
+            }
+        }
+    }
+}
