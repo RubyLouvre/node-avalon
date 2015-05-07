@@ -13,25 +13,27 @@
 var parse5 = require('parse5')
 var parser = new parse5.Parser()
 var expose = Date.now()
-function log() {
-    if (avalon.config.debug) {
-// http://stackoverflow.com/questions/8785624/how-to-safely-wrap-console-log
-        console.log.apply(console, arguments)
+
+    function log() {
+        if (avalon.config.debug) {
+            // http://stackoverflow.com/questions/8785624/how-to-safely-wrap-console-log
+            console.log.apply(console, arguments)
+        }
     }
-}
-/**
- * Creates a new object without a prototype. This object is useful for lookup without having to
- * guard against prototypically inherited properties via hasOwnProperty.
- *
- * Related micro-benchmarks:
- * - http://jsperf.com/object-create2
- * - http://jsperf.com/proto-map-lookup/2
- * - http://jsperf.com/for-in-vs-object-keys2
- */
+    /**
+     * Creates a new object without a prototype. This object is useful for lookup without having to
+     * guard against prototypically inherited properties via hasOwnProperty.
+     *
+     * Related micro-benchmarks:
+     * - http://jsperf.com/object-create2
+     * - http://jsperf.com/proto-map-lookup/2
+     * - http://jsperf.com/for-in-vs-object-keys2
+     */
 var window = {}
-function createMap() {
-    return Object.create(null)
-}
+
+    function createMap() {
+        return Object.create(null)
+    }
 
 var subscribers = "$" + expose
 var otherRequire = window.require
@@ -51,41 +53,39 @@ var Registry = {} //将函数曝光到此对象上，方便访问器收集依赖
 var W3C = true
 
 var class2type = {}
-"Boolean Number String Function Array Date RegExp Object Error".replace(rword, function (name) {
+"Boolean Number String Function Array Date RegExp Object Error".replace(rword, function(name) {
     class2type["[object " + name + "]"] = name.toLowerCase()
 })
 
-function noop() {
-}
+    function noop() {}
 
-function oneObject(array, val) {
-    if (typeof array === "string") {
-        array = array.match(rword) || []
-    }
-    var result = {},
+    function oneObject(array, val) {
+        if (typeof array === "string") {
+            array = array.match(rword) || []
+        }
+        var result = {},
             value = val !== void 0 ? val : 1
-    for (var i = 0, n = array.length; i < n; i++) {
-        result[array[i]] = value
+        for (var i = 0, n = array.length; i < n; i++) {
+            result[array[i]] = value
+        }
+        return result
     }
-    return result
-}
 
-//生成UUID http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript
-var generateID = function (prefix) {
+    //生成UUID http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript
+var generateID = function(prefix) {
     prefix = prefix || "avalon"
     return (prefix + Math.random() + Math.random()).replace(/0\./g, "")
 }
 
-var avalon = function (el) { //创建jQuery式的无new 实例化结构
+var avalon = function(el) { //创建jQuery式的无new 实例化结构
     return new avalon.init(el)
 }
 module.exports = avalon
 
 /*视浏览器情况采用最快的异步回调*/
-avalon.nextTick = function (fn) {
+avalon.nextTick = function(fn) {
     process.nextTick(fn)
-}// jsh
-
+} // jsh
 
 // https://github.com/rsms/js-lru
 var Cache = new function() {// jshint ignore:line
@@ -815,24 +815,25 @@ var valHooks = {
 /*********************************************************************
  *                           扫描系统                                 *
  **********************************************************************/
-avalon.scan = function (elem, vmodel) {
+avalon.scan = function(elem, vmodel) {
     var vmodels = vmodel ? [].concat(vmodel) : []
     scanTag(elem, vmodels)
 }
 //http://www.w3.org/TR/html5/syntax.html#void-elements
 var stopScan = oneObject("area,base,basefont,br,col,command,embed,hr,img,input,link,meta,param,source,track,wbr,noscript,script,style,textarea")
-function executeBindings(bindings, vmodels) {
-    for (var i = 0, data; data = bindings[i++]; ) {
-        data.vmodels = vmodels
-        bindingHandlers[data.type](data, vmodels)
-        if (data.evaluator && data.element && data.element.tagName) { //移除数据绑定，防止被二次解析
-            //chrome使用removeAttributeNode移除不存在的特性节点时会报错 https://github.com/RubyLouvre/avalon/issues/99
-            DOM.removeAttribute(data.element, data.name)
-           // data.element.removeAttribute(data.name)
+
+    function executeBindings(bindings, vmodels) {
+        for (var i = 0, data; data = bindings[i++];) {
+            data.vmodels = vmodels
+            bindingHandlers[data.type](data, vmodels)
+            if (data.evaluator && data.element && data.element.tagName) { //移除数据绑定，防止被二次解析
+                //chrome使用removeAttributeNode移除不存在的特性节点时会报错 https://github.com/RubyLouvre/avalon/issues/99
+                DOM.removeAttribute(data.element, data.name)
+                // data.element.removeAttribute(data.name)
+            }
         }
+        bindings.length = 0
     }
-    bindings.length = 0
-}
 
 var rmsAttr = /ms-(\w+)-?(.*)/
 var priorityMap = {
@@ -848,9 +849,10 @@ var priorityMap = {
 
 var events = oneObject("animationend,blur,change,input,click,dblclick,focus,keydown,keypress,keyup,mousedown,mouseenter,mouseleave,mousemove,mouseout,mouseover,mouseup,scan,scroll,submit")
 var obsoleteAttrs = oneObject("value,title,alt,checked,selected,disabled,readonly,enabled")
-function bindingSorter(a, b) {
-    return a.priority - b.priority
-}
+
+    function bindingSorter(a, b) {
+        return a.priority - b.priority
+    }
 function scanTag(elem, vmodels) {
     if (elem.tagName) {
         elem.nodeType = 1
@@ -859,12 +861,18 @@ function scanTag(elem, vmodels) {
         if (!DOM.getAttribute(elem, "ms-skip-ctrl")) {
             var ctrl = DOM.getAttribute(elem, "ms-important")
             if (ctrl) {
-                elem.attrs.push({name: "ms-skip-ctrl", value: "true"})
+                elem.attrs.push({
+                    name: "ms-skip-ctrl",
+                    value: "true"
+                })
                 var isImporant = true
             } else {
                 ctrl = DOM.getAttribute(elem, "ms-controller")
                 if (ctrl) {
-                    elem.attrs.push({name: "ms-skip-ctrl", value: "true"})
+                    elem.attrs.push({
+                        name: "ms-skip-ctrl",
+                        value: "true"
+                    })
                 }
             }
             if (ctrl) {
@@ -876,28 +884,29 @@ function scanTag(elem, vmodels) {
             }
         }
         scanAttr(elem, vmodels)
-    } else if (elem.nodeName === "#document") {//如果是文档
+    } else if (elem.nodeName === "#document") { //如果是文档
         scanNodeArray(elem.childNodes, vmodels)
-    } else if (elem.nodeName === "#document-fragment") {//如果是文档文型
+    } else if (elem.nodeName === "#document-fragment") { //如果是文档文型
         scanNodeArray(elem.childNodes, vmodels)
     }
 }
 function scanNodeArray(nodes, vmodels) {
-    for (var i = 0, node; node = nodes[i++]; ) {
+    for (var i = 0, node; node = nodes[i++];) {
         scanNode(node, vmodels)
     }
 }
+
 function scanNode(node, vmodels) {
     switch (DOM.nodeType(node)) {
         case 3: //如果是文本节点
             node.nodeType = 3
             scanText(node, vmodels)
             break
-        case 8://如果是注释节点
+        case 8: //如果是注释节点
             node.nodeType = 8
             scanText(node, vmodels)
             break
-        case 1://如果是元素节点
+        case 1: //如果是元素节点
             node.nodeType = 1
             scanTag(node, vmodels)
             break
@@ -1309,7 +1318,7 @@ avalon.parseExprProxy = parseExprProxy
  *                            事件总线                               *
  **********************************************************************/
 var EventBus = {
-    $watch: function (type, callback) {
+    $watch: function(type, callback) {
         if (typeof callback === "function") {
             var callbacks = this.$events[type]
             if (callbacks) {
@@ -1322,7 +1331,7 @@ var EventBus = {
         }
         return this
     },
-    $unwatch: function (type, callback) {
+    $unwatch: function(type, callback) {
         var n = arguments.length
         if (n === 0) { //让此VM的所有$watch回调无效化
             this.$watch.backup = this.$events
@@ -1340,7 +1349,7 @@ var EventBus = {
         }
         return this
     },
-    $fire: function (type) {
+    $fire: function(type) {
         var special, i, v, callback
         if (/^(\w+)!(\S+)$/.test(type)) {
             special = RegExp.$1
@@ -1363,18 +1372,17 @@ var EventBus = {
         } else {
             var callbacks = events[type] || []
             var all = events.$all || []
-            for (i = 0; callback = callbacks[i++]; ) {
+            for (i = 0; callback = callbacks[i++];) {
                 if (isFunction(callback))
                     callback.apply(this, args)
             }
-            for (i = 0; callback = all[i++]; ) {
+            for (i = 0; callback = all[i++];) {
                 if (isFunction(callback))
                     callback.apply(this, arguments)
             }
         }
     }
 }
-
 /*********************************************************************
  *                           modelFactory                             *
  **********************************************************************/
@@ -1749,62 +1757,98 @@ function notifySubscribers(list) { //通知依赖于这个访问器的订阅者�
     }
 }
 
-
-bindingHandlers.text = function (data, vmodels) {
+bindingHandlers.text = function(data, vmodels) {
+	parseExprProxy(data.value, vmodels, data)
+}
+bindingExecutors.text = function(val, elem) {
+	val = val == null ? "" : val //不在页面上显示undefined null
+	if (elem.nodeName === "#text") { //绑定在文本节点上
+		elem.value = val
+	} else { //绑定在特性节点上
+		DOM.innerText(elem, val)
+	}
+}
+bindingHandlers.html = function(data, vmodels) {
     parseExprProxy(data.value, vmodels, data)
 }
-bindingExecutors.text = function (val, elem) {
-    val = val == null ? "" : val //不在页面上显示undefined null
-    if (elem.nodeName === "#text") { //绑定在文本节点上
-        elem.value = val
-    } else { //绑定在特性节点上
-        DOM.innerText(elem, val)
-    }
-}
-
-bindingHandlers.html = function (data, vmodels) {
-    parseExprProxy(data.value, vmodels, data)
-}
-bindingExecutors.html = function (val, elem, data) {
+bindingExecutors.html = function(val, elem, data) {
     val = val == null ? "" : val
     var isHtmlFilter = "group" in data
     var parent = isHtmlFilter ? elem.parentNode : elem
     if (!parent)
         return
     if (typeof val === "string") {
-        var fragment = avalon.parseHTML(val).childNodes
+        var nodes = avalon.parseHTML(val).childNodes
     } else if (val) {
         if (DOM.nodeType(val) === 11) { //将val转换为文档碎片
-            fragment = val.childNodes
+            nodes = val.childNodes
         } else if (DOM.nodeType(val) === 1) {
-            fragment = val.childNodes
+            nodes = val.childNodes
         } else {
-            fragment = []
+            nodes = []
         }
     }
 
-    if (!fragment.length) {
-        fragment.push(DOM.createComment("ms-html"))
+    if (!nodes.length) {
+        nodes.push(DOM.createComment("ms-html"))
     }
-    var args = fragment.map(function (el) {
-        el.parentNode = parent
-        return el
+    var args = nodes.map(function(node) {
+        node.parentNode = parent
+        return node
     })
     var children = parent.childNodes
     //插入占位符, 如果是过滤器,需要有节制地移除指定的数量,如果是html指令,直接清空
     if (isHtmlFilter) {
-        var newGroup = fragment.length
-        var newElement = fragment[0]
+        data.group = nodes.length
+        data.element = nodes[0]
+
         var index = children.indexOf(elem)
         args.unshift(index, data.group)
         Array.prototype.splice.apply(children, args)
-        data.group = newGroup
-        data.element = newElement
     } else {
         args.unshift(index, children.length)
         Array.prototype.splice.apply(children, args)
     }
-    scanNodeArray(fragment, data.vmodels)
+    scanNodeArray(nodes, data.vmodels)
+}
+//这里提供了所有特殊display的元素 http://www.htmldog.com/reference/cssproperties/display/
+var specialDisplay = {
+    table: "table",
+    td: "table-cell",
+    th: "table-cell",
+    tr: "table-row",
+    li: "list-item",
+    thead: "table-header-group",
+    tfoot: "table-footer-group",
+    tbody: "table-row-group",
+    colgroup: "table-column-group",
+    col: "table-column",
+    caption: "caption"
+}
+var rdisplay = /display\s*\:\s*([\w-]+)\s*;?/
+bindingHandlers.visible = function (data, vmodels) {
+    var elem = data.element
+    //http://stackoverflow.com/questions/8228980/reset-css-display-property-to-default-value
+    var style = DOM.getAttribute(elem, "style")
+    if (style) { //如果用户在元素上设置了display
+        var array = style.match(rdisplay) || []
+        if (array[1]) {
+            data.display = array[1]
+        }
+    }
+    parseExprProxy(data.value, vmodels, data)
 }
 
+bindingExecutors.visible = function (val, elem, data) {
+    var style = DOM.getAttribute(elem, "style")
+    if (val) { //如果要显示,如果在元素设置display:none,那么就去掉
+        if (style && data.display) {
+            var replaced = data.display === "none" ? "" : data.display
+            DOM.setAttribute(elem, "style", style.replace(rdisplay, replaced))
+        }
+    } else {  //如果要隐藏
+        var cssText = !style ? "style:none;" : style.replace(rdisplay, "display:none;")
+        DOM.setAttribute(elem, "style", cssText)
+    }
+}
 })()

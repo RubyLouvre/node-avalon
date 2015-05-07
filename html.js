@@ -21,7 +21,7 @@ var text = heredoc(function(){
         <title>测试text绑定的后端渲染</title>
     </head>
     <body>
-        <div>{{aaa|html}}</div>
+        <div style="font-size:16px">{{aaa|html}}</div>
         <div ms-html="bbb"><b>11</b></div>
     </body>
 </html>
@@ -30,7 +30,6 @@ var text = heredoc(function(){
 var dom = parser.parse(text)
 avalon.scan(dom, vm)
 
+
 var str = serializer.serialize(dom);
 console.log(str)
-
- //
