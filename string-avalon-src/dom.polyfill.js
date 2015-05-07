@@ -65,6 +65,26 @@ var DOM = {
             }
         ]
     },
+    createElement: function (tagName) {
+        return {
+            nodeName: tagName,
+            tagName: tagName,
+            attrs: [],
+            namespaceURI: 'http://www.w3.org/1999/xhtml',
+            nodeType: 1,
+            childNodes: []
+        }
+    },
+    outerHTML: function (elem) {
+        var serializer = new parse5.Serializer();
+        var doc = {
+            nodeName: "#document",
+            quirksNode: false
+        }
+        elem.parentNode = doc
+        doc.childNodes = [elem]
+        return serializer.serialize(doc)
+    },
     innerHTML: function (parent, html) {
         var fragment = parser.parseFragment(html)
         var nodes = fragment.childNodes
@@ -74,7 +94,7 @@ var DOM = {
         }
         parent.childNodes = nodes
     },
-    appendChild: function(parent, html){
+    appendChild: function (parent, html) {
         var nodes = [].concat(html)
         for (var i = 0, node; node = nodes[i++]; ) {
             node.parentNode = parent
@@ -107,7 +127,7 @@ var DOM = {
             children.splice(index, 1)
         return elem
     },
-    createComment: function(data){
+    createComment: function (data) {
         return {
             parentNode: null,
             nodeType: 8,

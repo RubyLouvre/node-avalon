@@ -6,8 +6,8 @@ var serializer = new parse5.Serializer();
 var avalon = require('./avalon')
 var vm = avalon.define({
     $id: "test",
-    aaa: "<p><span>xxx</span></p><br/>",
-    bbb: "<p><span>bbb</span></p>ccc<br/>"
+    aaa: true,
+    bbb: false
     })
     
 function heredoc(fn) {
@@ -18,11 +18,11 @@ var text = heredoc(function(){
 <!DOCTYPE html>
 <html ms-controller="test">
     <head>
-        <title>测试html绑定的后端渲染</title>
+        <title>测试if绑定的后端渲染</title>
     </head>
     <body>
-        <div style="font-size:16px">{{aaa|html}}</div>
-        <div ms-html="bbb"><b>11</b></div>
+        <div ms-if="aaa"></div>
+        <div ms-if="bbb"></div>
     </body>
 </html>
      */
