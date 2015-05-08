@@ -1,4 +1,4 @@
-bindingHandlers["if"] = function (data, vmodels) {
+bindingHandlers["data"] = bindingHandlers["if"] = function (data, vmodels) {
     parseExprProxy(data.value, vmodels, data)
 }
 
