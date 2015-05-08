@@ -42,7 +42,7 @@ gulp.task('combo', function () {
             "modelFactory",
             "dispatcher"
         ]
-        var directives = ["text","html","visible", "if", "attr", "data"]
+        var directives = ["text","html","visible", "if", "attr", "data", "duplex"]
         directives = directives.map(function(el){
            return "directive/"+ el
         })

@@ -46,10 +46,17 @@ var DOM = {
         })
         return elem
     },
-    removeAttribute: function (elem, key) {
+    setBoolAttribute: function (elem, name, value) {
+        if (value) {
+            DOM.setAttribute(elem, name, name)
+        } else {
+            DOM.removeAttribute(elem, name)
+        }
+    },
+    removeAttribute: function (elem, name) {
         var attrs = elem.attrs || []
         for (var i = attrs.length, attr; attr = attrs[--i]; ) {
-            if (attr.name === key) {
+            if (attr.name === name) {
                 attrs.splice(i, 1)
                 break
             }
