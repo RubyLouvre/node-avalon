@@ -3,6 +3,7 @@ function scanNodeArray(nodes, vmodels) {
         scanNode(node, vmodels)
     }
 }
+var scriptTypes = oneObject(["", "text/javascript", "text/ecmascript", "application/ecmascript", "application/javascript"])
 
 function scanNode(node, vmodels) {
     switch (DOM.nodeType(node)) {
@@ -18,6 +19,21 @@ function scanNode(node, vmodels) {
             break
         case 1: //如果是元素节点
             node.nodeType = 1
+            var id = DOM.getAttribute(node, "id")
+            if (id) {
+                switch (node.nodeName) {
+                    case "script":
+                        var type = DOM.getAttribute(node, "type")
+                        if (type && !scriptTypes[type]) {
+                            DOM.ids[id] = node.childNodes[0].value
+                        }
+                        break
+                    case "textarea":
+                    case "noscript":
+                        DOM.ids[id] = node.childNodes[0].value
+                        break
+                }
+            }
             scanTag(node, vmodels)
             break
     }

@@ -1,4 +1,5 @@
 var DOM = {
+    ids: {},
     getAttribute: function (elem, name) {
         var attrs = elem.attrs || []
         for (var i = 0, attr; attr = attrs[i++]; ) {

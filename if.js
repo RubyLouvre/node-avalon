@@ -21,6 +21,7 @@ var text = heredoc(function(){
         <title>测试if绑定的后端渲染</title>
     </head>
     <body>
+       <textarea>xxxx<b>xx</b>x</textarea>
         <div ms-if="aaa"></div>
         <div ms-if="bbb"></div>
     </body>
@@ -28,6 +29,7 @@ var text = heredoc(function(){
      */
 })
 var dom = parser.parse(text)
+console.log(dom.childNodes[1].childNodes[2].childNodes[0])
 avalon.scan(dom, vm)
 
 
