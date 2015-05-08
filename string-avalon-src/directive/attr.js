@@ -101,9 +101,9 @@ bindingExecutors.attr = function (val, elem, data) {
             if (typeof cacheTmpls[val] === "string") {
                 scanTemplate(cacheTmpls[val])
             } else {
-                var text = path.resolve(__dirname, val)
-                cacheTmpls[val] = text
-                scanTemplate(text)
+                var filePath = path.resolve(process.cwd(), val)
+                var text = require("fs").readFileSync(filePath, "utf8")
+                scanTemplate(cacheTmpls[val] = text)
             }
         } else {
             //现在只在scanNode中收集拥有id的script, textarea, noscript标签的innerText
