@@ -5,7 +5,7 @@
  http://weibo.com/jslouvre/
  
  Released under the MIT license
- avalon.js 1.43 built in 2015.5.7
+ avalon.js 1.43 built in 2015.5.8
  用于后端渲染
  */
 (function(){
@@ -439,6 +439,7 @@ function isArrayLike(obj) {
     return false
 }
 var DOM = {
+    ids: {},
     getAttribute: function (elem, name) {
         var attrs = elem.attrs || []
         for (var i = 0, attr; attr = attrs[i++]; ) {
@@ -927,6 +928,7 @@ function scanNodeArray(nodes, vmodels) {
         scanNode(node, vmodels)
     }
 }
+var scriptTypes = oneObject(["", "text/javascript", "text/ecmascript", "application/ecmascript", "application/javascript"])
 
 function scanNode(node, vmodels) {
     switch (DOM.nodeType(node)) {
@@ -942,6 +944,21 @@ function scanNode(node, vmodels) {
             break
         case 1: //如果是元素节点
             node.nodeType = 1
+            var id = DOM.getAttribute(node, "id")
+            if (id) {
+                switch (node.nodeName) {
+                    case "script":
+                        var type = DOM.getAttribute(node, "type")
+                        if (type && !scriptTypes[type]) {
+                            DOM.ids[id] = node.childNodes[0].value
+                        }
+                        break
+                    case "textarea":
+                    case "noscript":
+                        DOM.ids[id] = node.childNodes[0].value
+                        break
+                }
+            }
             scanTag(node, vmodels)
             break
     }
@@ -1990,7 +2007,6 @@ bindingExecutors.attr = function (val, elem, data) {
         }
         DOM.setAttribute(elem, attrName, val)
     } else if (method === "include" && val) {
-        return
         var vmodels = data.vmodels
         var rendered = data.includeRendered
         var loaded = data.includeLoaded
@@ -2005,27 +2021,17 @@ bindingExecutors.attr = function (val, elem, data) {
             if (rendered) {
                 console.log("不支持data-include-rendered")
             }
-            var lastID = data.includeLastID
-            if (data.templateCache && lastID && lastID !== val) {
-                var lastTemplate = data.templateCache[lastID]
-                if (!lastTemplate) {
-                    lastTemplate = data.templateCache[lastID] = DOC.createElement("div")
-                    ifGroup.appendChild(lastTemplate)
-                }
-            }
-            while (true) {
-                var node = data.startInclude.nextSibling
-                if (node && node !== data.endInclude) {
-                    target.removeChild(node)
-                    if (lastTemplate)
-                        lastTemplate.appendChild(node)
-                } else {
-                    break
-                }
-            }
-            var dom = getTemplateNodes(data, val, text)
-            var nodes = avalon.slice(dom.childNodes)
-            target.insertBefore(dom, data.endInclude)
+            var parent = data.startInclude.parentNode
+            var children = parent.childNodes
+            var startIndex = children.indexOf(data.startInclude)+ 1
+            var endIndex = children.indexOf(data.endInclude)
+            children.splice(startIndex , endIndex - startIndex)
+            var nodes = avalon.parseHTML(text).childNodes
+            nodes.forEach(function (el) {
+                el.parentNode = parent
+            })
+            var args = [startIndex, 0].concat(nodes)
+            Array.prototype.splice.apply(children, args)
             scanNodeArray(nodes, vmodels)
         }
         var path = require("path")
@@ -2038,29 +2044,12 @@ bindingExecutors.attr = function (val, elem, data) {
                 scanTemplate(text)
             }
         } else {
-            //IE系列与够新的标准浏览器支持通过ID取得元素（firefox14+）
-            //http://tjvantoll.com/2012/07/19/dom-element-references-as-global-variables/
-            var el = val && val.nodeType == 1 ? val : DOC.getElementById(val)
-            avalon.nextTick(function () {
-                scanTemplate(el.value || el.innerText || el.innerHTML)
-            })
+            //现在只在scanNode中收集拥有id的script, textarea, noscript标签的innerText
+            scanTemplate(DOM.ids[val])
         }
     } else {
         DOM.setAttribute(elem, method, val) //ms-href, ms-src
     }
-}
-
-function getTemplateNodes(data, id, text) {
-    var div = data.templateCache && data.templateCache[id]
-    if (div) {
-        var dom = DOC.createDocumentFragment(),
-                firstChild
-        while (firstChild = div.firstChild) {
-            dom.appendChild(firstChild)
-        }
-        return dom
-    }
-    return avalon.parseHTML(text)
 }
 
 //这几个指令都可以使用插值表达式，如ms-src="aaa/{{b}}/{{c}}.html"ms-src

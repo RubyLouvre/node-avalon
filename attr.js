@@ -22,19 +22,20 @@ var text = heredoc(function(){
         <title>测试attr绑定的后端渲染</title>
     </head>
     <body>
+        <script id='tmpl' type="avalon"><strong>这是模板</strong></script>
         <div ms-attr-title='aaa'></div>
         <input ms-value="bbb"/>
         <p><a ms-src="{{aaa}}ss/{{bbb}}.html">link</a></p>
         <select><option ms-selected="ccc">aaa</option></select>
-        |<div ms-include=aaa></div>|
-        <div ms-include=bbb data-include-replace='true'>222</div>
+        |<div ms-include="'tmpl'"></div>|
+       
     </body>
 </html>
      */
 })
 var dom = parser.parse(text)
 avalon.scan(dom, vm)
-
+// <div ms-include=bbb data-include-replace='true'>222</div>
 
 var str = serializer.serialize(dom);
 console.log(str)

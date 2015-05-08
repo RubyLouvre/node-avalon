@@ -21,7 +21,6 @@ var text = heredoc(function(){
         <title>测试if绑定的后端渲染</title>
     </head>
     <body>
-       <textarea>xxxx<b>xx</b>x</textarea>
         <div ms-if="aaa"></div>
         <div ms-if="bbb"></div>
     </body>

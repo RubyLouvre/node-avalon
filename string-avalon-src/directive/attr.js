@@ -69,7 +69,6 @@ bindingExecutors.attr = function (val, elem, data) {
         }
         DOM.setAttribute(elem, attrName, val)
     } else if (method === "include" && val) {
-        return
         var vmodels = data.vmodels
         var rendered = data.includeRendered
         var loaded = data.includeLoaded
@@ -84,12 +83,12 @@ bindingExecutors.attr = function (val, elem, data) {
             if (rendered) {
                 console.log("不支持data-include-rendered")
             }
-            var parent = data.startInclude
+            var parent = data.startInclude.parentNode
             var children = parent.childNodes
-            var startIndex = children.indexOf(data.startInclude)
+            var startIndex = children.indexOf(data.startInclude)+ 1
             var endIndex = children.indexOf(data.endInclude)
-            children.splice(startIndex, endIndex - startIndex)
-            var nodes = avalon.parseHTML(val).childNodes
+            children.splice(startIndex , endIndex - startIndex)
+            var nodes = avalon.parseHTML(text).childNodes
             nodes.forEach(function (el) {
                 el.parentNode = parent
             })
