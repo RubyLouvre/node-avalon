@@ -3,7 +3,7 @@ var parser = new parse5.Parser();
 var serializer = new parse5.Serializer();
 //https://github.com/exolution/xCube/blob/master/XParser.js
 
-var avalon = require('./avalon')
+var avalon = require('../avalon')
 var vm = avalon.define({
     $id: "test",
     aaa: true,
