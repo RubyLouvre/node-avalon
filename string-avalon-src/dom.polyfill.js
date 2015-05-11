@@ -83,12 +83,16 @@ var DOM = {
         }
     },
     outerHTML: function (elem) {
-        var serializer = new parse5.Serializer();
+        var serializer = new parse5.Serializer()
+        var clone = {}
+        for (var i in elem) {
+            clone[i] = elem[i]
+        }
         var doc = {
             nodeName: "#document",
             quirksNode: false
         }
-        elem.parentNode = doc
+        clone.parentNode = doc
         doc.childNodes = [elem]
         return serializer.serialize(doc)
     },
@@ -126,8 +130,8 @@ var DOM = {
     },
     replaceChild: function (newNode, oldNode) {
         var parent = oldNode.parentNode
-        var childNodes = parent.childNodes
-        var index = childNodes.indexOf(oldNode)
+        var children = parent.childNodes
+        var index = children.indexOf(oldNode)
         if (!~index)
             return
         if (Array.isArray(newNode)) {
@@ -136,10 +140,13 @@ var DOM = {
                 el.parentNode = parent
                 args.push(el)
             }
-            Array.prototype.splice.apply(childNodes, args)
+            Array.prototype.splice.apply(children, args)
         } else {
+            console.log("++++", index)
             newNode.parentNode = parent
-            Array.prototype.splice.apply(childNodes, [index, 1, newNode])
+            var a = Array.prototype.splice.apply(children, [index, 1, newNode])
+            console.log(children)
+            console.log(a)
         }
     },
     removeChild: function (elem) {
