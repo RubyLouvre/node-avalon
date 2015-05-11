@@ -82,6 +82,38 @@ var DOM = {
             childNodes: []
         }
     },
+    cloneNode: function (elem, deep) {
+        var ret = {
+            parentNode: null
+        }
+        if (deep) {
+            for (var i in elem) {
+                if (i === "parentNode") {
+                    ret[i] = elem[i]
+                } else if (i === "childNodes") {
+                    var newChildren = []
+                    var children = elem.childNodes
+                    for (var j = 0, el; el = children[j++]; ) {
+                        el = DOM.cloneNode(el, true)
+                        el.parentNode = ret
+                        newChildren.push(el)
+                    }
+                    ret.childNodes = newChildren
+                } else {
+                    ret[i] = avalon.mix(true, elem[i])
+                }
+            }
+        } else {
+            for (var i in elem) {
+                if (i === "childNodes") {
+                    ret[i] = []
+                } else {
+                    ret[i] = elem[i]
+                }
+            }
+        }
+        return ret
+    },
     outerHTML: function (elem) {
         var serializer = new parse5.Serializer()
         var clone = {}
