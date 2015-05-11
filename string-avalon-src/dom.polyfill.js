@@ -1,3 +1,4 @@
+var nodeOne = oneObject("value,data,attrs,nodeName,tagName,parentNode,childNodes,quirksMode namespaceURI")
 var DOM = {
     ids: {},
     getAttribute: function (elem, name) {
@@ -88,19 +89,25 @@ var DOM = {
         }
         if (deep) {
             for (var i in elem) {
+                if (!nodeOne[i]){
+                    continue 
+                }
+                  
                 if (i === "parentNode") {
                     ret[i] = elem[i]
                 } else if (i === "childNodes") {
                     var newChildren = []
                     var children = elem.childNodes
                     for (var j = 0, el; el = children[j++]; ) {
-                        el = DOM.cloneNode(el, true)
-                        el.parentNode = ret
-                        newChildren.push(el)
+                      var  ele = DOM.cloneNode(el, true)
+                        ele.parentNode = ret
+                        newChildren.push(ele)
                     }
                     ret.childNodes = newChildren
-                } else {
+                } else if (i === "attrs") {
                     ret[i] = avalon.mix(true, elem[i])
+                } else {
+                    ret[i] = elem[i]
                 }
             }
         } else {
@@ -112,6 +119,7 @@ var DOM = {
                 }
             }
         }
+        console.log(ret)
         return ret
     },
     outerHTML: function (elem) {
@@ -174,11 +182,8 @@ var DOM = {
             }
             Array.prototype.splice.apply(children, args)
         } else {
-            console.log("++++", index)
             newNode.parentNode = parent
-            var a = Array.prototype.splice.apply(children, [index, 1, newNode])
-            console.log(children)
-            console.log(a)
+            Array.prototype.splice.apply(children, [index, 1, newNode])
         }
     },
     removeChild: function (elem) {
