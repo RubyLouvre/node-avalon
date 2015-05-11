@@ -8,7 +8,8 @@ var vm = avalon.define({
         $id: "test",
         a: false,
         d: true,
-        b: ["1","2"]
+        b: ["1","2"],
+        select: 2
     })
     
 function heredoc(fn) {
@@ -22,6 +23,13 @@ var text = heredoc(function(){
         <title>测试attr绑定的后端渲染</title>
     </head>
     <body ms-controller=test>
+        
+        <select ms-duplex="select">
+            <option value="1">value 1</option>
+            <option value="2">value 2</option>
+            <option value="3">value 3</option>
+        </select>
+
         <input type="radio" ms-duplex-checked='a'/>
         <input type="radio" ms-duplex-checked='d' id='d'/>
         <input type="checkbox" ms-duplex-checked='a'/>

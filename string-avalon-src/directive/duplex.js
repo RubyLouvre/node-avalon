@@ -136,4 +136,14 @@ duplexBinding.SELECT = function (elem, evaluator, data) {
     elem.duplexCallback = function () {
         avalon(elem).val(val)
     }
+
+    // option 元素添加 selected 属性
+    elem.childNodes.some(function(item) {
+        if (item.nodeName === 'option') {
+            if (DOM.getAttribute(item, 'value') == val) {
+                DOM.setAttribute(item, 'selected', 'selected')
+                return true
+            }
+        }
+    })
 }
