@@ -33,7 +33,7 @@ var DOM = {
     },
     setAttribute: function (elem, key, value) {
         var attrs = elem.attrs || (elem.attrs = [])
-        for (var i = 0, attr; attr = attrs[i++]; ){
+        for (var i = 0, attr; attr = attrs[i++]; ) {
             if (attr.name === key) {
                 attr.value = value
                 return elem
@@ -47,7 +47,6 @@ var DOM = {
     },
     setBoolAttribute: function (elem, name, value) {
         if (value) {
-            console.log("setBoolAttribute "+name)
             DOM.setAttribute(elem, name, name)
         } else {
             DOM.removeAttribute(elem, name)
@@ -94,13 +93,28 @@ var DOM = {
         return serializer.serialize(doc)
     },
     innerHTML: function (parent, html) {
-        var fragment = parser.parseFragment(html)
-        var nodes = fragment.childNodes
-        for (var i = 0, node; node = nodes[i++]; ) {
-            node.nodeType = DOM.nodeType(node)
-            node.parentNode = parent
+        if (typeof html === "string") {
+            var fragment = parser.parseFragment(html)
+            var nodes = fragment.childNodes
+            for (var i = 0, node; node = nodes[i++]; ) {
+                node.nodeType = DOM.nodeType(node)
+                node.parentNode = parent
+            }
+            parent.childNodes = nodes
+        } else {
+            var elem = {}
+            for (var i in parent) {
+                if (i === "attrs") {
+                    elem[i] = []
+                } else {
+                    elem[i] = parent[i]
+                }
+            }
+            html = DOM.outerHTML(elem)
+            return html.replace("<" + elem.tagName + ">", "")
+                    .replace("<" + elem.tagName + "/>", "")
+                    .replace("<\/" + elem.tagName + ">", "")
         }
-        parent.childNodes = nodes
     },
     appendChild: function (parent, html) {
         var nodes = [].concat(html)
