@@ -21,6 +21,7 @@ var duplexBinding = bindingHandlers.duplex = function (data, vmodels) {
                     log("ms-duplex-radio已经更名为ms-duplex-checked")
                 name = "checked"
                 data.isChecked = true
+                
             }
             if (name === "bool") {
                 name = "boolean"
@@ -102,8 +103,9 @@ duplexBinding.INPUT = function (elem, evaluator, data) {
     var elemValue = DOM.getAttribute(elem, "value")
     if (data.isChecked || $type === "radio") {
         var checked = data.isChecked ? !!val : val + "" === elemValue
-        console.log(val + "  " + data.isChecked + "  " + checked)
+        console.log(val + "  " + data.isChecked + " : " + checked)
         DOM.setBoolAttribute(elem, "checked", checked)
+        console.log(elem)
         DOM.setAttribute(elem, "oldValue", String(checked))
         var needSet = true
     } else if ($type === "checkbox") {

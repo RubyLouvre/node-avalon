@@ -32,16 +32,13 @@ var DOM = {
         return typeof value === "string"
     },
     setAttribute: function (elem, key, value) {
-        console.log(elem)
         var attrs = elem.attrs || (elem.attrs = [])
-        for (var i = 0; i < attrs.length; i++) {
-            var attr = attrs[i]
+        for (var i = 0, attr; attr = attrs[i++]; ){
             if (attr.name === key) {
                 attr.value = value
                 return elem
             }
         }
-        console.log("________________"+ key+" "+value)
         attrs.push({
             name: key,
             value: value

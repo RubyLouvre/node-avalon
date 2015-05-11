@@ -472,16 +472,13 @@ var DOM = {
         return typeof value === "string"
     },
     setAttribute: function (elem, key, value) {
-        console.log(elem)
         var attrs = elem.attrs || (elem.attrs = [])
-        for (var i = 0; i < attrs.length; i++) {
-            var attr = attrs[i]
+        for (var i = 0, attr; attr = attrs[i++]; ){
             if (attr.name === key) {
                 attr.value = value
                 return elem
             }
         }
-        console.log("________________"+ key+" "+value)
         attrs.push({
             name: key,
             value: value
@@ -2420,8 +2417,9 @@ duplexBinding.INPUT = function (elem, evaluator, data) {
     var elemValue = DOM.getAttribute(elem, "value")
     if (data.isChecked || $type === "radio") {
         var checked = data.isChecked ? !!val : val + "" === elemValue
-        console.log(val + "  " + data.isChecked + "  " + checked)
+        console.log(val + "  " + data.isChecked + " : " + checked)
         DOM.setBoolAttribute(elem, "checked", checked)
+        console.log(elem)
         DOM.setAttribute(elem, "oldValue", String(checked))
         var needSet = true
     } else if ($type === "checkbox") {
