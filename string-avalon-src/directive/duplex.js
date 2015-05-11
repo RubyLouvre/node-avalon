@@ -97,10 +97,12 @@ var duplexProxy = {}
 duplexProxy.input = function (val, elem, data) {
     var $type = DOM.getAttribute(elem, "type")
     var elemValue = DOM.getAttribute(elem, "value")
+
     if (data.isChecked || $type === "radio") {
         var checked = data.isChecked ? !!val : val + "" === elemValue
         DOM.setBoolAttribute(elem, "checked", checked)
         DOM.setAttribute(elem, "oldValue", String(checked))
+        var needSet = true
     } else if ($type === "checkbox") {
         var array = [].concat(val) //强制转换为数组
         var checked = array.indexOf(data.pipe(elemValue, data, "get")) > -1
@@ -109,10 +111,22 @@ duplexProxy.input = function (val, elem, data) {
         val = data.pipe(val, data, "set")
         DOM.setAttribute(elem, "value", String(val))
     }
+    if (!needSet)
+        DOM.setAttribute(elem, "oldValue", String(oldValue))
 }
-duplexProxy.input = duplexProxy.textarea
-duplexProxy.select = function (val, elem, data) {
+duplexProxy.textarea = function (val, elem, data) {
+    val = data.pipe(val, data, "set")
+    elem.childNodes.splice(0, 1, {
+        nodeName: "#text",
+        value: val,
+        nodeType: 1,
+        parentNode: elem
+    })
+}
+duplexProxy.select = function (val, elem) {
     val = Array.isArray(val) ? val.map(String) : val + ""
-    avalon(elem).val(val)
     DOM.setAttribute(elem, "oldValue", String(val))
+    elem.duplexCallback = function () {
+        avalon(elem).val(val)
+    }
 }

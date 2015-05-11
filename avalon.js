@@ -5,7 +5,7 @@
  http://weibo.com/jslouvre/
  
  Released under the MIT license
- avalon.js 1.43 built in 2015.5.8
+ avalon.js 1.43 built in 2015.5.11
  用于后端渲染
  */
 (function(){
@@ -951,6 +951,9 @@ function scanNode(node, vmodels) {
             break
         case 1: //如果是元素节点
             node.nodeType = 1
+            if (node.duplexCallback) {
+                node.duplexCallback()
+            }
             var id = DOM.getAttribute(node, "id")
             if (id) {
                 switch (node.nodeName) {
@@ -2172,10 +2175,12 @@ var duplexProxy = {}
 duplexProxy.input = function (val, elem, data) {
     var $type = DOM.getAttribute(elem, "type")
     var elemValue = DOM.getAttribute(elem, "value")
+
     if (data.isChecked || $type === "radio") {
         var checked = data.isChecked ? !!val : val + "" === elemValue
         DOM.setBoolAttribute(elem, "checked", checked)
         DOM.setAttribute(elem, "oldValue", String(checked))
+        var needSet = true
     } else if ($type === "checkbox") {
         var array = [].concat(val) //强制转换为数组
         var checked = array.indexOf(data.pipe(elemValue, data, "get")) > -1
@@ -2184,12 +2189,80 @@ duplexProxy.input = function (val, elem, data) {
         val = data.pipe(val, data, "set")
         DOM.setAttribute(elem, "value", String(val))
     }
+    if (!needSet)
+        DOM.setAttribute(elem, "oldValue", String(oldValue))
 }
-duplexProxy.input = duplexProxy.textarea
-duplexProxy.select = function (val, elem, data) {
+duplexProxy.textarea = function (val, elem, data) {
+    val = data.pipe(val, data, "set")
+    elem.childNodes.splice(0, 1, {
+        nodeName: "#text",
+        value: val,
+        nodeType: 1,
+        parentNode: elem
+    })
+}
+duplexProxy.select = function (val, elem) {
     val = Array.isArray(val) ? val.map(String) : val + ""
-    avalon(elem).val(val)
     DOM.setAttribute(elem, "oldValue", String(val))
+    elem.duplexCallback = function () {
+        avalon(elem).val(val)
+    }
+}
+
+//根据VM的属性值或表达式的值切换类名，ms-class="xxx yyy zzz:flag" 
+//http://www.cnblogs.com/rubylouvre/archive/2012/12/17/2818540.html
+bindingHandlers["class"] = function (data, vmodels) {
+    var oldStyle = data.param,
+            text = data.value,
+            rightExpr
+    data.handlerName = "class"
+    if (!oldStyle || isFinite(oldStyle)) {
+        data.param = "" //去掉数字
+        var noExpr = text.replace(rexprg, function (a) {
+            return a.replace(/./g, "0")
+            //return Math.pow(10, a.length - 1) //将插值表达式插入10的N-1次方来占位
+        })
+        var colonIndex = noExpr.indexOf(":") //取得第一个冒号的位置
+        if (colonIndex === -1) { // 比如 ms-class="aaa bbb ccc" 的情况
+            var className = text
+        } else { // 比如 ms-class-1="ui-state-active:checked" 的情况 
+            className = text.slice(0, colonIndex)
+            rightExpr = text.slice(colonIndex + 1)
+            parseExpr(rightExpr, vmodels, data) //决定是添加还是删除
+            if (!data.evaluator) {
+                log("debug: ms-class '" + (rightExpr || "").trim() + "' 不存在于VM中")
+                return false
+            } else {
+                data._evaluator = data.evaluator
+                data._args = data.args
+            }
+        }
+        var hasExpr = rexpr.test(className) //比如ms-class="width{{w}}"的情况
+        if (!hasExpr) {
+            data.immobileClass = className
+        }
+        parseExprProxy("", vmodels, data, (hasExpr ? scanExpr(className) : 0))
+    } else {
+        data.immobileClass = data.oldStyle = data.param
+        parseExprProxy(text, vmodels, data)
+    }
+}
+
+bindingExecutors["class"] = function (val, elem, data) {
+    var $elem = avalon(elem),
+            method = data.type
+    if (method === "class" && data.oldStyle) { //如果是旧风格
+        $elem.toggleClass(data.oldStyle, !!val)
+    } else {
+        //如果存在冒号就有求值函数
+        data.toggleClass = data._evaluator ? !!data._evaluator.apply(elem, data._args) : true
+        data.newClass = data.immobileClass || val
+        if (data.oldClass && data.newClass !== data.oldClass) {
+            $elem.removeClass(data.oldClass)
+        }
+        data.oldClass = data.newClass
+        $elem.toggleClass(data.newClass, data.toggleClass)
+    }
 }
 
 })()
