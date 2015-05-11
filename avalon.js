@@ -438,6 +438,7 @@ function isArrayLike(obj) {
     }
     return false
 }
+var nodeOne = oneObject("value,data,attrs,nodeName,tagName,parentNode,childNodes,quirksMode namespaceURI")
 var DOM = {
     ids: {},
     getAttribute: function (elem, name) {
@@ -522,6 +523,46 @@ var DOM = {
             childNodes: []
         }
     },
+    cloneNode: function (elem, deep) {
+        var ret = {
+            parentNode: null
+        }
+        if (deep) {
+            for (var i in elem) {
+                if (!nodeOne[i]){
+                    console.log("  continue  "+i)
+                      continue 
+                }
+                  
+                if (i === "parentNode") {
+                    ret[i] = elem[i]
+                } else if (i === "childNodes") {
+                    var newChildren = []
+                    var children = elem.childNodes
+                    for (var j = 0, el; el = children[j++]; ) {
+                      var  ele = DOM.cloneNode(el, true)
+                        ele.parentNode = ret
+                        newChildren.push(ele)
+                    }
+                    ret.childNodes = newChildren
+                } else if (i === "attrs") {
+                    ret[i] = avalon.mix(true, elem[i])
+                } else {
+                    ret[i] = elem[i]
+                }
+            }
+        } else {
+            for (var i in elem) {
+                if (i === "childNodes") {
+                    ret[i] = []
+                } else {
+                    ret[i] = elem[i]
+                }
+            }
+        }
+        console.log(ret)
+        return ret
+    },
     outerHTML: function (elem) {
         var serializer = new parse5.Serializer()
         var clone = {}
@@ -582,11 +623,8 @@ var DOM = {
             }
             Array.prototype.splice.apply(children, args)
         } else {
-            console.log("++++", index)
             newNode.parentNode = parent
-            var a = Array.prototype.splice.apply(children, [index, 1, newNode])
-            console.log(children)
-            console.log(a)
+            Array.prototype.splice.apply(children, [index, 1, newNode])
         }
     },
     removeChild: function (elem) {
@@ -999,9 +1037,8 @@ function scanAttr(elem, vmodels) {
     var bindings = [],
             msData = {},
             match
-    for (var i = attributes.length - 1; i >= 0; i--) {
-        var attr = attributes[i]
-        if (match = attr.name.match(rmsAttr)) {
+    for (var i = attributes.length, attr; attr = attributes[--i]; ) {
+        if (match = (attr.name || "").match(rmsAttr)) {
             //如果是以指定前缀命名的
             var type = match[1]
             var param = match[2] || ""
@@ -1021,7 +1058,7 @@ function scanAttr(elem, vmodels) {
                 param = type
                 type = "attr"
                 name = "ms-attr-" + param
-                attributes.splice(i, 1, {name: name, value: value})
+                attributes.splice(++i, 1, {name: name, value: value})
                 match = [name]
                 msData[name] = value
             }
@@ -1055,6 +1092,7 @@ function scanAttr(elem, vmodels) {
             }
         }
     }
+
     bindings.sort(bindingSorter)
     var scanNode = true
     for (i = 0; binding = bindings[i]; i++) {
@@ -2584,26 +2622,23 @@ bindingHandlers.repeat = function (data, vmodels) {
         children.splice(0, children.length, comment)
     } else {
         data.template = DOM.outerHTML(elem).trim()
-        console.log(elem)
-        console.log("+++++++++++++++++++++")
-        console.log(comment)
-        
         DOM.replaceChild(comment, elem)
     }
     data.template = avalon.parseHTML(data.template)
-//    data.rollback = function () {
-//        var elem = data.element
-//        if (!elem)
-//            return
-//        bindingExecutors.repeat.call(data, "clear")
-//        var parentNode = elem.parentNode
-//        var content = data.template
-//        var target = content.firstChild
-//        parentNode.replaceChild(content, elem)
-//        var start = data.$stamp
-//        start && start.parentNode && start.parentNode.removeChild(start)
-//        target = data.element = data.type === "repeat" ? target : parentNode
-//    }
+
+    data.rollback = function () {
+        var elem = data.element
+        if (!elem)
+            return
+        bindingExecutors.repeat.call(data, "clear")
+        var parentNode = elem.parentNode
+        var content = data.template
+        var target = content.firstChild
+        parentNode.replaceChild(content, elem)
+        var start = data.$stamp
+        start && start.parentNode && start.parentNode.removeChild(start)
+        target = data.element = data.type === "repeat" ? target : parentNode
+    }
     if (freturn) {
         return
     }
@@ -2636,14 +2671,16 @@ bindingHandlers.repeat = function (data, vmodels) {
 }
 
 bindingExecutors.repeat = function (method, pos, el) {
-    
-    return
     if (method) {
         var data = this
         var end = data.element
         var parent = end.parentNode
         var proxies = data.proxies
-        var transation = hyperspace.cloneNode(false)
+        var transation = []
+        //string-avalon特有
+        transation.appendChild = function (el) {
+            Array.prototype.push.apply(transation, el.childNodes)
+        }
         switch (method) {
             case "add": //在pos位置后添加el数组（pos为数字，el为数组）
                 var n = pos + el
@@ -2657,7 +2694,10 @@ bindingExecutors.repeat = function (method, pos, el) {
                     proxies.splice(i, 0, proxy)
                     shimController(data, transation, proxy, fragments)
                 }
-                parent.insertBefore(transation, start)
+                var children = parent.childNodes
+                var startIndex = children.indexOf(start)
+                Array.prototype.splice.apply(children, [startIndex, 0].concat(transation))
+                //  parent.insertBefore(transation, start)
                 for (i = 0; fragment = fragments[i++]; ) {
                     scanNodeArray(fragment.nodes, fragment.vmodels)
                     fragment.nodes = fragment.vmodels = null
@@ -2750,12 +2790,12 @@ bindingExecutors.repeat = function (method, pos, el) {
             method = "del"
         var callback = data.renderedCallback || noop,
                 args = arguments
-        checkScan(parent, function () {
-            callback.apply(parent, args)
-            if (parent.oldValue && parent.tagName === "SELECT") { //fix #503
-                avalon(parent).val(parent.oldValue.split(","))
-            }
-        }, NaN)
+//        checkScan(parent, function () {
+//            callback.apply(parent, args)
+//            if (parent.oldValue && parent.tagName === "SELECT") { //fix #503
+//                avalon(parent).val(parent.oldValue.split(","))
+//            }
+//        }, NaN)
     }
 }
 
@@ -2764,10 +2804,17 @@ bindingExecutors.repeat = function (method, pos, el) {
 })
 
 function shimController(data, transation, proxy, fragments) {
-    var content = data.template.cloneNode(true)
+    console.log("+++++++++++++++++++++++"+DOM.cloneNode)
+    console.log(data.template)
+    
+    var content = DOM.cloneNode(data.template, true)
+    console.log("---------------------")
+    console.log(content)
     var nodes = avalon.slice(content.childNodes)
     if (proxy.$stamp) {
-        content.insertBefore(proxy.$stamp, content.firstChild)
+        content.childNodes.unshift(proxy.$stamp)
+        proxy.$stamp.parentNode = content
+        // content.insertBefore(proxy.$stamp, content.firstChild)
     }
     transation.appendChild(content)
     var nv = [proxy].concat(data.vmodels)
@@ -2857,7 +2904,7 @@ function eachProxyAgent(index, data) {
     proxy.$last = index === last
     proxy.$host = host
     proxy.$outer = data.$outer
-    proxy.$stamp = data.clone.cloneNode(false)
+    proxy.$stamp = DOM.createComment(data.clone.data) //data.clone.cloneNode(false)
     proxy.$remove = function () {
         return host.removeAt(proxy.$index)
     }

@@ -3,9 +3,8 @@ function scanAttr(elem, vmodels) {
     var bindings = [],
             msData = {},
             match
-    for (var i = attributes.length - 1; i >= 0; i--) {
-        var attr = attributes[i]
-        if (match = attr.name.match(rmsAttr)) {
+    for (var i = attributes.length, attr; attr = attributes[--i]; ) {
+        if (match = (attr.name || "").match(rmsAttr)) {
             //如果是以指定前缀命名的
             var type = match[1]
             var param = match[2] || ""
@@ -25,7 +24,7 @@ function scanAttr(elem, vmodels) {
                 param = type
                 type = "attr"
                 name = "ms-attr-" + param
-                attributes.splice(i, 1, {name: name, value: value})
+                attributes.splice(++i, 1, {name: name, value: value})
                 match = [name]
                 msData[name] = value
             }
@@ -59,6 +58,7 @@ function scanAttr(elem, vmodels) {
             }
         }
     }
+
     bindings.sort(bindingSorter)
     var scanNode = true
     for (i = 0; binding = bindings[i]; i++) {
