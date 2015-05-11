@@ -16,7 +16,7 @@ var duplexBinding = bindingHandlers.duplex = function (data, vmodels) {
             elem.msData["ms-duplex"] = data.value
         }
         data.param.replace(/\w+/g, function (name) {
-            if (/^(checkbox|radio)$/.test(elem.type) && /^(radio|checked)$/.test(name)) {
+            if (/^(checkbox|radio)$/.test(DOM.getAttribute(elem, 'type')) && /^(radio|checked)$/.test(name)) {
                 if (name === "radio")
                     log("ms-duplex-radio已经更名为ms-duplex-checked")
                 name = "checked"
