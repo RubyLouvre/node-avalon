@@ -7,6 +7,7 @@ var avalon = require('../avalon')
 var vm = avalon.define({
         $id: "test",
         a: false,
+        d: true,
         b: ["1","2"]
     })
     
@@ -22,12 +23,12 @@ var text = heredoc(function(){
     </head>
     <body ms-controller=test>
         <input type="radio" ms-duplex-checked='a'/>
-        <input type="radio" ms-duplex-checked='!a'/>
+        <input type="radio" ms-duplex-checked='d' id='d'/>
         <input type="checkbox" ms-duplex-checked='a'/>
         <input type="checkbox" ms-duplex-checked='!a'/>
-        <input type="checkbox" ms-duplex-string='b' value=1/>
-        <input type="checkbox" ms-duplex-string='b' value=2/>
-        <input type="checkbox" ms-duplex-string='b' value=3/>
+        <input type="checkbox" ms-duplex-string='b' value="1"/>
+        <input type="checkbox" ms-duplex-string='b' value="2"/>
+        <input type="checkbox" ms-duplex-string='b' value="3"/>
         <input type="text" ms-duplex="c"/>
         <textarea ms-duplex="c"></textarea>
     </body>
@@ -38,3 +39,6 @@ var dom = parser.parse(text)
 avalon.scan(dom, vm)
 var str = serializer.serialize(dom);
 console.log(str)
+/*
+       
+ */

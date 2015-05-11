@@ -32,6 +32,7 @@ var DOM = {
         return typeof value === "string"
     },
     setAttribute: function (elem, key, value) {
+        console.log(elem)
         var attrs = elem.attrs || (elem.attrs = [])
         for (var i = 0; i < attrs.length; i++) {
             var attr = attrs[i]
@@ -40,6 +41,7 @@ var DOM = {
                 return elem
             }
         }
+        console.log("________________"+ key+" "+value)
         attrs.push({
             name: key,
             value: value
@@ -48,6 +50,7 @@ var DOM = {
     },
     setBoolAttribute: function (elem, name, value) {
         if (value) {
+            console.log("setBoolAttribute "+name)
             DOM.setAttribute(elem, name, name)
         } else {
             DOM.removeAttribute(elem, name)

@@ -3,38 +3,44 @@ var duplexBinding = bindingHandlers.duplex = function (data, vmodels) {
     var elem = data.element,
             hasCast
     var params = []
-    var casting = oneObject("string,number,boolean,checked")
-    if (elem.type === "radio" && data.param === "") {
-        data.param = "checked"
-    }
-    if (elem.msData) {
-        elem.msData["ms-duplex"] = data.value
-    }
-    data.param.replace(/\w+/g, function (name) {
-        if (/^(checkbox|radio)$/.test(elem.type) && /^(radio|checked)$/.test(name)) {
-            if (name === "radio")
-                log("ms-duplex-radio已经更名为ms-duplex-checked")
-            name = "checked"
-            data.isChecked = true
+    var tagName = elem.tagName.toUpperCase()
+    parseExprProxy(data.value, vmodels, data, 0, 1)
+
+    data.changed = getBindingCallback(elem, "data-duplex-changed", vmodels) || noop
+    if (data.evaluator && data.args) {
+        var casting = oneObject("string,number,boolean,checked")
+        if (elem.type === "radio" && data.param === "") {
+            data.param = "checked"
         }
-        if (name === "bool") {
-            name = "boolean"
-            log("ms-duplex-bool已经更名为ms-duplex-boolean")
-        } else if (name === "text") {
-            name = "string"
-            log("ms-duplex-text已经更名为ms-duplex-string")
+        if (elem.msData) {
+            elem.msData["ms-duplex"] = data.value
         }
-        if (casting[name]) {
-            hasCast = true
+        data.param.replace(/\w+/g, function (name) {
+            if (/^(checkbox|radio)$/.test(elem.type) && /^(radio|checked)$/.test(name)) {
+                if (name === "radio")
+                    log("ms-duplex-radio已经更名为ms-duplex-checked")
+                name = "checked"
+                data.isChecked = true
+            }
+            if (name === "bool") {
+                name = "boolean"
+                log("ms-duplex-bool已经更名为ms-duplex-boolean")
+            } else if (name === "text") {
+                name = "string"
+                log("ms-duplex-text已经更名为ms-duplex-string")
+            }
+            if (casting[name]) {
+                hasCast = true
+            }
+            avalon.Array.ensure(params, name)
+        })
+        if (!hasCast) {
+            params.push("string")
         }
-        avalon.Array.ensure(params, name)
-    })
-    if (!hasCast) {
-        params.push("string")
+        data.param = params.join("-")
+        data.pipe = pipe
+        duplexBinding[tagName] && duplexBinding[tagName](elem, data.evaluator.apply(null, data.args), data)
     }
-    data.param = params.join("-")
-    data.pipe = pipe
-    parseExprProxy(data.value, vmodels, data)
 }
 //不存在 bindingExecutors.duplex
 function fixNull(val) {
@@ -88,18 +94,15 @@ function pipe(val, data, action, e) {
     return val
 }
 
-bindingExecutors.duplex = function (val, elem, data) {
-    duplexProxy[elem.nodeName.toLowerCase()](val, elem, data)
-}
 
-var duplexProxy = {}
 
-duplexProxy.input = function (val, elem, data) {
+duplexBinding.INPUT = function (elem, evaluator, data) {
+    var val = evaluator()
     var $type = DOM.getAttribute(elem, "type")
     var elemValue = DOM.getAttribute(elem, "value")
-
     if (data.isChecked || $type === "radio") {
         var checked = data.isChecked ? !!val : val + "" === elemValue
+        console.log(val + "  " + data.isChecked + "  " + checked)
         DOM.setBoolAttribute(elem, "checked", checked)
         DOM.setAttribute(elem, "oldValue", String(checked))
         var needSet = true
@@ -111,10 +114,11 @@ duplexProxy.input = function (val, elem, data) {
         val = data.pipe(val, data, "set")
         DOM.setAttribute(elem, "value", String(val))
     }
-    if (!needSet)
-        DOM.setAttribute(elem, "oldValue", String(oldValue))
+    // if (!needSet)
+    //    DOM.setAttribute(elem, "oldValue", String(oldValue))
 }
-duplexProxy.textarea = function (val, elem, data) {
+duplexBinding.TEXTAREA = function (elem, evaluator, data) {
+    var val = evaluator()
     val = data.pipe(val, data, "set")
     elem.childNodes.splice(0, 1, {
         nodeName: "#text",
@@ -123,7 +127,8 @@ duplexProxy.textarea = function (val, elem, data) {
         parentNode: elem
     })
 }
-duplexProxy.select = function (val, elem) {
+duplexBinding.SELECT = function (elem, evaluator, data) {
+    var val = evaluator()
     val = Array.isArray(val) ? val.map(String) : val + ""
     DOM.setAttribute(elem, "oldValue", String(val))
     elem.duplexCallback = function () {

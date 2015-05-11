@@ -42,8 +42,7 @@ function addAssign(vars, scope, name, data) {
             ret.push(prop + prefix + prop)
             data.vars.push(prop)
             if (data.type === "duplex") {
-                console.log("不存在duplex绑定对象")
-               // vars.get = name + "." + prop
+                vars.get = name + "." + prop
             }
             vars.splice(i, 1)
         }
@@ -122,7 +121,7 @@ function parseExpr(code, scopes, data) {
             var reg = new RegExp("\\b" + v + "(?:\\.\\w+|\\[\\w+\\])+", "ig")
             code = code.replace(reg, function (_) {
                 var c = _.charAt(v.length)
-                var r =  RegExp.rightContext
+                var r = IEVersion ? code.slice(arguments[1] + _.length) : RegExp.rightContext
                 var method = /^\s*\(/.test(r)
                 if (c === "." || c === "[" || method) {//比如v为aa,我们只匹配aa.bb,aa[cc],不匹配aaa.xxx
                     var name = "var" + String(Math.random()).replace(/^0\./, "")
