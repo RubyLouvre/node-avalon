@@ -530,8 +530,7 @@ var DOM = {
         if (deep) {
             for (var i in elem) {
                 if (!nodeOne[i]){
-                    console.log("  continue  "+i)
-                      continue 
+                    continue 
                 }
                   
                 if (i === "parentNode") {
@@ -2510,6 +2509,16 @@ duplexBinding.SELECT = function (elem, evaluator, data) {
     elem.duplexCallback = function () {
         avalon(elem).val(val)
     }
+
+    // option 元素添加 selected 属性
+    elem.childNodes.some(function(item) {
+        if (item.nodeName === 'option') {
+            if (DOM.getAttribute(item, 'value') == val) {
+                DOM.setAttribute(item, 'selected', 'selected')
+                return true
+            }
+        }
+    })
 }
 
 //根据VM的属性值或表达式的值切换类名，ms-class="xxx yyy zzz:flag" 
