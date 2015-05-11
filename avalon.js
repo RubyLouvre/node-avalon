@@ -2294,6 +2294,8 @@ bindingExecutors.attr = function (val, elem, data) {
             //现在只在scanNode中收集拥有id的script, textarea, noscript标签的innerText
             scanTemplate(DOM.ids[val])
         }
+    } else if (method === "css" ){
+        bindingExecutors.css(val, elem, data)
     } else {
         DOM.setAttribute(elem, method, val) //ms-href, ms-src
     }
@@ -2507,6 +2509,14 @@ bindingExecutors["class"] = function (val, elem, data) {
         data.oldClass = data.newClass
         $elem.toggleClass(data.newClass, data.toggleClass)
     }
+}
+
+bindingHandlers.css = bindingHandlers.attr 
+
+
+bindingExecutors.css = function (val, elem, data) {
+    console.log('here! here!')
+    DOM.setAttribute(elem, 'style', data.param + ': ' + val + ';')
 }
 
 })()
