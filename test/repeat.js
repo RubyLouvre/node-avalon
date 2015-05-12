@@ -39,5 +39,9 @@ describe('测试ms-repeat', function () {
 
 
     })
+    it("async", function(){
+        
+        
+    })
 })
 
