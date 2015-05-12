@@ -45,6 +45,14 @@ var DOM = {
         })
         return elem
     },
+    setStyle: function(elem, key, value) {
+
+        var oldValue = DOM.getAttribute(elem, 'style') || '',
+            newValue = oldValue + (key + ': ' + value + ';')
+
+        DOM.setAttribute(elem, 'style', newValue)
+
+    },
     setBoolAttribute: function (elem, name, value) {
         if (value) {
             console.log("setBoolAttribute "+name)

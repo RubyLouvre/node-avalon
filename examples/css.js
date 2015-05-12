@@ -6,7 +6,9 @@ var serializer = new parse5.Serializer();
 var avalon = require('../avalon')
 var vm = avalon.define({
         $id: "test",
-        color: "red"
+        color: "red",
+        opacity: 0.1,
+        zIndex: 1
     })
     
 function heredoc(fn) {
@@ -21,8 +23,9 @@ var text = heredoc(function(){
     </head>
     <body>
         <p
-            ms-css-color="color"
-            ms-css-color="color"
+            ms-css-background-color="color"
+            ms-css-opacity="opacity"
+            ms-css-z-index="zIndex"
         >
             heheda
         </p>

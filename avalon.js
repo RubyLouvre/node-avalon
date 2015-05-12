@@ -5,7 +5,7 @@
  http://weibo.com/jslouvre/
  
  Released under the MIT license
- avalon.js 1.43 built in 2015.5.11
+ avalon.js 1.43 built in 2015.5.12
  用于后端渲染
  */
 (function(){
@@ -484,6 +484,14 @@ var DOM = {
             value: value
         })
         return elem
+    },
+    setStyle: function(elem, key, value) {
+
+        var oldValue = DOM.getAttribute(elem, 'style') || '',
+            newValue = oldValue + (key + ': ' + value + ';')
+
+        DOM.setAttribute(elem, 'style', newValue)
+
     },
     setBoolAttribute: function (elem, name, value) {
         if (value) {
@@ -2294,8 +2302,6 @@ bindingExecutors.attr = function (val, elem, data) {
             //现在只在scanNode中收集拥有id的script, textarea, noscript标签的innerText
             scanTemplate(DOM.ids[val])
         }
-    } else if (method === "css" ){
-        bindingExecutors.css(val, elem, data)
     } else {
         DOM.setAttribute(elem, method, val) //ms-href, ms-src
     }
@@ -2515,13 +2521,16 @@ bindingHandlers.css = bindingHandlers.attr
 
 
 bindingExecutors.css = function (val, elem, data) {
-    console.log('here! here!')
-    
-    var attr = data.param
-    DOM.setAttribute(elem, 'style', attr+ ': ' + val + ';')
+    var key = data.param
 
-    if (attr === 'opacity') {
-        // ie8- hack
+    if (key === 'zIndex') {
+        
+    }
+
+    DOM.setStyle(elem, key, val)
+
+    if (key === 'opacity') {
+        DOM.setStyle(elem, 'filter', 'alpha(opacity=' + val * 100 + ')\\9')
     }
 }
 
