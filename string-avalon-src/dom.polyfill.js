@@ -124,7 +124,6 @@ var DOM = {
                 }
             }
         }
-        console.log(ret)
         return ret
     },
     outerHTML: function (elem) {
