@@ -5,7 +5,7 @@
  http://weibo.com/jslouvre/
  
  Released under the MIT license
- avalon.js 1.43 built in 2015.5.11
+ avalon.js 1.43 built in 2015.5.12
  用于后端渲染
  */
 (function(){
@@ -530,8 +530,7 @@ var DOM = {
         if (deep) {
             for (var i in elem) {
                 if (!nodeOne[i]){
-                    console.log("  continue  "+i)
-                      continue 
+                    continue 
                 }
                   
                 if (i === "parentNode") {
@@ -546,7 +545,12 @@ var DOM = {
                     }
                     ret.childNodes = newChildren
                 } else if (i === "attrs") {
-                    ret[i] = avalon.mix(true, elem[i])
+                    ret[i] = elem.attrs.map(function(el){
+                        return {
+                            name: el.name,
+                            value: el.value
+                        }
+                    })
                 } else {
                     ret[i] = elem[i]
                 }
@@ -560,7 +564,6 @@ var DOM = {
                 }
             }
         }
-        console.log(ret)
         return ret
     },
     outerHTML: function (elem) {
@@ -2114,16 +2117,16 @@ function notifySubscribers(list) { //通知依赖于这个访问器的订阅者�
     }
 }
 
-bindingHandlers.text = function(data, vmodels) {
-	parseExprProxy(data.value, vmodels, data)
+bindingHandlers.text = function (data, vmodels) {
+    parseExprProxy(data.value, vmodels, data)
 }
-bindingExecutors.text = function(val, elem) {
-	val = val == null ? "" : val //不在页面上显示undefined null
-	if (elem.nodeName === "#text") { //绑定在文本节点上
-		elem.value = val
-	} else { //绑定在特性节点上
-		DOM.innerText(elem, val)
-	}
+bindingExecutors.text = function (val, elem) {
+    val = val == null ? "" : val //不在页面上显示undefined null
+    if (elem.nodeName === "#text") { //绑定在文本节点上
+        elem.value = String(val)
+    } else { //绑定在特性节点上
+        DOM.innerText(elem, val)
+    }
 }
 bindingHandlers.html = function(data, vmodels) {
     parseExprProxy(data.value, vmodels, data)
@@ -2477,9 +2480,7 @@ duplexBinding.INPUT = function (elem, evaluator, data) {
     var elemValue = DOM.getAttribute(elem, "value")
     if (data.isChecked || $type === "radio") {
         var checked = data.isChecked ? !!val : val + "" === elemValue
-        console.log(val + "  " + data.isChecked + " : " + checked)
         DOM.setBoolAttribute(elem, "checked", checked)
-        console.log(elem)
         DOM.setAttribute(elem, "oldValue", String(checked))
         var needSet = true
     } else if ($type === "checkbox") {
@@ -2618,7 +2619,6 @@ bindingHandlers.repeat = function (data, vmodels) {
         data.template = DOM.innerHTML(elem).trim()
         var children = elem.childNodes
         comment.parentNode = elem
-
         children.splice(0, children.length, comment)
     } else {
         data.template = DOM.outerHTML(elem).trim()
@@ -2804,12 +2804,9 @@ bindingExecutors.repeat = function (method, pos, el) {
 })
 
 function shimController(data, transation, proxy, fragments) {
-    console.log("+++++++++++++++++++++++"+DOM.cloneNode)
-    console.log(data.template)
-    
+  
     var content = DOM.cloneNode(data.template, true)
-    console.log("---------------------")
-    console.log(content)
+ 
     var nodes = avalon.slice(content.childNodes)
     if (proxy.$stamp) {
         content.childNodes.unshift(proxy.$stamp)
