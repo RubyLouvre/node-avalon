@@ -2787,9 +2787,9 @@ bindingExecutors.repeat = function (method, pos, el) {
                         shimController(data, transation, pool[key], fragments)
                     }
                 }
+
                 var comment = data.$stamp = data.clone
-                parent.insertBefore(comment, end)
-                parent.insertBefore(transation, end)
+                DOM.replaceChild([comment].concat(transation, end), end)
                 for (i = 0; fragment = fragments[i++]; ) {
                     scanNodeArray(fragment.nodes, fragment.vmodels)
                     fragment.nodes = fragment.vmodels = null
@@ -2814,9 +2814,9 @@ bindingExecutors.repeat = function (method, pos, el) {
 })
 
 function shimController(data, transation, proxy, fragments) {
-  
+
     var content = DOM.cloneNode(data.template, true)
- 
+
     var nodes = avalon.slice(content.childNodes)
     if (proxy.$stamp) {
         content.childNodes.unshift(proxy.$stamp)
