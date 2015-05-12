@@ -23,10 +23,9 @@ describe('测试ms-if', function () {
         var dom = parser.parse(text)
         avalon.scan(dom, vm)
         var str = serializer.serialize(dom);
-        console.log(str)
+        // console.log(str)
         expect(str.indexOf('<div>x</div>') !== -1).to.be(true)
         expect(str.indexOf('<!--<div ms-if="bbb"></div>-->') !== -1).to.be(true)
-     //   avalon.vmodels = {}
     })
 })
 

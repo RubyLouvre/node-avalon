@@ -25,11 +25,9 @@ describe('测试{{prop}},{{prop|html}},ms-text,ms-html', function () {
         var dom = parser.parse(text)
         avalon.scan(dom, vm)
         var str = serializer.serialize(dom);
-        console.log(str)
         expect(str.indexOf('<div><em>用于测试是否被测除</em>xxxx&lt;b&gt;1111&lt;/b&gt;yyyy</div>') !== -1).to.be(true)
         expect(str.indexOf('<div><em>用于测试是否被测除</em>xxxx<b>1111</b>yyyy</div>') !== -1).to.be(true)
         expect(str.indexOf('<div>&lt;b&gt;222&lt;/b&gt;</div>') !== -1).to.be(true)
         expect(str.indexOf('<div><b>222</b></div>') !== -1).to.be(true)
-        avalon.vmodels = {}
     })
 })

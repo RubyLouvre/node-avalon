@@ -16,9 +16,9 @@ describe('测试ms-visible', function () {
              <title>测试visible绑定的后端渲染</title>
              </head>
              <body>
-             <div style="display:inline-block" ms-visible='toggle'></div>
-             <div style="display:inline-block" ms-visible='!toggle'></div>
-             <table style="display:table" ms-visible="table">
+             <div style="display:inline-block;" ms-visible='toggle'></div>
+             <div style="display:inline-block;" ms-visible='!toggle'></div>
+             <table style="display:table;" ms-visible="table">
              <tr ms-visible="tr"><td ms-visible="td"></td></tr>
              </table>
              </body>
@@ -29,16 +29,9 @@ describe('测试ms-visible', function () {
         avalon.scan(dom, vm)
         var str = serializer.serialize(dom);
         console.log(str)
-//        expect(str.indexOf('<div style="display:inline-block" ms-visible="toggle"></div>') !== -1).to.be(true)
-//        expect(str.indexOf('data-b="123"') !== -1).to.be(true)
-//        expect(str.indexOf('data-c="false"') !== -1).to.be(true)
-//        expect(str.indexOf('data-d="null"') !== -1).to.be(true)
-    //    avalon.vmodels = {}
-    
-    
-//    <div style="display:inline-block" ms-visible="toggle"></div>
-//<div style="display:inline-block" ms-visible="!toggle"></div>
-//<table style="display:table" ms-visible="table">
-//<tbody><tr ms-visible="tr"><td ms-visible="td"></td></tr>
+        expect(str.indexOf('<div style="inline-block;"></div>') !== -1).to.be(true)
+        expect(str.indexOf('<div style="display:none;"></div>') !== -1).to.be(true)
+        expect(str.indexOf('<table style="display:table;">') !== -1).to.be(true)
+        expect(str.indexOf('<tr><td></td></tr>') !== -1).to.be(true)
     })
 })
