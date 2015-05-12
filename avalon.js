@@ -1061,7 +1061,7 @@ function scanAttr(elem, vmodels) {
                 param = type
                 type = "attr"
                 name = "ms-attr-" + param
-                attributes.splice(i, 1, {name: name, value: value})
+                attributes.splice(++i, 1, {name: name, value: value})
                 match = [name]
                 msData[name] = value
             }
@@ -2511,6 +2511,16 @@ duplexBinding.SELECT = function (elem, evaluator, data) {
     elem.duplexCallback = function () {
         avalon(elem).val(val)
     }
+
+    // option 元素添加 selected 属性
+    elem.childNodes.some(function(item) {
+        if (item.nodeName === 'option') {
+            if (DOM.getAttribute(item, 'value') == val) {
+                DOM.setAttribute(item, 'selected', 'selected')
+                return true
+            }
+        }
+    })
 }
 
 //根据VM的属性值或表达式的值切换类名，ms-class="xxx yyy zzz:flag" 
@@ -2777,9 +2787,9 @@ bindingExecutors.repeat = function (method, pos, el) {
                         shimController(data, transation, pool[key], fragments)
                     }
                 }
+
                 var comment = data.$stamp = data.clone
-                parent.insertBefore(comment, end)
-                parent.insertBefore(transation, end)
+                DOM.replaceChild([comment].concat(transation, end), end)
                 for (i = 0; fragment = fragments[i++]; ) {
                     scanNodeArray(fragment.nodes, fragment.vmodels)
                     fragment.nodes = fragment.vmodels = null
@@ -2804,9 +2814,9 @@ bindingExecutors.repeat = function (method, pos, el) {
 })
 
 function shimController(data, transation, proxy, fragments) {
-  
+
     var content = DOM.cloneNode(data.template, true)
- 
+
     var nodes = avalon.slice(content.childNodes)
     if (proxy.$stamp) {
         content.childNodes.unshift(proxy.$stamp)
