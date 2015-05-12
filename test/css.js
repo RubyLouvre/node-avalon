@@ -30,7 +30,6 @@ describe('测试ms-css', function () {
         var dom = parser.parse(text)
         avalon.scan(dom, vm)
         var str = serializer.serialize(dom);
-        // console.log(str)
         expect(str.indexOf('background-color: red;') !== -1).to.be(true)
         expect(str.indexOf('opacity: 0.1') !== -1).to.be(true)
         expect(str.indexOf('filter: alpha(opacity=10)\\9;') !== -1).to.be(true)

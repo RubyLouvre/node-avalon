@@ -36,7 +36,6 @@ bindingHandlers.repeat = function (data, vmodels) {
     var comment = data.element = DOM.createComment(signature + ":end")
     data.clone = DOM.createComment(signature)
     //   hyperspace.appendChild(comment)
-
     if (type === "each" || type === "with") {
         data.template = DOM.innerHTML(elem).trim()
         var children = elem.childNodes
@@ -160,7 +159,8 @@ bindingExecutors.repeat = function (method, pos, el) {
                         transation.appendChild(node)
                     }
                 }
-                parent.insertBefore(transation, end)
+                DOM.replaceChild(transation.concat(end), end)
+                // parent.insertBefore(transation, end)
                 break
             case "index": //将proxies中的第pos个起的所有元素重新索引
                 last = proxies.length - 1
@@ -250,15 +250,15 @@ function locateNode(data, pos) {
 }
 
 function sweepNodes(start, end, callback) {
-    while (true) {
-        var node = end.previousSibling
-        if (!node)
-            break
-        node.parentNode.removeChild(node)
-        callback && callback.call(node)
-        if (node === start) {
-            break
-        }
+    var parent = start.parentNode
+    var children = parent.childNodes
+    var startIndex = children.indexOf(start) + 1
+    var endIndex = children.indexOf(end)
+    var array = children.splice(startIndex, endIndex)
+    if (array.length && callback) {
+        array.forEach(function (node) {
+            callback.call(node)
+        })
     }
 }
 

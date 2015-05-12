@@ -927,6 +927,32 @@ var valHooks = {
         }
     }
 }
+function bindForBrowser(data){
+    var props = "name,param,priority,type,value"
+    var options = {}
+    props.replace(rword,function(prop){
+        options[prop] = data[prop]
+    })
+    var array = data.vmodels.map(function(el){
+        return el.$id
+    })
+
+    var args = [JSON.stringify(options),  JSON.stringify(array)]
+    var element = data.element
+    if(DOM.nodeType(element) === 1){
+        DOM.setAttribute(element, "ms-scan-"+ Math.round(Math.random() * 100) ,"avalon.rebind("+ args.concat(false)+")")
+    }else{
+        var node = document.createElement("script")
+        var id = ("ms"+ Math.random()).replace(/0\.\d/,"")
+        node.id = id
+        node.innerHTML = "setTimeout(function(){avalon.rebind("+ args.concat(JSON.stringify(id))+")},500)"
+        try{
+            
+             element.parentNode.insertBefore(node, element.nextSibling )
+        }catch(e){
+        }
+    }
+}
 /*********************************************************************
  *                           扫描系统                                 *
  **********************************************************************/
@@ -1086,7 +1112,7 @@ function scanAttr(elem, vmodels) {
                 param = type
                 type = "attr"
                 name = "ms-attr-" + param
-                attributes.splice(++i, 1, {name: name, value: value})
+                attributes.splice(i, 1, {name: name, value: value})
                 match = [name]
                 msData[name] = value
             }
@@ -2228,11 +2254,11 @@ bindingExecutors.visible = function (val, elem, data) {
     var style = DOM.getAttribute(elem, "style")
     if (val) { //如果要显示,如果在元素设置display:none,那么就去掉
         if (style && data.display) {
-            var replaced = data.display === "none" ? "" : data.display
+            var replaced = data.display === "none" ? "" : ["display:", data.display, ";"].join("")
             DOM.setAttribute(elem, "style", style.replace(rdisplay, replaced))
         }
     } else {  //如果要隐藏
-        var cssText = !style ? "style:none;" : style.replace(rdisplay, "display:none;")
+        var cssText = !style ? "display:none;" : style.replace(rdisplay, "display:none;")
         DOM.setAttribute(elem, "style", cssText)
     }
 }
@@ -2394,6 +2420,7 @@ bindingExecutors.attr = function (val, elem, data) {
 })
 // bindingHandlers.data 定义在if.js
 bindingExecutors.data = function(val, elem, data) {
+    bindForBrowser(data)
     var key = "data-" + data.param
     if (val && typeof val === "object") {
         console.warn("ms-data对应的值必须是简单数据类型")
@@ -2781,7 +2808,8 @@ bindingExecutors.repeat = function (method, pos, el) {
                         transation.appendChild(node)
                     }
                 }
-                parent.insertBefore(transation, end)
+                DOM.replaceChild(transation.concat(end), end)
+                // parent.insertBefore(transation, end)
                 break
             case "index": //将proxies中的第pos个起的所有元素重新索引
                 last = proxies.length - 1
@@ -2871,15 +2899,15 @@ function locateNode(data, pos) {
 }
 
 function sweepNodes(start, end, callback) {
-    while (true) {
-        var node = end.previousSibling
-        if (!node)
-            break
-        node.parentNode.removeChild(node)
-        callback && callback.call(node)
-        if (node === start) {
-            break
-        }
+    var parent = start.parentNode
+    var children = parent.childNodes
+    var startIndex = children.indexOf(start) + 1
+    var endIndex = children.indexOf(end)
+    var array = children.splice(startIndex, endIndex)
+    if (array.length && callback) {
+        array.forEach(function (node) {
+            callback.call(node)
+        })
     }
 }
 
