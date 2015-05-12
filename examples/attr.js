@@ -25,7 +25,7 @@ var text = heredoc(function(){
     <body>
         <script id='tmpl' type="avalon"><strong>这是模板</strong></script>
         <div ms-attr-title='aaa'></div>
-        <input ms-value="bbb"/>
+        <input ms-value="bbb" ms-title="ccc" />
         <p><a ms-src="{{aaa}}ss/{{bbb}}.html">link</a></p>
         <select><option ms-selected="ccc">aaa</option></select>
         |<div ms-include="'tmpl'">这里的内容会被替换掉</div>|

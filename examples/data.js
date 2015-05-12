@@ -33,4 +33,4 @@ avalon.scan(dom, vm)
 var str = serializer.serialize(dom);
 
 console.log(str)
-expect
+
