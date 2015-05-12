@@ -105,7 +105,12 @@ var DOM = {
                     }
                     ret.childNodes = newChildren
                 } else if (i === "attrs") {
-                    ret[i] = avalon.mix(true, elem[i])
+                    ret[i] = elem.attrs.map(function(el){
+                        return {
+                            name: el.name,
+                            value: el.value
+                        }
+                    })
                 } else {
                     ret[i] = elem[i]
                 }
@@ -119,7 +124,6 @@ var DOM = {
                 }
             }
         }
-        console.log(ret)
         return ret
     },
     outerHTML: function (elem) {
