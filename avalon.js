@@ -2667,7 +2667,6 @@ bindingHandlers.repeat = function (data, vmodels) {
     var comment = data.element = DOM.createComment(signature + ":end")
     data.clone = DOM.createComment(signature)
     //   hyperspace.appendChild(comment)
-
     if (type === "each" || type === "with") {
         data.template = DOM.innerHTML(elem).trim()
         var children = elem.childNodes
@@ -2747,10 +2746,7 @@ bindingExecutors.repeat = function (method, pos, el) {
                     proxies.splice(i, 0, proxy)
                     shimController(data, transation, proxy, fragments)
                 }
-                var children = parent.childNodes
-                var startIndex = children.indexOf(start)
-                Array.prototype.splice.apply(children, [startIndex, 0].concat(transation))
-                //  parent.insertBefore(transation, start)
+                DOM.replaceChild(transation.concat(start), start)
                 for (i = 0; fragment = fragments[i++]; ) {
                     scanNodeArray(fragment.nodes, fragment.vmodels)
                     fragment.nodes = fragment.vmodels = null
@@ -2886,7 +2882,7 @@ function sweepNodes(start, end, callback) {
     var children = parent.childNodes
     var startIndex = children.indexOf(start) + 1
     var endIndex = children.indexOf(end)
-    var array = children.splice(startIndex, endIndex)
+    var array = children.splice(startIndex, endIndex - startIndex)
     if (array.length && callback) {
         array.forEach(function (node) {
             callback.call(node)
