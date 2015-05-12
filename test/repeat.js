@@ -2,7 +2,7 @@
 describe('测试ms-repeat', function () {
     it("sync", function () {
         var vm = avalon.define({
-            $id: "test",
+            $id: "test-repeat",
             array: [1, 2, 3, 4, 5],
             object: {
                 a: 1,
@@ -13,7 +13,7 @@ describe('测试ms-repeat', function () {
         var text = heredoc(function () {
             /*
              <!DOCTYPE html>
-             <html ms-controller="test">
+             <html ms-controller="test-repeat">
              <head>
              <title>测试repeat绑定的后端渲染</title>
              </head>

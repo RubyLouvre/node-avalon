@@ -1,7 +1,7 @@
 describe('测试ms-data', function () {
     it("sync", function () {
         var vm = avalon.define({
-            $id: "test",
+            $id: "test-data",
             string: "11",
             number: 123,
             bool: false,
@@ -10,11 +10,11 @@ describe('测试ms-data', function () {
         var text = heredoc(function () {
             /*
              <!DOCTYPE html>
-             <html ms-controller="test">
+             <html ms-controller="test-data">
              <head>
              <title>测试attr绑定的后端渲染</title>
              </head>
-             <body ms-controller=test>
+             <body>
              <div ms-data-a='string' ms-data-b="number" ms-data-c="bool" ms-data-d="null"></div>
              </body>
              </html>
