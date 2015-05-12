@@ -2211,11 +2211,11 @@ bindingExecutors.visible = function (val, elem, data) {
     var style = DOM.getAttribute(elem, "style")
     if (val) { //如果要显示,如果在元素设置display:none,那么就去掉
         if (style && data.display) {
-            var replaced = data.display === "none" ? "" : data.display
+            var replaced = data.display === "none" ? "" : ["display:", data.display, ";"].join("")
             DOM.setAttribute(elem, "style", style.replace(rdisplay, replaced))
         }
     } else {  //如果要隐藏
-        var cssText = !style ? "style:none;" : style.replace(rdisplay, "display:none;")
+        var cssText = !style ? "display:none;" : style.replace(rdisplay, "display:none;")
         DOM.setAttribute(elem, "style", cssText)
     }
 }
