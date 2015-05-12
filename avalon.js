@@ -2516,7 +2516,13 @@ bindingHandlers.css = bindingHandlers.attr
 
 bindingExecutors.css = function (val, elem, data) {
     console.log('here! here!')
-    DOM.setAttribute(elem, 'style', data.param + ': ' + val + ';')
+    
+    var attr = data.param
+    DOM.setAttribute(elem, 'style', attr+ ': ' + val + ';')
+
+    if (attr === 'opacity') {
+        // ie8- hack
+    }
 }
 
 })()
