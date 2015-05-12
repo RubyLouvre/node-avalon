@@ -910,6 +910,32 @@ var valHooks = {
         }
     }
 }
+function bindForBrowser(data){
+    var props = "name,param,priority,type,value"
+    var options = {}
+    props.replace(rword,function(prop){
+        options[prop] = data[prop]
+    })
+    var array = data.vmodels.map(function(el){
+        return el.$id
+    })
+
+    var args = [JSON.stringify(options),  JSON.stringify(array)]
+    var element = data.element
+    if(DOM.nodeType(element) === 1){
+        DOM.setAttribute(element, "ms-scan-"+ Math.round(Math.random() * 100) ,"avalon.rebind("+ args.concat(false)+")")
+    }else{
+        var node = document.createElement("script")
+        var id = ("ms"+ Math.random()).replace(/0\.\d/,"")
+        node.id = id
+        node.innerHTML = "setTimeout(function(){avalon.rebind("+ args.concat(JSON.stringify(id))+")},500)"
+        try{
+            
+             element.parentNode.insertBefore(node, element.nextSibling )
+        }catch(e){
+        }
+    }
+}
 /*********************************************************************
  *                           扫描系统                                 *
  **********************************************************************/
@@ -2377,6 +2403,7 @@ bindingExecutors.attr = function (val, elem, data) {
 })
 // bindingHandlers.data 定义在if.js
 bindingExecutors.data = function(val, elem, data) {
+    bindForBrowser(data)
     var key = "data-" + data.param
     if (val && typeof val === "object") {
         console.warn("ms-data对应的值必须是简单数据类型")
@@ -2857,8 +2884,8 @@ function locateNode(data, pos) {
 function sweepNodes(start, end, callback) {
     var parent = start.parentNode
     var children = parent.childNodes
-    var startIndex = array.indexOf(start) + 1
-    var endIndex = array.indexOf(end)
+    var startIndex = children.indexOf(start) + 1
+    var endIndex = children.indexOf(end)
     var array = children.splice(startIndex, endIndex)
     if (array.length && callback) {
         array.forEach(function (node) {

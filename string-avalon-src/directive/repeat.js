@@ -36,7 +36,6 @@ bindingHandlers.repeat = function (data, vmodels) {
     var comment = data.element = DOM.createComment(signature + ":end")
     data.clone = DOM.createComment(signature)
     //   hyperspace.appendChild(comment)
-
     if (type === "each" || type === "with") {
         data.template = DOM.innerHTML(elem).trim()
         var children = elem.childNodes
@@ -253,8 +252,8 @@ function locateNode(data, pos) {
 function sweepNodes(start, end, callback) {
     var parent = start.parentNode
     var children = parent.childNodes
-    var startIndex = array.indexOf(start) + 1
-    var endIndex = array.indexOf(end)
+    var startIndex = children.indexOf(start) + 1
+    var endIndex = children.indexOf(end)
     var array = children.splice(startIndex, endIndex)
     if (array.length && callback) {
         array.forEach(function (node) {

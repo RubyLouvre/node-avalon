@@ -30,7 +30,6 @@ describe('测试ms-visible', function () {
         var dom = parser.parse(text)
         avalon.scan(dom, vm)
         var str = serializer.serialize(dom);
-        console.log(str)
         expect(str.indexOf('<div style="display:inline-block;"></div>') !== -1).to.be(true)
         expect(str.indexOf('<div></div>') !== -1).to.be(true)
         expect(str.indexOf('<div id="hidden_case_0" style="display:none;"></div>') !== -1).to.be(true)

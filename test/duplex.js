@@ -40,9 +40,7 @@ describe('测试ms-duplex', function () {
 
         var dom = parser.parse(text)
         avalon.scan(dom, vm)
-        var str = serializer.serialize(dom);
-        // console.log(str)
-        
+        var str = serializer.serialize(dom)
         expect(str.indexOf('<option value="2" selected="selected">value 2</option>') !== -1).to.be(true)
         expect(str.indexOf('id="radio-2" checked="checked"') !== -1).to.be(true)
         expect(str.indexOf('id="checkbox-0" checked="checked"') !== -1).to.be(true)
