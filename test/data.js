@@ -28,6 +28,7 @@ describe('测试ms-data', function () {
         expect(str.indexOf('data-b="123"') !== -1).to.be(true)
         expect(str.indexOf('data-c="false"') !== -1).to.be(true)
         expect(str.indexOf('data-d="null"') !== -1).to.be(true)
+      //  avalon.vmodels = {}
     })
 })
 

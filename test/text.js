@@ -1,14 +1,15 @@
 describe('测试{{prop}},{{prop|html}},ms-text,ms-html', function () {
     it("sync", function () {
+
         var vm = avalon.define({
-            $id: "test",
+            $id: "ms-text-1",
             aaa: "<b>1111</b>",
             bbb: "<b>222</b>"
         })
         var text = heredoc(function () {
             /*
              <!DOCTYPE html>
-             <html ms-controller="test">
+             <html ms-controller="ms-text-1">
              <head>
              <title>测试text绑定的后端渲染</title>
              </head>
@@ -29,5 +30,6 @@ describe('测试{{prop}},{{prop|html}},ms-text,ms-html', function () {
         expect(str.indexOf('<div><em>用于测试是否被测除</em>xxxx<b>1111</b>yyyy</div>') !== -1).to.be(true)
         expect(str.indexOf('<div>&lt;b&gt;222&lt;/b&gt;</div>') !== -1).to.be(true)
         expect(str.indexOf('<div><b>222</b></div>') !== -1).to.be(true)
+        avalon.vmodels = {}
     })
 })

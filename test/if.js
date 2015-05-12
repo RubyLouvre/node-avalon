@@ -26,6 +26,7 @@ describe('测试ms-if', function () {
         console.log(str)
         expect(str.indexOf('<div>x</div>') !== -1).to.be(true)
         expect(str.indexOf('<!--<div ms-if="bbb"></div>-->') !== -1).to.be(true)
+     //   avalon.vmodels = {}
     })
 })
 
