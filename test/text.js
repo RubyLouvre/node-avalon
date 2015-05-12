@@ -30,4 +30,30 @@ describe('测试{{prop}},{{prop|html}},ms-text,ms-html', function () {
         expect(str.indexOf('<div>&lt;b&gt;222&lt;/b&gt;</div>') !== -1).to.be(true)
         expect(str.indexOf('<div><b>222</b></div>') !== -1).to.be(true)
     })
+    it("async", function () {
+
+        var vm = avalon.define({
+            $id: "ms-text-2",
+            aaa: 111
+        })
+        var text = heredoc(function () {
+            /*
+             <!DOCTYPE html>
+             <html ms-controller="ms-text-2">
+             <head>
+             <title>测试text绑定的后端渲染</title>
+             </head>
+             <body>{{aaa}}</body>
+             </html>
+             */
+        })
+        var dom = parser.parse(text)
+        avalon.scan(dom, vm)
+        var str = serializer.serialize(dom);
+        expect(str.indexOf('<body>111') !== -1).to.be(true)
+        vm.aaa = 222
+        var str = serializer.serialize(dom);
+        expect(str.indexOf('<body>222') !== -1).to.be(true)
+
+    })
 })
