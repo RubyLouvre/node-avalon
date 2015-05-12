@@ -48,10 +48,27 @@ var DOM = {
     },
     setStyle: function(elem, key, value) {
 
-        var oldValue = DOM.getAttribute(elem, 'style') || '',
-            newValue = oldValue + (key + ': ' + value + ';')
+        /**
+         * 匹配带有 !important 的属性
+         * @example
+         * /(?=color\s*:)[^;]+!important\s*(;|$)/ 可以匹配出 'color: red !important;'
+         */
+        var regImportant = new RegExp('(?=' + key + '\\s*:)[^;]+!important\\s*(;|$)'),
+            oldValue = DOM.getAttribute(elem, 'style') || ''
 
-        DOM.setAttribute(elem, 'style', newValue)
+        if (!regImportant.test(oldValue)) {
+            // 如果该属性木有 !important 结尾的值，替换之
+            /**
+             * 匹配带有 !important 的属性
+             * @example
+             * /(?=color\s*:)[^;]+!important\s*(;|$)/ 可以匹配出 'color: red !important;'
+             */
+            var regKey = new RegExp('(' + key + '\\s*:)[^;]*(;|$)', 'g'),
+                newValue = key + ': ' + value + ';' + oldValue.replace(regKey, '')
+
+            DOM.setAttribute(elem, 'style', newValue)
+        }
+
 
     },
     setBoolAttribute: function (elem, name, value) {

@@ -26,6 +26,8 @@ var text = heredoc(function(){
             ms-css-background-color="color"
             ms-css-opacity="opacity"
             ms-css-z-index="zIndex"
+
+            style="opacity: .5; z-index: 3!important;"
         >
             heheda
         </p>
