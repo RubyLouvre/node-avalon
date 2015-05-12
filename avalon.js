@@ -2364,6 +2364,8 @@ bindingExecutors.attr = function (val, elem, data) {
             //现在只在scanNode中收集拥有id的script, textarea, noscript标签的innerText
             scanTemplate(DOM.ids[val])
         }
+    } else if (method === "css" ){
+        bindingExecutors.css(val, elem, data)
     } else {
         DOM.setAttribute(elem, method, val) //ms-href, ms-src
     }
@@ -2591,22 +2593,13 @@ bindingHandlers.css = bindingHandlers.attr
 
 
 bindingExecutors.css = function (val, elem, data) {
-<<<<<<< HEAD
     var key = data.param
-
-    if (key === 'zIndex') {
-        
-    }
 
     DOM.setStyle(elem, key, val)
 
     if (key === 'opacity') {
         DOM.setStyle(elem, 'filter', 'alpha(opacity=' + val * 100 + ')\\9')
     }
-}
-
-=======
-    
 }
 
 bindingHandlers.repeat = function (data, vmodels) {
@@ -3000,5 +2993,4 @@ function recycleProxies(proxies, type) {
     if (type === "each")
         proxies.length = 0
 }
->>>>>>> master
 })()
