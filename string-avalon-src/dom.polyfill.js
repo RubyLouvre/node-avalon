@@ -1,3 +1,4 @@
+var nodeOne = oneObject("value,data,attrs,nodeName,tagName,parentNode,childNodes,quirksMode namespaceURI")
 var DOM = {
     ids: {},
     getAttribute: function (elem, name) {
@@ -33,7 +34,7 @@ var DOM = {
     },
     setAttribute: function (elem, key, value) {
         var attrs = elem.attrs || (elem.attrs = [])
-        for (var i = 0, attr; attr = attrs[i++]; ){
+        for (var i = 0, attr; attr = attrs[i++]; ) {
             if (attr.name === key) {
                 attr.value = value
                 return elem
@@ -55,7 +56,6 @@ var DOM = {
     },
     setBoolAttribute: function (elem, name, value) {
         if (value) {
-            console.log("setBoolAttribute "+name)
             DOM.setAttribute(elem, name, name)
         } else {
             DOM.removeAttribute(elem, name)
@@ -91,24 +91,86 @@ var DOM = {
             childNodes: []
         }
     },
+    cloneNode: function (elem, deep) {
+        var ret = {
+            parentNode: null
+        }
+        if (deep) {
+            for (var i in elem) {
+                if (!nodeOne[i]){
+                    continue 
+                }
+                  
+                if (i === "parentNode") {
+                    ret[i] = elem[i]
+                } else if (i === "childNodes") {
+                    var newChildren = []
+                    var children = elem.childNodes
+                    for (var j = 0, el; el = children[j++]; ) {
+                      var  ele = DOM.cloneNode(el, true)
+                        ele.parentNode = ret
+                        newChildren.push(ele)
+                    }
+                    ret.childNodes = newChildren
+                } else if (i === "attrs") {
+                    ret[i] = elem.attrs.map(function(el){
+                        return {
+                            name: el.name,
+                            value: el.value
+                        }
+                    })
+                } else {
+                    ret[i] = elem[i]
+                }
+            }
+        } else {
+            for (var i in elem) {
+                if (i === "childNodes") {
+                    ret[i] = []
+                } else {
+                    ret[i] = elem[i]
+                }
+            }
+        }
+        return ret
+    },
     outerHTML: function (elem) {
-        var serializer = new parse5.Serializer();
+        var serializer = new parse5.Serializer()
+        var clone = {}
+        for (var i in elem) {
+            clone[i] = elem[i]
+        }
         var doc = {
             nodeName: "#document",
             quirksNode: false
         }
-        elem.parentNode = doc
+        clone.parentNode = doc
         doc.childNodes = [elem]
         return serializer.serialize(doc)
     },
     innerHTML: function (parent, html) {
-        var fragment = parser.parseFragment(html)
-        var nodes = fragment.childNodes
-        for (var i = 0, node; node = nodes[i++]; ) {
-            node.nodeType = DOM.nodeType(node)
-            node.parentNode = parent
+        if (typeof html === "string") {
+            var fragment = parser.parseFragment(html)
+            var nodes = fragment.childNodes
+            for (var i = 0, node; node = nodes[i++]; ) {
+                node.nodeType = DOM.nodeType(node)
+                node.parentNode = parent
+            }
+            parent.childNodes = nodes
+        } else {
+            var elem = {}
+            for (var i in parent) {
+                if (i === "attrs") {
+                    elem[i] = []
+                } else {
+                    elem[i] = parent[i]
+                }
+            }
+            html = DOM.outerHTML(elem)
+            return html.replace("<" + elem.tagName + ">", "")
+                    .replace("<" + elem.tagName + "/>", "")
+                    .replace("<\/" + elem.tagName + ">", "")
         }
-        parent.childNodes = nodes
     },
     appendChild: function (parent, html) {
         var nodes = [].concat(html)
@@ -120,8 +182,8 @@ var DOM = {
     },
     replaceChild: function (newNode, oldNode) {
         var parent = oldNode.parentNode
-        var childNodes = parent.childNodes
-        var index = childNodes.indexOf(oldNode)
+        var children = parent.childNodes
+        var index = children.indexOf(oldNode)
         if (!~index)
             return
         if (Array.isArray(newNode)) {
@@ -130,10 +192,10 @@ var DOM = {
                 el.parentNode = parent
                 args.push(el)
             }
-            Array.prototype.splice.apply(childNodes, args)
+            Array.prototype.splice.apply(children, args)
         } else {
             newNode.parentNode = parent
-            Array.prototype.splice.apply(childNodes, [index, 1, newNode])
+            Array.prototype.splice.apply(children, [index, 1, newNode])
         }
     },
     removeChild: function (elem) {

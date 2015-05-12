@@ -6,10 +6,9 @@ var serializer = new parse5.Serializer();
 var avalon = require('../avalon')
 var vm = avalon.define({
         $id: "test",
-        aaa: "111",
-        bbb: "222",
-        ccc: "333",
-        tt: "./template1.html"
+        a: false,
+        d: true,
+        b: ["1","2"]
     })
     
 function heredoc(fn) {
@@ -22,14 +21,16 @@ var text = heredoc(function(){
     <head>
         <title>测试attr绑定的后端渲染</title>
     </head>
-    <body>
-        <script id='tmpl' type="avalon"><strong>这是模板</strong></script>
-        <div ms-attr-title='aaa'></div>
-        <input ms-value="bbb" ms-title="ccc" />
-        <p><a ms-src="{{aaa}}ss/{{bbb}}.html">link</a></p>
-        <select><option ms-selected="ccc">aaa</option></select>
-        |<div ms-include="'tmpl'">这里的内容会被替换掉</div>|
-       <blockquote ms-include-src="tt" data-include-replace='true'>这个元素会被替换掉</blockquote>
+    <body ms-controller=test>
+        <input type="radio" ms-duplex-checked='a'/>
+        <input type="radio" ms-duplex-checked='d' id='d'/>
+        <input type="checkbox" ms-duplex-checked='a'/>
+        <input type="checkbox" ms-duplex-checked='!a'/>
+        <input type="checkbox" ms-duplex-string='b' value="1"/>
+        <input type="checkbox" ms-duplex-string='b' value="2"/>
+        <input type="checkbox" ms-duplex-string='b' value="3"/>
+        <input type="text" ms-duplex="c"/>
+        <textarea ms-duplex="c"></textarea>
     </body>
 </html>
      */
@@ -38,3 +39,6 @@ var dom = parser.parse(text)
 avalon.scan(dom, vm)
 var str = serializer.serialize(dom);
 console.log(str)
+/*
+       
+ */

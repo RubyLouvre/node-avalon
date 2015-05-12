@@ -43,7 +43,7 @@ gulp.task('combo', function () {
         "collection",
         "dispatcher"
     ]
-    var directives = ["text", "html", "visible", "if", "attr", "data", "duplex", "class", "css"]
+    var directives = ["text", "html", "visible", "if", "attr", "data", "duplex", "class", "css", "repeat"]
     directives = directives.map(function (el) {
         return "directive/" + el
     })

@@ -103,9 +103,7 @@ duplexBinding.INPUT = function (elem, evaluator, data) {
     var elemValue = DOM.getAttribute(elem, "value")
     if (data.isChecked || $type === "radio") {
         var checked = data.isChecked ? !!val : val + "" === elemValue
-        console.log(val + "  " + data.isChecked + " : " + checked)
         DOM.setBoolAttribute(elem, "checked", checked)
-        console.log(elem)
         DOM.setAttribute(elem, "oldValue", String(checked))
         var needSet = true
     } else if ($type === "checkbox") {
@@ -136,4 +134,14 @@ duplexBinding.SELECT = function (elem, evaluator, data) {
     elem.duplexCallback = function () {
         avalon(elem).val(val)
     }
+
+    // option 元素添加 selected 属性
+    elem.childNodes.some(function(item) {
+        if (item.nodeName === 'option') {
+            if (DOM.getAttribute(item, 'value') == val) {
+                DOM.setAttribute(item, 'selected', 'selected')
+                return true
+            }
+        }
+    })
 }
