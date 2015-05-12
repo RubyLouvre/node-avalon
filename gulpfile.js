@@ -32,6 +32,7 @@ gulp.task('combo', function () {
         "core",
         "dom.polyfill",
         "dom",
+        "bindForBrowser",
         "scan",
         "scanTag",
         "scanNode",

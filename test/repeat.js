@@ -28,6 +28,7 @@ describe('测试ms-repeat', function () {
         })
         var dom = parser.parse(text)
         avalon.scan(dom, vm)
+        console.log(dom)
         var str = serializer.serialize(dom);
 
         str = str.replace(/<!--\w+\d+(:end)?-->/g, "")
