@@ -5,11 +5,9 @@ var serializer = new parse5.Serializer();
 
 var avalon = require('../avalon')
 var vm = avalon.define({
-        $id: "test",
-        string: "11",
-        number: 123,
-        bool: false,
-        null: null
+    $id: "test",
+    aaa: true,
+    bbb: false
     })
     
 function heredoc(fn) {
@@ -20,17 +18,19 @@ var text = heredoc(function(){
 <!DOCTYPE html>
 <html ms-controller="test">
     <head>
-        <title>测试attr绑定的后端渲染</title>
+        <title>测试if绑定的后端渲染</title>
     </head>
-    <body ms-controller=test>
-        <div ms-data-a='string' ms-data-b="number" ms-data-c="bool" ms-data-d="null"></div>
+    <body>
+        <div ms-if="aaa"></div>
+        <div ms-if="bbb"></div>
     </body>
 </html>
      */
 })
 var dom = parser.parse(text)
+console.log(dom.childNodes[1].childNodes[2].childNodes[0])
 avalon.scan(dom, vm)
-var str = serializer.serialize(dom);
 
+
+var str = serializer.serialize(dom);
 console.log(str)
-expect
