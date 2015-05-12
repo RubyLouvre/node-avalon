@@ -65,6 +65,7 @@ describe('测试ms-repeat', function () {
         expect(str.indexOf('<ul><li>1-0</li><li>2-1</li><li>3-2</li><li>4-3</li><li>5-4</li></ul>') !== -1).to.be(true)
         console.log("==================")
         vm.array.shift()
+        console.log(vm.array.length+"!")
         setTimeout(function () {
             var str = serializer.serialize(dom);
             str = str.replace(/<!--\w+\d+(:end)?-->/g, "")
