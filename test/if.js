@@ -2,14 +2,14 @@
 describe('测试ms-if', function () {
     it("sync", function () {
         var vm = avalon.define({
-            $id: "test",
+            $id: "test-if",
             aaa: true,
             bbb: false
         })
         var text = heredoc(function () {
             /*
              <!DOCTYPE html>
-             <html ms-controller="test">
+             <html ms-controller="test-if">
              <head>
              <title>测试if绑定的后端渲染</title>
              </head>
