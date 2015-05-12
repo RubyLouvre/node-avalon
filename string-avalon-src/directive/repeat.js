@@ -41,7 +41,6 @@ bindingHandlers.repeat = function (data, vmodels) {
         data.template = DOM.innerHTML(elem).trim()
         var children = elem.childNodes
         comment.parentNode = elem
-
         children.splice(0, children.length, comment)
     } else {
         data.template = DOM.outerHTML(elem).trim()
@@ -227,12 +226,9 @@ bindingExecutors.repeat = function (method, pos, el) {
 })
 
 function shimController(data, transation, proxy, fragments) {
-    console.log("+++++++++++++++++++++++"+DOM.cloneNode)
-    console.log(data.template)
-    
+  
     var content = DOM.cloneNode(data.template, true)
-    console.log("---------------------")
-    console.log(content)
+ 
     var nodes = avalon.slice(content.childNodes)
     if (proxy.$stamp) {
         content.childNodes.unshift(proxy.$stamp)
