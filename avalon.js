@@ -486,6 +486,14 @@ var DOM = {
         })
         return elem
     },
+    setStyle: function(elem, key, value) {
+
+        var oldValue = DOM.getAttribute(elem, 'style') || '',
+            newValue = oldValue + (key + ': ' + value + ';')
+
+        DOM.setAttribute(elem, 'style', newValue)
+
+    },
     setBoolAttribute: function (elem, name, value) {
         if (value) {
             DOM.setAttribute(elem, name, name)
@@ -2356,6 +2364,8 @@ bindingExecutors.attr = function (val, elem, data) {
             //现在只在scanNode中收集拥有id的script, textarea, noscript标签的innerText
             scanTemplate(DOM.ids[val])
         }
+    } else if (method === "css" ){
+        bindingExecutors.css(val, elem, data)
     } else {
         DOM.setAttribute(elem, method, val) //ms-href, ms-src
     }
@@ -2583,7 +2593,13 @@ bindingHandlers.css = bindingHandlers.attr
 
 
 bindingExecutors.css = function (val, elem, data) {
-    
+    var key = data.param
+
+    DOM.setStyle(elem, key, val)
+
+    if (key === 'opacity') {
+        DOM.setStyle(elem, 'filter', 'alpha(opacity=' + val * 100 + ')\\9')
+    }
 }
 
 bindingHandlers.repeat = function (data, vmodels) {
