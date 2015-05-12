@@ -24,7 +24,9 @@ var text = heredoc(function () {
      </head>
      <body>
      <div style="display:inline-block" ms-visible='toggle'></div>
+     <div ms-visible='toggle'></div>
      <div style="display:inline-block" ms-visible='!toggle'></div>
+     <div ms-visible='!toggle'></div>
      <table style="display:table" ms-visible="table">
      <tr ms-visible="tr"><td ms-visible="td"></td></tr>
      </table>
