@@ -2788,7 +2788,6 @@ bindingExecutors.repeat = function (method, pos, el) {
                     }
                 }
                 DOM.replaceChild(transation.concat(end), end)
-                // parent.insertBefore(transation, end)
                 break
             case "index": //将proxies中的第pos个起的所有元素重新索引
                 last = proxies.length - 1
