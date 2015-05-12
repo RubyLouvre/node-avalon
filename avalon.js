@@ -1061,7 +1061,7 @@ function scanAttr(elem, vmodels) {
                 param = type
                 type = "attr"
                 name = "ms-attr-" + param
-                attributes.splice(i, 1, {name: name, value: value})
+                attributes.splice(++i, 1, {name: name, value: value})
                 match = [name]
                 msData[name] = value
             }
