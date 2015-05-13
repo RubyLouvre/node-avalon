@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>插值表达式 {{text}}</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style>
+    
+</style>
+<script src="avalon.browser.js"></script>
+<script>
+   
+</script>
+</head>
+<body ms-controller="test">
+
+    <h3>node</h3>
+    
+    <span ms-scan-111="avalon.rebind([{
+        expr: 'true',
+        filters: '',
+        type: 'text',
+        value: 'text1'
+    }], ['test'])">孤立的插值表达式</span>
+
+    <p>
+        前面的文字 - 
+        <span ms-scan-112="avalon.rebind([{
+            expr: 'true',
+            filters: '',
+            type: 'text',
+            value: 'text2'
+        }], ['test'])">被包含的插值表达式</span>
+         - 后面的文字
+    </p>
+
+    <h3>browser</h3>
+    {{text1}}
+    <br>
+    {{text2}}
+    
+	<button ms-click="change">change</button>
+	<script>
+	    var testVm = avalon.define({
+		    	$id: 'test',
+
+                text1: '孤立的插值表达式',
+                text2: '被包含的插值表达式',
+
+                change: function() {
+                    var randomNum = Math.random()
+
+                    testVm.text1 = '孤立的插值表达式' + randomNum
+                    testVm.text2 = '被包含的插值表达式' + randomNum
+                }
+		    })
+	    	
+	</script>
+</body>
+</html>
