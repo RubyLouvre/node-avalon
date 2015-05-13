@@ -6,7 +6,8 @@ var serializer = new parse5.Serializer();
 var avalon = require('../avalon')
 var vm = avalon.define({
     $id: "test",
-    aaa: "111"
+    aaa: "111",
+    bbb: "2"
 })
 
 function heredoc(fn) {
@@ -14,12 +15,13 @@ function heredoc(fn) {
 }
 var text = heredoc(function(){
     /*
-<!DOCTYPE html ms-controller="test"><html><body>
-    <div ms-attr-title='aaa'>{{aaa}}</div>
+<!DOCTYPE html><html ms-controller="test"><body>
+    <div ms-attr-title='aaa' ms-attr-name="bbb"></div>
 </body></html>
      */
 })
 var dom = parser.parse(text)
+debugger
 avalon.scan(dom, vm)
 var str = serializer.serialize(dom);
 console.log(str)
