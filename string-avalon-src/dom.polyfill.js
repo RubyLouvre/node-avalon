@@ -175,18 +175,17 @@ var DOM = {
             }
             parent.childNodes = nodes
         } else {
-            var elem = {}
+            var clone = {}
             for (var i in parent) {
                 if (i === "attrs") {
-                    elem[i] = []
+                    clone[i] = []
                 } else {
-                    elem[i] = parent[i]
+                    clone[i] = parent[i]
                 }
             }
-            html = DOM.outerHTML(elem)
-            return html.replace("<" + elem.tagName + ">", "")
-                    .replace("<" + elem.tagName + "/>", "")
-                    .replace("<\/" + elem.tagName + ">", "")
+            html = DOM.outerHTML(clone)
+            return html.replace(new RegExp("<"+clone.tagName+"\/?>"), "")
+                    .replace("<\/" + clone.tagName + ">", "")
         }
     },
     appendChild: function (parent, html) {
