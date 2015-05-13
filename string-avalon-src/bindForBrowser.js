@@ -11,15 +11,16 @@ function bindForBrowser(data){
     var args = [JSON.stringify(options),  JSON.stringify(array)]
     var element = data.element
     if(DOM.nodeType(element) === 1){
-        DOM.setAttribute(element, "ms-scan-"+ Math.round(Math.random() * 100) ,"avalon.rebind("+ args.concat(false)+")")
+        var scanJSFn = "avalon.rebind("+ args.concat(false)+")";
+        scanJSFn = scanJSFn.replace(/"/ig, "'"); // 因为ms-scan-xx内的内容是在双引号内，所以需要把所有的Stringify产生的双引号转换为单引号
+        DOM.setAttribute(element, "ms-scan-"+ Math.round(Math.random() * 100) , scanJSFn)
     }else{
-        var node = document.createElement("script")
+        var node = DOM.createElement("script")
         var id = ("ms"+ Math.random()).replace(/0\.\d/,"")
-        node.id = id
-        node.innerHTML = "setTimeout(function(){avalon.rebind("+ args.concat(JSON.stringify(id))+")},500)"
+        DOM.innerHTML(node, "setTimeout(function(){avalon.rebind("+ args.concat(JSON.stringify(id))+")},500)")
+        DOM.setAttribute(node, "id", id);
         try{
-            
-             element.parentNode.insertBefore(node, element.nextSibling )
+            element.parentNode.childNodes.push(node)
         }catch(e){
         }
     }

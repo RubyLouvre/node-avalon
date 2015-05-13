@@ -5,33 +5,18 @@ var serializer = new parse5.Serializer();
 
 var avalon = require('../avalon')
 var vm = avalon.define({
-        $id: "test",
-        aaa: "111",
-        bbb: "222",
-        ccc: "333",
-        tt: "./template1.html"
-    })
-    
+    $id: "test",
+    aaa: "111"
+})
+
 function heredoc(fn) {
     return fn.toString().replace(/^[^\/]+\/\*!?\s?/, '').replace(/\*\/[^\/]+$/, '')
 }
 var text = heredoc(function(){
     /*
-<!DOCTYPE html>
-<html ms-controller="test">
-    <head>
-        <title>测试attr绑定的后端渲染</title>
-    </head>
-    <body>
-        <script id='tmpl' type="avalon"><strong>这是模板</strong></script>
-        <div ms-attr-title='aaa'></div>
-        <input ms-value="bbb" ms-title="ccc" />
-        <p><a ms-src="{{aaa}}ss/{{bbb}}.html">link</a></p>
-        <select><option ms-selected="ccc">aaa</option></select>
-        |<div ms-include="'tmpl'">这里的内容会被替换掉</div>|
-       <blockquote ms-include-src="tt" data-include-replace='true'>这个元素会被替换掉</blockquote>
-    </body>
-</html>
+<!DOCTYPE html ms-controller="test"><html><body>
+    <div ms-attr-title='aaa'>{{aaa}}</div>
+</body></html>
      */
 })
 var dom = parser.parse(text)
