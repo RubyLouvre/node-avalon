@@ -11,7 +11,7 @@ global.heredoc = function (fn) {
     return fn.toString().replace(/^[^\/]+\/\*!?\s?/, '').replace(/\*\/[^\/]+$/, '')
 }
 //https://github.com/exolution/xCube/blob/master/XParser.js
-var files = ["data","if", "text", "visible","repeat", "css"]
+var files = ["repeat"]//["data","if", "text", "visible","repeat", "css"]
 files.forEach(function (val) {
     var filePath = path.resolve(process.cwd(), val)
     require(filePath)
