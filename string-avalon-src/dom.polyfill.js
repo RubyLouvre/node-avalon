@@ -8,6 +8,17 @@ var DOM = {
                 return attr.value
         }
     },
+    /*
+     * 使用正则表达寻找一个attribute的Name。返回第一个匹配成功的attrName或者undefined
+     */
+    lookupAttributeName: function (elem, attrNameRegex) {
+        var attrs = elem.attrs || []
+        for (var i = 0, attr; attr = attrs[i++]; ) {
+            if (attrNameRegex.test(attr.name))
+                return attr.name
+        }
+        return undefined;
+    },
     nodeType: function (elem) {
         if (elem.nodeName === elem.tagName) {
             return 1

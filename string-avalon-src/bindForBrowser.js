@@ -13,7 +13,15 @@ function bindForBrowser(data){
     if(DOM.nodeType(element) === 1){
         var scanJSFn = "avalon.rebind("+ args.concat(false)+")";
         scanJSFn = scanJSFn.replace(/"/ig, "'"); // 因为ms-scan-xx内的内容是在双引号内，所以需要把所有的Stringify产生的双引号转换为单引号
-        DOM.setAttribute(element, "ms-scan-"+ Math.round(Math.random() * 100) , scanJSFn)
+        
+        // 查找ms-scan-*的attribute，如果没有，则生成一个ms-scan-random()。
+        var scanAttrName = DOM.lookupAttributeName(element, /^ms-scan-\d*$/);
+        if (scanAttrName == undefined) {
+            scanAttrName = "ms-scan-"+ Math.round(Math.random() * 100);
+        } else {
+            scanJSFn = [DOM.getAttribute(element, scanAttrName), scanJSFn].join(";");
+        }
+        DOM.setAttribute(element, scanAttrName , scanJSFn)
     }else{
         var node = DOM.createElement("script")
         var id = ("ms"+ Math.random()).replace(/0\.\d/,"")

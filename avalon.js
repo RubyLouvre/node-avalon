@@ -5,7 +5,7 @@
  http://weibo.com/jslouvre/
  
  Released under the MIT license
- avalon.js 1.43 built in 2015.5.12
+ avalon.js 1.43 built in 2015.5.13
  用于后端渲染
  */
 (function(){
@@ -447,6 +447,17 @@ var DOM = {
             if (attr.name === name)
                 return attr.value
         }
+    },
+    /*
+     * 使用正则表达寻找一个attribute的Name。返回第一个匹配成功的attrName或者undefined
+     */
+    lookupAttributeName: function (elem, attrNameRegex) {
+        var attrs = elem.attrs || []
+        for (var i = 0, attr; attr = attrs[i++]; ) {
+            if (attrNameRegex.test(attr.name))
+                return attr.name
+        }
+        return undefined;
     },
     nodeType: function (elem) {
         if (elem.nodeName === elem.tagName) {
@@ -942,7 +953,15 @@ function bindForBrowser(data){
     if(DOM.nodeType(element) === 1){
         var scanJSFn = "avalon.rebind("+ args.concat(false)+")";
         scanJSFn = scanJSFn.replace(/"/ig, "'"); // 因为ms-scan-xx内的内容是在双引号内，所以需要把所有的Stringify产生的双引号转换为单引号
-        DOM.setAttribute(element, "ms-scan-"+ Math.round(Math.random() * 100) , scanJSFn)
+        
+        // 查找ms-scan-*的attribute，如果没有，则生成一个ms-scan-random()。
+        var scanAttrName = DOM.lookupAttributeName(element, /^ms-scan-\d*$/);
+        if (scanAttrName == undefined) {
+            scanAttrName = "ms-scan-"+ Math.round(Math.random() * 100);
+        } else {
+            scanJSFn = [DOM.getAttribute(element, scanAttrName), scanJSFn].join(";");
+        }
+        DOM.setAttribute(element, scanAttrName , scanJSFn)
     }else{
         var node = DOM.createElement("script")
         var id = ("ms"+ Math.random()).replace(/0\.\d/,"")
