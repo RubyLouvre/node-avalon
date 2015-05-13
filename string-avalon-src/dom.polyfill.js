@@ -46,7 +46,7 @@ var DOM = {
         })
         return elem
     },
-    setStyle: function(elem, key, value) {
+    setStyle: function (elem, key, value) {
 
         /**
          * 匹配带有 !important 的属性
@@ -54,7 +54,7 @@ var DOM = {
          * /(?=color\s*:)[^;]+!important\s*(;|$)/ 可以匹配出 'color: red !important;'
          */
         var regImportant = new RegExp('(?=' + key + '\\s*:)[^;]+!important\\s*(;|$)'),
-            oldValue = DOM.getAttribute(elem, 'style') || ''
+                oldValue = DOM.getAttribute(elem, 'style') || ''
 
         if (!regImportant.test(oldValue)) {
             // 如果该属性木有 !important 结尾的值，替换之
@@ -64,7 +64,7 @@ var DOM = {
              * /(?=color\s*:)[^;]+!important\s*(;|$)/ 可以匹配出 'color: red !important;'
              */
             var regKey = new RegExp('(' + key + '\\s*:)[^;]*(;|$)', 'g'),
-                newValue = key + ': ' + value + ';' + oldValue.replace(regKey, '')
+                    newValue = key + ': ' + value + ';' + oldValue.replace(regKey, '')
 
             DOM.setAttribute(elem, 'style', newValue)
         }
@@ -114,23 +114,23 @@ var DOM = {
         }
         if (deep) {
             for (var i in elem) {
-                if (!nodeOne[i]){
-                    continue 
+                if (!nodeOne[i]) {
+                    continue
                 }
-                  
+
                 if (i === "parentNode") {
                     ret[i] = elem[i]
                 } else if (i === "childNodes") {
                     var newChildren = []
                     var children = elem.childNodes
                     for (var j = 0, el; el = children[j++]; ) {
-                      var  ele = DOM.cloneNode(el, true)
+                        var ele = DOM.cloneNode(el, true)
                         ele.parentNode = ret
                         newChildren.push(ele)
                     }
                     ret.childNodes = newChildren
                 } else if (i === "attrs") {
-                    ret[i] = elem.attrs.map(function(el){
+                    ret[i] = elem.attrs.map(function (el) {
                         return {
                             name: el.name,
                             value: el.value
@@ -184,7 +184,7 @@ var DOM = {
                 }
             }
             html = DOM.outerHTML(clone)
-            return html.replace(new RegExp("<"+clone.tagName+"\/?>"), "")
+            return html.replace(new RegExp("<" + clone.tagName + "\/?>"), "")
                     .replace("<\/" + clone.tagName + ">", "")
         }
     },
@@ -239,4 +239,49 @@ avalon.innerHTML = function (parent, html) {
 }
 avalon.clearHTML = function (parent) {
     parent.childNodes.length = 0
+}
+function forEachElements(dom, callback) {
+    for (var i = 0, el; el = dom.childNodes[i++]; ) {
+        if (el.tagName) {
+            if (callback(el) === false) {
+                break
+            } else {
+                forEachElements(el, callback)
+            }
+        }
+    }
+}
+avalon.getElementById = function (dom, id) {
+    var ret = null
+    forEachElements(dom, function (el) {
+        if (DOM.getAttribute(el, "id") === id) {
+            ret = el
+            return false
+        }
+    })
+    return ret
+}
+avalon.getElementsTagName = function (dom, tagName) {
+    var ret = []
+    forEachElements(dom, function (el) {
+        if (el.tagName === tagName) {
+            ret.push(el)
+        }
+    })
+    return ret
+}
+avalon.getElementsClassName = function (dom, className, tagName) {
+    if(typeof tagName === "string"){
+        dom = {
+            childNodes: avalon.getElementsTagName(dom, tagName)
+        }
+    }
+    var pattern = new RegExp("(^|\\s)" + className + "(\\s|$)");
+    var ret = []
+    forEachElements(dom, function (el) {
+        if (pattern.test(DOM.getAttribute(el, "class"))) {
+            ret.push(el)
+        }
+    })
+    return ret
 }
