@@ -1,13 +1,6 @@
 var nodeOne = oneObject("value,data,attrs,nodeName,tagName,parentNode,childNodes,quirksMode namespaceURI")
 var DOM = {
     ids: {},
-    getAttribute: function (elem, name) {
-        var attrs = elem.attrs || []
-        for (var i = 0, attr; attr = attrs[i++]; ) {
-            if (attr.name === name)
-                return attr.value
-        }
-    },
     nodeType: function (elem) {
         if (elem.nodeName === elem.tagName) {
             return 1
@@ -28,6 +21,13 @@ var DOM = {
         }
         return 2
     },
+    getAttribute: function (elem, name) {
+        var attrs = elem.attrs || []
+        for (var i = 0, attr; attr = attrs[i++]; ) {
+            if (attr.name === name)
+                return attr.value
+        }
+    },
     hasAttribute: function (el, name) {
         var value = DOM.getAttribute(el, name)
         return typeof value === "string"
@@ -45,6 +45,23 @@ var DOM = {
             value: value
         })
         return elem
+    },
+    removeAttribute: function (elem, name) {
+        var attrs = elem.attrs || []
+        for (var i = attrs.length, attr; attr = attrs[--i]; ) {
+            if (attr.name === name) {
+                attrs.splice(i, 1)
+                break
+            }
+        }
+        return elem
+    },
+    setBoolAttribute: function (elem, name, value) {
+        if (value) {
+            DOM.setAttribute(elem, name, name)
+        } else {
+            DOM.removeAttribute(elem, name)
+        }
     },
     setStyle: function (elem, key, value) {
 
@@ -68,35 +85,29 @@ var DOM = {
 
             DOM.setAttribute(elem, 'style', newValue)
         }
-
-
-    },
-    setBoolAttribute: function (elem, name, value) {
-        if (value) {
-            DOM.setAttribute(elem, name, name)
-        } else {
-            DOM.removeAttribute(elem, name)
-        }
-    },
-    removeAttribute: function (elem, name) {
-        var attrs = elem.attrs || []
-        for (var i = attrs.length, attr; attr = attrs[--i]; ) {
-            if (attr.name === name) {
-                attrs.splice(i, 1)
-                break
-            }
-        }
-        return elem
     },
     innerText: function (elem, text) {
-        elem.childNodes = [
-            {
-                nodeName: "#text",
-                nodeType: 3,
-                value: text,
-                parentNode: elem
+        //如果它没有孩子,添加一个新文本节点,如果它第一个孩子是文本节点,那么直接在它上面改
+        //如果是其他节点类型,替换为新文本节点,最后将孩子个数减至1
+        var array = elem.childNodes
+        var textNode = {
+            nodeName: "#text",
+            nodeType: 3,
+            value: text,
+            parentNode: elem
+        }
+        //如果没有节点,添加一个新文本节点
+        if (!array.length) {
+            array.push(textNode)
+        } else {
+            array.length = 1
+            var firstChild = array[0]
+            if (firstChild.nodeName === "#text") {
+                firstChild.value = text
+            } else {
+                DOM.replaceChild(textNode, firstChild)
             }
-        ]
+        }
     },
     createElement: function (tagName) {
         return {
@@ -117,7 +128,6 @@ var DOM = {
                 if (!nodeOne[i]) {
                     continue
                 }
-
                 if (i === "parentNode") {
                     ret[i] = elem[i]
                 } else if (i === "childNodes") {
@@ -271,7 +281,7 @@ avalon.getElementsTagName = function (dom, tagName) {
     return ret
 }
 avalon.getElementsClassName = function (dom, className, tagName) {
-    if(typeof tagName === "string"){
+    if (typeof tagName === "string") {
         dom = {
             childNodes: avalon.getElementsTagName(dom, tagName)
         }
