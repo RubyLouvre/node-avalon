@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>test</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style>
+    
+</style>
+<script src="avalon.browser.js"></script>
+<script>
+   
+</script>
+</head>
+<body ms-controller="test">
+    <a id="ttt" ms-scan-1="avalon.rebind([{
+                name: 'ms-attr-title',
+                param: 'title',
+                priority: 970,
+                type: 'attr',
+                value: 'aaa',
+            }, {
+                name: 'ms-attr-href',
+                param: 'href',
+                priority: 970,
+                type: 'attr',
+                value: 'url',
+            }], ['test'])">text2 xxx</a>
+
+    <a ms-attr-title="aaa" ms-attr-href="url">{{text}} xxx</a>
+    {{text2}}
+    
+    <div ms-controller="test2"></div>
+	<button ms-click="change">change</button>
+	<script>
+	    var testVm = avalon.define({
+		    	$id: 'test',
+
+		    	aaa: 'red',
+                url: 'http://www.qunar.com',
+                text: 'haha',
+                text2: 'heheda',
+
+                change: function() {
+                    testVm.aaa = 'hehe'
+                    testVm.url = 'http://www.baidu.com',
+                    testVm.text = 'xixi'
+                }
+		    })
+            avalon.define({
+                $id: 'test2'
+            })
+	    	
+	</script>
+</body>
+</html>
