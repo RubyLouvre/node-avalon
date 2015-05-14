@@ -1,6 +1,7 @@
 function scanNodeArray(nodes, vmodels) {
-    for (var i = 0, node; node = nodes[i++]; ) {
-        scanNode(node, vmodels)
+    var n = nodes.length
+    for (var i = 0; i < n; i++ ) {
+        scanNode(nodes[i], vmodels)
     }
 }
 var scriptTypes = oneObject(["", "text/javascript", "text/ecmascript", "application/ecmascript", "application/javascript"])
@@ -19,8 +20,9 @@ function scanNode(node, vmodels) {
             break
         case 1: //如果是元素节点
             node.nodeType = 1
-            if (node.duplexCallback) {
-                node.duplexCallback()
+            if (node.msCallback) {
+                node.msCallback()
+                delete node.msCallback
             }
             var id = DOM.getAttribute(node, "id")
             if (id) {
