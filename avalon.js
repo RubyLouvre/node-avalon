@@ -5,7 +5,7 @@
  http://weibo.com/jslouvre/
  
  Released under the MIT license
- avalon.js 1.43 built in 2015.5.13
+ avalon.js 1.43 built in 2015.5.14
  用于后端渲染
  */
 (function(){
@@ -460,6 +460,18 @@ var DOM = {
                 return 11
         }
         return 2
+    },
+    
+    /*
+     * 使用正则表达寻找一个attribute的Name。返回第一个匹配成功的attrName或者undefined
+     */
+    lookupAttributeName: function (elem, attrNameRegex) {
+        var attrs = elem.attrs || []
+        for (var i = 0, attr; attr = attrs[i++]; ) {
+            if (attrNameRegex.test(attr.name))
+                return attr.name
+        }
+        return undefined;
     },
     getAttribute: function (elem, name) {
         var attrs = elem.attrs || []
@@ -995,15 +1007,24 @@ function bindForBrowser(data){
     var args = [JSON.stringify(options),  JSON.stringify(array)]
     var element = data.element
     if(DOM.nodeType(element) === 1){
-        DOM.setAttribute(element, "ms-scan-"+ Math.round(Math.random() * 100) ,"avalon.rebind("+ args.concat(false)+")")
+        var scanJSFn = "avalon.rebind("+ args.concat(false)+")";
+        scanJSFn = scanJSFn.replace(/"/ig, "'"); // 因为ms-scan-xx内的内容是在双引号内，所以需要把所有的Stringify产生的双引号转换为单引号
+        
+        // 查找ms-scan-*的attribute，如果没有，则生成一个ms-scan-random()。
+        var scanAttrName = DOM.lookupAttributeName(element, /^ms-scan-\d*$/);
+        if (scanAttrName == undefined) {
+            scanAttrName = "ms-scan-"+ Math.round(Math.random() * 100);
+        } else {
+            scanJSFn = [DOM.getAttribute(element, scanAttrName), scanJSFn].join(";");
+        }
+        DOM.setAttribute(element, scanAttrName , scanJSFn)
     }else{
-        var node = document.createElement("script")
+        var node = DOM.createElement("script")
         var id = ("ms"+ Math.random()).replace(/0\.\d/,"")
-        node.id = id
-        node.innerHTML = "setTimeout(function(){avalon.rebind("+ args.concat(JSON.stringify(id))+")},500)"
+        DOM.innerHTML(node, "setTimeout(function(){avalon.rebind("+ args.concat(JSON.stringify(id))+")},500)")
+        DOM.setAttribute(node, "id", id);
         try{
-            
-             element.parentNode.insertBefore(node, element.nextSibling )
+            element.parentNode.childNodes.push(node)
         }catch(e){
         }
     }
@@ -2227,7 +2248,8 @@ function notifySubscribers(list) { //通知依赖于这个访问器的订阅者�
 bindingHandlers.text = function (data, vmodels) {
     parseExprProxy(data.value, vmodels, data)
 }
-bindingExecutors.text = function (val, elem) {
+bindingExecutors.text = function (val, elem, data) {
+    bindForBrowser(data)
     val = val == null ? "" : val //不在页面上显示undefined null
     if (elem.nodeName === "#text") { //绑定在文本节点上
       //  console.log(elem.parentNode)
@@ -2406,6 +2428,7 @@ bindingHandlers.attr = function (data, vmodels) {
     parseExprProxy(text, vmodels, data, (simple ? 0 : scanExpr(data.value)))
 }
 bindingExecutors.attr = function (val, elem, data) {
+    bindForBrowser(data)
     var method = data.type
     var attrName = data.param
     if (method === "attr") {
