@@ -21,6 +21,18 @@ var DOM = {
         }
         return 2
     },
+    
+    /*
+     * 使用正则表达寻找一个attribute的Name。返回第一个匹配成功的attrName或者undefined
+     */
+    lookupAttributeName: function (elem, attrNameRegex) {
+        var attrs = elem.attrs || []
+        for (var i = 0, attr; attr = attrs[i++]; ) {
+            if (attrNameRegex.test(attr.name))
+                return attr.name
+        }
+        return undefined;
+    },
     getAttribute: function (elem, name) {
         var attrs = elem.attrs || []
         for (var i = 0, attr; attr = attrs[i++]; ) {
