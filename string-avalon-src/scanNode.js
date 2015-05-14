@@ -1,6 +1,7 @@
 function scanNodeArray(nodes, vmodels) {
-    var n = nodes.length
-    for (var i = 0; i < n; i++ ) {
+    var len = nodes.length,
+        i = 0;
+    for (; i < len; i++) {
         scanNode(nodes[i], vmodels)
     }
 }
@@ -20,9 +21,8 @@ function scanNode(node, vmodels) {
             break
         case 1: //如果是元素节点
             node.nodeType = 1
-            if (node.msCallback) {
-                node.msCallback()
-                delete node.msCallback
+            if (node.duplexCallback) {
+                node.duplexCallback()
             }
             var id = DOM.getAttribute(node, "id")
             if (id) {
