@@ -80,6 +80,7 @@ function scanText(textNode, vmodels) {
             var node = {
                 nodeName: "#text",
                 value: token.value,
+                nodeMark:"avalon文本节点",
                 nodeType: 3
             } //将文本转换为文本节点，并替换原来的文本节点
             if (token.expr) {

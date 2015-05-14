@@ -5,7 +5,7 @@
  http://weibo.com/jslouvre/
  
  Released under the MIT license
- avalon.js 1.43 built in 2015.5.13
+ avalon.js 1.43 built in 2015.5.14
  用于后端渲染
  */
 (function(){
@@ -1323,6 +1323,7 @@ function scanText(textNode, vmodels) {
             var node = {
                 nodeName: "#text",
                 value: token.value,
+                nodeMark:"avalon文本节点",
                 nodeType: 3
             } //将文本转换为文本节点，并替换原来的文本节点
             if (token.expr) {
@@ -2251,10 +2252,9 @@ bindingExecutors.text = function (val, elem, data) {
     bindForBrowser(data)
     val = val == null ? "" : val //不在页面上显示undefined null
     if (elem.nodeName === "#text") { //绑定在文本节点上
-        console.log("++++++++++++++"+ val)
+      //  console.log(elem.parentNode)
+     //   console.log(elem.parentNode.childNodes.indexOf(elem))
         elem.value = String(val)
-     //   if(!elem.xxxx)
-            elem.xxx = '22222222'
     } else { //绑定在特性节点上
         DOM.innerText(elem, val)
     }
@@ -2845,13 +2845,34 @@ bindingExecutors.repeat = function (method, pos, el) {
                     shimController(data, transation, proxy, fragments)
                 }
                 DOM.replaceChild(transation.concat(start), start)
+                parent.childNodes.forEach(function (el) {
+                    console.log(el.parentNode == parent)
+                })
+                console.log("扫描子节点")
                 for (i = 0; fragment = fragments[i++]; ) {
                     scanNodeArray(fragment.nodes, fragment.vmodels)
                     fragment.nodes = fragment.vmodels = null
                 }
+                parent.childNodes.forEach(function (el) {
+                    if (el.tagName) {
+                        console.log("********************")
+                        el.childNodes.forEach(function (elem) {
+                            console.log(elem.parentNode === el)
+                        })
+                    }
+                })
                 break
             case "del": //将pos后的el个元素删掉(pos, el都是数字)
                 start = proxies[pos].$stamp
+                console.log("del")
+                parent.childNodes.forEach(function (el) {
+                    if (el.tagName) {
+                        console.log("********************")
+                        el.childNodes.forEach(function (elem) {
+                            console.log(elem.parentNode === el)
+                        })
+                    }
+                })
                 end = locateNode(data, pos + el)
                 sweepNodes(start, end)
                 var removed = proxies.splice(pos, el)
@@ -2951,14 +2972,11 @@ bindingExecutors.repeat = function (method, pos, el) {
 })
 
 function shimController(data, transation, proxy, fragments) {
-
     var content = DOM.cloneNode(data.template, true)
-
     var nodes = avalon.slice(content.childNodes)
     if (proxy.$stamp) {
         content.childNodes.unshift(proxy.$stamp)
         proxy.$stamp.parentNode = content
-        // content.insertBefore(proxy.$stamp, content.firstChild)
     }
     transation.appendChild(content)
     var nv = [proxy].concat(data.vmodels)
@@ -2977,7 +2995,7 @@ function locateNode(data, pos) {
 function sweepNodes(start, end, callback) {
     var parent = start.parentNode
     var children = parent.childNodes
-    var startIndex = children.indexOf(start) + 1
+    var startIndex = children.indexOf(start)
     var endIndex = children.indexOf(end)
     var array = children.splice(startIndex, endIndex - startIndex)
     if (array.length && callback) {
