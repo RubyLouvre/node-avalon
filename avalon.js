@@ -1120,8 +1120,10 @@ function scanTag(elem, vmodels) {
     }
 }
 function scanNodeArray(nodes, vmodels) {
-    for (var i = 0, node; node = nodes[i++]; ) {
-        scanNode(node, vmodels)
+    var len = nodes.length,
+        i = 0;
+    for (; i < len; i++) {
+        scanNode(nodes[i], vmodels)
     }
 }
 var scriptTypes = oneObject(["", "text/javascript", "text/ecmascript", "application/ecmascript", "application/javascript"])
