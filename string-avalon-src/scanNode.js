@@ -1,11 +1,8 @@
 function scanNodeArray(nodes, vmodels) {
     var len = nodes.length,
-        i = 0,
-        node;
+        i = 0;
     for (; i < len; i++) {
-        node = nodes[i]
-        if (node.nodeName == "#text") debugger
-        scanNode(node, vmodels)
+        scanNode(nodes[i], vmodels)
     }
 }
 var scriptTypes = oneObject(["", "text/javascript", "text/ecmascript", "application/ecmascript", "application/javascript"])
