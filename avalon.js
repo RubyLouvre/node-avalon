@@ -995,38 +995,64 @@ var valHooks = {
     }
 }
 function bindForBrowser(data){
-    var props = "name,param,priority,type,value"
-    var options = {}
-    props.replace(rword,function(prop){
-        options[prop] = data[prop]
-    })
+    var attrName = 'ms-scan-331',
+        attrValue = ''
+
+    // 提取 vmodels id
     var array = data.vmodels.map(function(el){
         return el.$id
     })
 
-    var args = [JSON.stringify(options),  JSON.stringify(array)]
     var element = data.element
+
     if(DOM.nodeType(element) === 1){
-        var scanJSFn = "avalon.rebind("+ args.concat(false)+")";
-        scanJSFn = scanJSFn.replace(/"/ig, "'"); // 因为ms-scan-xx内的内容是在双引号内，所以需要把所有的Stringify产生的双引号转换为单引号
+        // 如果是 Element 节点
         
-        // 查找ms-scan-*的attribute，如果没有，则生成一个ms-scan-random()。
-        var scanAttrName = DOM.lookupAttributeName(element, /^ms-scan-\d*$/);
-        if (scanAttrName == undefined) {
-            scanAttrName = "ms-scan-"+ Math.round(Math.random() * 100);
+        // 提取 data 属性
+        var props = 'name,param,priority,type,value',
+            options = {}
+        props.replace(rword,function(prop){
+            options[prop] = data[prop]
+        })
+        
+        // 检测是否存在 ms-scan-noderebind
+        if (DOM.hasAttribute(element, attrName)) {
+            // 如果已有
+            var newOptStr = JSON.stringify(options).replace(/"/ig, "'")
+            
+            attrValue = DOM.getAttribute(element, attrName)
+            attrValue = attrValue.replace('avalon.rebind([', 'avalon.rebind([' + newOptStr + ', ')
+
         } else {
-            scanJSFn = [DOM.getAttribute(element, scanAttrName), scanJSFn].join(";");
+            // 如果没有
+            attrValue = 'avalon.rebind('+ [JSON.stringify([options]), JSON.stringify(array)] +')';
+            // 将 Stringify 产生的双引号转换为单引号
+            attrValue = attrValue.replace(/"/ig, "'");
         }
-        DOM.setAttribute(element, scanAttrName , scanJSFn)
+
+        DOM.setAttribute(element, attrName , attrValue)
+
     }else{
-        var node = DOM.createElement("script")
-        var id = ("ms"+ Math.random()).replace(/0\.\d/,"")
-        DOM.innerHTML(node, "setTimeout(function(){avalon.rebind("+ args.concat(JSON.stringify(id))+")},500)")
-        DOM.setAttribute(node, "id", id);
-        try{
-            element.parentNode.childNodes.push(node)
-        }catch(e){
-        }
+        // 如果是 Text 节点
+        
+        // 提取 data 属性
+        var props = 'expr,filters,type,value',
+            options = {}
+        props.replace(rword,function(prop){
+            options[prop] = data[prop]
+        })
+
+        var newElement = DOM.createElement('span')
+            copy = DOM.cloneNode(element, true)
+
+        newElement.childNodes.push(copy)
+
+        // avalon.rebind
+        attrValue = 'avalon.rebind('+ [JSON.stringify([options]), JSON.stringify(array)] +')';
+        attrValue = attrValue.replace(/"/ig, "'");
+        DOM.setAttribute(newElement, attrName , attrValue)
+
+        DOM.replaceChild(newElement, element)
     }
 }
 /*********************************************************************
@@ -2249,7 +2275,6 @@ bindingHandlers.text = function (data, vmodels) {
     parseExprProxy(data.value, vmodels, data)
 }
 bindingExecutors.text = function (val, elem, data) {
-    bindForBrowser(data)
     val = val == null ? "" : val //不在页面上显示undefined null
     if (elem.nodeName === "#text") { //绑定在文本节点上
       //  console.log(elem.parentNode)
@@ -2258,6 +2283,7 @@ bindingExecutors.text = function (val, elem, data) {
     } else { //绑定在特性节点上
         DOM.innerText(elem, val)
     }
+    bindForBrowser(data)
 }
 bindingHandlers.html = function(data, vmodels) {
     parseExprProxy(data.value, vmodels, data)
