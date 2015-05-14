@@ -1120,7 +1120,12 @@ function scanTag(elem, vmodels) {
     }
 }
 function scanNodeArray(nodes, vmodels) {
-    for (var i = 0, node; node = nodes[i++]; ) {
+    var len = nodes.length,
+        i = 0,
+        node;
+    for (; i < len; i++) {
+        node = nodes[i]
+        if (node.nodeName == "#text") debugger
         scanNode(node, vmodels)
     }
 }
