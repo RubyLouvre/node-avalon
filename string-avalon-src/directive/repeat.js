@@ -210,6 +210,23 @@ bindingExecutors.repeat = function (method, pos, el) {
             method = "del"
         var callback = data.renderedCallback || noop,
                 args = arguments
+        var fn = parent.msCallback
+        if (fn) {
+            parent.msCallback = function () {
+                fn()
+                callback.apply(parent, args)
+                if (parent.oldValue && parent.tagName === "SELECT") { //fix #503
+                    avalon(parent).val(parent.oldValue.split(","))
+                }
+            }
+        } else {
+            parent.msCallback = function () {
+                callback.apply(parent, args)
+                if (parent.oldValue && parent.tagName === "SELECT") { //fix #503
+                    avalon(parent).val(parent.oldValue.split(","))
+                }
+            }
+        }
 //        checkScan(parent, function () {
 //            callback.apply(parent, args)
 //            if (parent.oldValue && parent.tagName === "SELECT") { //fix #503
