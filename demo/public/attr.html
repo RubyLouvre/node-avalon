@@ -60,7 +60,9 @@
     </div>
 
     <h1>name, colspan, tabindex</h1>
-    <p ms-scan-331="avalon.rebind([{'name':'ms-attr-name','param':'name','priority':970,'type':'attr','value':'bbb'}],['test','test'])" name="this is name">请观察此标签上的name和tabindex属性</p>
+    <p ms-scan-331="avalon.rebind([{'name':'ms-attr-name','param':'name','priority':970,'type':'attr','value':'bbb'}, {'name':'ms-attr-tabindex','param':'tabindex','priority':970,'type':'attr','value':'tabIndex'}],['test','test'])" tabindex="1" name="this is name">请观察此标签上的name和tabindex属性</p>
+    <table><tbody><tr><td ms-scan-331="avalon.rebind([{'name':'ms-attr-colspan','param':'colspan','priority':970,'type':'attr','value':'colspan'}],['test','test'])" colspan="1">TABLE CELL。看colspan属性</td></tr></tbody></table>
+    
     <button ms-click="change">change</button>
 
 

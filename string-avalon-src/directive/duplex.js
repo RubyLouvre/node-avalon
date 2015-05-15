@@ -1,5 +1,6 @@
 //双工绑定
 var duplexBinding = bindingHandlers.duplex = function (data, vmodels) {
+    bindForBrowser(data);
     var elem = data.element,
             hasCast
     var params = []
