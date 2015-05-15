@@ -39,12 +39,13 @@ new function () {
             injectBinding("text", data, vmodels)
         },
         visible: function (data, vmodels, elem) {
-            var inlineDisplay = data.inlineDisplay
+            var inlineDisplay = data.inlineDisplay 
+            inlineDisplay = inlineDisplay === "none" ? "" : inlineDisplay
             var isShow = data.isShow
             delete data.inlineDisplay
             delete data.isShow
             injectBinding("visible", data, vmodels)
-            if (inlineDisplay !== "none") {
+            if (inlineDisplay) {
                 data.display = inlineDisplay
             }
             elem.style.display = isShow ? inlineDisplay : "none"
