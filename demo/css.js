@@ -5,7 +5,7 @@ var parse5 = require('parse5'),
 	serializer = new parse5.Serializer(),
 	fs = require('fs'),
 	// 引入 node-avalon
-	avalon = require('../../avalon'),
+	avalon = require('../avalon'),
 	// 引入 js 文件，以字符串形式
 	scriptStr = fs.readFileSync('./script/' + name + '.js', 'utf-8'),
 	// 引入 html 文件，以字符串形式
