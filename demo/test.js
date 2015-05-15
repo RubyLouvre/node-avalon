@@ -1,11 +1,13 @@
 var files = ["attr","css","if","expression","visible"]
 
 var parse5 = require('parse5'),
-        parser = new parse5.Parser(),
-        serializer = new parse5.Serializer(),
-        fs = require('fs'),
-        // 引入 node-avalon
-        avalon = require('../avalon')
+    parser = new parse5.Parser(),
+    serializer = new parse5.Serializer(),
+    fs = require('fs'),
+    // 引入 node-avalon
+    avalon = require('../avalon')
+
+fs.mkdir('./public', function(){})
 
 files.forEach(function (name) {
     // 引入 js 文件，以字符串形式
@@ -19,8 +21,16 @@ files.forEach(function (name) {
     avalon.scan(dom, vm)
     var str = serializer.serialize(dom);
 
-    fs.writeFile('./public/' + name + '.html', str, function (err) {
-        console.log('成功生成 ./public/' + name + '.html');
+    var fileName = './public/' + name + '.html'
+    
+
+    fs.writeFile(fileName, str, function (err) {
+        if (err) {
+            console.log(fileName + '创建失败！')
+            console.log(err)
+        } else {
+            console.log(fileName + '创建成功！');
+        }
     });
 })
 
