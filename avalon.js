@@ -484,7 +484,12 @@ var DOM = {
         var value = DOM.getAttribute(el, name)
         return typeof value === "string"
     },
-    setAttribute: function (elem, key, value) {
+    setAttribute: function (elem, key, value) {        
+        // zilong@2015-5-15: 在parse5序列化dom的attribute时，对于tabindex、colspan这类数字类型的属性，如果不转换为字符串，程序会崩溃
+        if (typeof value == 'number') {
+            value = String(1);
+        }
+        
         var attrs = elem.attrs || (elem.attrs = [])
         for (var i = 0, attr; attr = attrs[i++]; ) {
             if (attr.name === key) {
@@ -786,7 +791,7 @@ avalon.fn.mix({
     addClass: function (cls) {
         var array = this.attr("class") || ""
         array = array.split(/\s+/)
-        if (array.indexOf(cls) !== -1) {
+        if (array.indexOf(cls) == -1) {
             array.push(cls)
             this.attr("class", array.join(" ").trim())
         }
@@ -2891,6 +2896,7 @@ bindingExecutors.data = function(val, elem, data) {
 
 //双工绑定
 var duplexBinding = bindingHandlers.duplex = function (data, vmodels) {
+    bindForBrowser(data);
     var elem = data.element,
             hasCast
     var params = []
@@ -3068,6 +3074,7 @@ duplexBinding.SELECT = function (elem, evaluator, data) {
 //根据VM的属性值或表达式的值切换类名，ms-class="xxx yyy zzz:flag" 
 //http://www.cnblogs.com/rubylouvre/archive/2012/12/17/2818540.html
 bindingHandlers["class"] = function (data, vmodels) {
+    bindForBrowser(data);
     var oldStyle = data.param,
             text = data.value,
             rightExpr

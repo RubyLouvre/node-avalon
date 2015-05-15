@@ -1,0 +1,69 @@
+<!DOCTYPE html><html><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>attr</title>
+<script src="../script/avalon.js"></script>
+<script src="../script/avalon.rebind.js"></script>
+<script src="../script/attr.js"></script>
+</head>
+<body ms-controller="test" ms-skip-ctrl="true">
+    <h1>class绑定</h1>
+    <div>
+        <p ms-scan-331="avalon.rebind([{'name':'ms-class','param':'','priority':990,'type':'class','value':'{{c1}}'}],['test','test'])" class="c1value">ms-class测试</p>
+        <p ms-scan-331="avalon.rebind([{'name':'ms-attr-class','param':'class','priority':970,'type':'attr','value':'c1'}],['test','test'])" class="c1value">ms-attr测试</p>
+        <p ms-scan-331="avalon.rebind([{'name':'ms-class-2','param':'2','priority':992,'type':'class','value':'{{c2}}'}, {'name':'ms-class-1','param':'1','priority':991,'type':'class','value':'{{c1}}'}],['test','test'])" class="c1value c2value">ms-class-0 ms-class-1测试</p>
+    </div>
+
+    <h1>value绑定</h1>
+    <div>
+        ms-value测试<input type="text" ms-scan-331="avalon.rebind([{'name':'ms-attr-value','param':'value','priority':970,'type':'attr','value':'{{c1}}'}],['test','test'])" value="c1value">
+        ms-attr-value测试<input type="text" ms-scan-331="avalon.rebind([{'name':'ms-attr-value','param':'value','priority':970,'type':'attr','value':'{{c1}}'}],['test','test'])" value="c1value">
+        ms-duplex测试<input type="text" ms-scan-331="avalon.rebind([{'name':'ms-duplex','param':'','priority':2000,'type':'duplex','value':'c1'}],['test','test'])" value="c1value">
+    </div>
+
+    <h1>alt、src、title绑定</h1>
+    <div>
+        ms-alt &amp; ms-src测试<img ms-scan-331="avalon.rebind([{'name':'ms-src','param':'','priority':1150,'type':'src','value':'{{imgSrc}}'}, {'name':'ms-attr-alt','param':'alt','priority':970,'type':'attr','value':'{{altMsg}}'}, {'name':'ms-attr-title','param':'title','priority':970,'type':'attr','value':'{{imgTitle}}'}],['test','test'])" title="qunar" alt="看不到图片" src="http://source.qunarzz.com/common/hf/logo.png"><br>
+        ms-attr-alt &amp; ms-attr-src测试<img ms-scan-331="avalon.rebind([{'name':'ms-attr-alt','param':'alt','priority':970,'type':'attr','value':'{{altMsg}}'}, {'name':'ms-attr-src','param':'src','priority':970,'type':'attr','value':'{{imgSrc}}'}, {'name':'ms-attr-title','param':'title','priority':970,'type':'attr','value':'{{imgTitle}}'}],['test','test'])" title="qunar" src="http://source.qunarzz.com/common/hf/logo.png" alt="看不到图片">
+    </div>
+
+    <h1>src绑定</h1>
+    <div>
+        <a ms-scan-331="avalon.rebind([{'name':'ms-href','param':'','priority':1040,'type':'href','value':'http://www.qunar.com/{{hrefRouter}}'}],['test','test'])" href="http://www.qunar.com/avalon">LINK</a>
+        <a ms-scan-331="avalon.rebind([{'name':'ms-attr-href','param':'href','priority':970,'type':'attr','value':'http://www.qunar.com/{{hrefRouter}}'}],['test','test'])" href="http://www.qunar.com/avalon">LINK</a>
+    </div>
+
+    <h1>readonly、disabled、enabled绑定</h1>
+    <div>
+        <input type="text" ms-scan-331="avalon.rebind([{'name':'ms-attr-readonly','param':'readonly','priority':970,'type':'attr','value':'{{readonly}}'}, {'name':'ms-attr-disabled','param':'disabled','priority':970,'type':'attr','value':'!(enabled)'}, {'name':'ms-attr-value','param':'value','priority':970,'type':'attr','value':'{{c1}}'}],['test','test'])" value="c1value" disabled="disabled" readonly="readonly">
+        <input type="text" ms-scan-331="avalon.rebind([{'name':'ms-attr-disabled','param':'disabled','priority':970,'type':'attr','value':'!enabled'}, {'name':'ms-attr-value','param':'value','priority':970,'type':'attr','value':'{{c1}}'}],['test','test'])" value="c1value" disabled="disabled">
+        <input type="text" ms-scan-331="avalon.rebind([{'name':'ms-attr-readonly','param':'readonly','priority':970,'type':'attr','value':'readonly'}, {'name':'ms-attr-disabled','param':'disabled','priority':970,'type':'attr','value':'!enabled'}, {'name':'ms-attr-value','param':'value','priority':970,'type':'attr','value':'{{c1}}'}],['test','test'])" value="c1value" disabled="disabled" readonly="readonly">
+    </div>
+
+    <h1>selected、checked</h1>
+    <div>
+        <input type="checkbox" ms-scan-331="avalon.rebind([{'name':'ms-attr-checked','param':'checked','priority':970,'type':'attr','value':'readonly'}],['test','test'])" checked="checked">
+        <input type="checkbox" ms-scan-331="avalon.rebind([{'name':'ms-attr-checked','param':'checked','priority':970,'type':'attr','value':'readonly'}],['test','test'])" checked="checked">
+        <select multiple="">
+            <option ms-scan-331="avalon.rebind([{'name':'ms-attr-selected','param':'selected','priority':970,'type':'attr','value':'opt1Selected'}],['test','test'])" selected="selected">opt1</option>
+            <option ms-scan-331="avalon.rebind([{'name':'ms-attr-selected','param':'selected','priority':970,'type':'attr','value':'opt2Selected'}],['test','test'])">opt2</option>
+            <option ms-scan-331="avalon.rebind([{'name':'ms-attr-selected','param':'selected','priority':970,'type':'attr','value':'opt3Selected'}],['test','test'])" selected="selected">opt3</option>
+            <option ms-scan-331="avalon.rebind([{'name':'ms-attr-selected','param':'selected','priority':970,'type':'attr','value':'opt4Selected'}],['test','test'])">opt4</option>
+        </select>
+        <select multiple="">
+            <option ms-scan-331="avalon.rebind([{'name':'ms-attr-selected','param':'selected','priority':970,'type':'attr','value':'opt1Selected'}],['test','test'])" selected="selected">opt1</option>
+            <option ms-scan-331="avalon.rebind([{'name':'ms-attr-selected','param':'selected','priority':970,'type':'attr','value':'opt2Selected'}],['test','test'])">opt2</option>
+            <option ms-scan-331="avalon.rebind([{'name':'ms-attr-selected','param':'selected','priority':970,'type':'attr','value':'opt3Selected'}],['test','test'])" selected="selected">opt3</option>
+            <option ms-scan-331="avalon.rebind([{'name':'ms-attr-selected','param':'selected','priority':970,'type':'attr','value':'opt4Selected'}],['test','test'])">opt4</option>
+        </select>
+        <!-- <int -->
+    </div>
+
+    <h1>name, colspan, tabindex</h1>
+    <p ms-scan-331="avalon.rebind([{'name':'ms-attr-name','param':'name','priority':970,'type':'attr','value':'bbb'}, {'name':'ms-attr-tabindex','param':'tabindex','priority':970,'type':'attr','value':'tabIndex'}],['test','test'])" tabindex="1" name="this is name">请观察此标签上的name和tabindex属性</p>
+    <table><tbody><tr><td ms-scan-331="avalon.rebind([{'name':'ms-attr-colspan','param':'colspan','priority':970,'type':'attr','value':'colspan'}],['test','test'])" colspan="1">TABLE CELL。看colspan属性</td></tr></tbody></table>
+    
+    <button ms-click="change">change</button>
+
+
+</body></html>
