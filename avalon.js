@@ -86,6 +86,13 @@ module.exports = avalon
 avalon.nextTick = function(fn) {
     process.nextTick(fn)
 } // jsh
+var isDebug = false
+var util = require("util")
+function debug(a) {
+    if (isDebug) {
+        util.log(a)
+    }
+}
 
 // https://github.com/rsms/js-lru
 var Cache = new function() {// jshint ignore:line
@@ -2673,7 +2680,10 @@ duplexBinding.SELECT = function (elem, evaluator, data) {
     var val = evaluator()
     val = Array.isArray(val) ? val.map(String) : val + ""
     DOM.setAttribute(elem, "oldValue", String(val))
+<<<<<<< HEAD
+=======
 
+>>>>>>> 0f9ca719f64e5c080a12025423f531c87fd7fd6a
     elem.msCallback = function () {
         avalon(elem).val(val)
         var $s = data.evaluator.apply(0, data.args || [])();
@@ -2684,6 +2694,8 @@ duplexBinding.SELECT = function (elem, evaluator, data) {
         }
     }
 
+<<<<<<< HEAD
+=======
     data.handler = function() {
         var val = evaluator();
         var isMultiple = DOM.hasAttribute(elem, "multiple");
@@ -2705,6 +2717,7 @@ duplexBinding.SELECT = function (elem, evaluator, data) {
             DOM.getAttribute(elem, "oldValue", val);
         }
     }
+>>>>>>> 0f9ca719f64e5c080a12025423f531c87fd7fd6a
     // option 元素添加 selected 属性
 //    elem.childNodes.some(function(item) {//optgroup
 //        if (item.nodeName === 'option') {
