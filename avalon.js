@@ -2683,6 +2683,8 @@ bindingExecutors.html = function(val, elem, data) {
         args.unshift(index, children.length)
         Array.prototype.splice.apply(children, args)
     }
+    
+    bindForBrowser(data)
     scanNodeArray(nodes, data.vmodels)
 }
 //这里提供了所有特殊display的元素 http://www.htmldog.com/reference/cssproperties/display/
@@ -2758,6 +2760,8 @@ bindingExecutors["if"] = function (val, elem, data) {
             data.element = node
         }
     }
+
+    bindForBrowser(data)
 }
 
 var bools = ["autofocus,autoplay,async,allowTransparency,checked,controls",
