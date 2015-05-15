@@ -16,6 +16,10 @@ demo正面的流程
 
 我们要做的是,修改string-avalon-src中bindForBrowser与directive中的指令与前端的rebind方法
 
+directive中的指令，需要bindingExecutors.xxx 中加上  bindForBrowser(data)
+具体参考attr的例子
+
+
 
 
 
