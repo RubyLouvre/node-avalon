@@ -132,7 +132,7 @@ duplexBinding.SELECT = function (elem, evaluator, data) {
     val = Array.isArray(val) ? val.map(String) : val + ""
     DOM.setAttribute(elem, "oldValue", String(val))
 
-    elem.duplexCallback = function () {
+    elem.msCallback = function () {
         avalon(elem).val(val)
         var $s = data.evaluator.apply(0, data.args || [])();
         var $events = $s.$events

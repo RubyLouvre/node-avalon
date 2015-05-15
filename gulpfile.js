@@ -27,6 +27,7 @@ gulp.task('combo', function () {
     var files = [
         "inter",
         "variable",
+        "debug",
         "cache",
         "configuration",
         "core",

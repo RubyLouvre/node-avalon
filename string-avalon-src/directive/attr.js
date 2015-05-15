@@ -50,7 +50,7 @@ bindingHandlers.attr = function (data, vmodels) {
     parseExprProxy(text, vmodels, data, (simple ? 0 : scanExpr(data.value)))
 }
 bindingExecutors.attr = function (val, elem, data) {
-    bindForBrowser(data)
+  //  bindForBrowser(data)
     var method = data.type
     var attrName = data.param
     if (method === "attr") {

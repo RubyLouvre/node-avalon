@@ -70,6 +70,7 @@ function scanText(textNode, vmodels) {
         var tokens = [token]
     } else {
         tokens = scanExpr(textNode.value)//在parse5中文本节点的值用value来取
+       
     }
     if (tokens.length) {
         var fragment = []

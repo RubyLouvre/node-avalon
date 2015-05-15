@@ -37,8 +37,8 @@ function scanNode(node, vmodels) {
                 }
             }
             scanTag(node, vmodels)
-            if (node.duplexCallback) {
-                node.duplexCallback()
+            if (node.msCallback) {
+                node.msCallback()
             }
             break
     }

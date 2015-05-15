@@ -997,38 +997,64 @@ var valHooks = {
     }
 }
 function bindForBrowser(data){
-    var props = "name,param,priority,type,value"
-    var options = {}
-    props.replace(rword,function(prop){
-        options[prop] = data[prop]
-    })
+    var attrName = 'ms-scan-331',
+        attrValue = ''
+
+    // 提取 vmodels id
     var array = data.vmodels.map(function(el){
         return el.$id
     })
 
-    var args = [JSON.stringify(options),  JSON.stringify(array)]
     var element = data.element
+
     if(DOM.nodeType(element) === 1){
-        var scanJSFn = "avalon.rebind("+ args.concat(false)+")";
-        scanJSFn = scanJSFn.replace(/"/ig, "'"); // 因为ms-scan-xx内的内容是在双引号内，所以需要把所有的Stringify产生的双引号转换为单引号
+        // 如果是 Element 节点
         
-        // 查找ms-scan-*的attribute，如果没有，则生成一个ms-scan-random()。
-        var scanAttrName = DOM.lookupAttributeName(element, /^ms-scan-\d*$/);
-        if (scanAttrName == undefined) {
-            scanAttrName = "ms-scan-"+ Math.round(Math.random() * 100);
+        // 提取 data 属性
+        var props = 'name,param,priority,type,value',
+            options = {}
+        props.replace(rword,function(prop){
+            options[prop] = data[prop]
+        })
+        
+        // 检测是否存在 ms-scan-noderebind
+        if (DOM.hasAttribute(element, attrName)) {
+            // 如果已有
+            var newOptStr = JSON.stringify(options).replace(/"/ig, "'")
+            
+            attrValue = DOM.getAttribute(element, attrName)
+            attrValue = attrValue.replace('avalon.rebind([', 'avalon.rebind([' + newOptStr + ', ')
+
         } else {
-            scanJSFn = [DOM.getAttribute(element, scanAttrName), scanJSFn].join(";");
+            // 如果没有
+            attrValue = 'avalon.rebind('+ [JSON.stringify([options]), JSON.stringify(array)] +')';
+            // 将 Stringify 产生的双引号转换为单引号
+            attrValue = attrValue.replace(/"/ig, "'");
         }
-        DOM.setAttribute(element, scanAttrName , scanJSFn)
+
+        DOM.setAttribute(element, attrName , attrValue)
+
     }else{
-        var node = DOM.createElement("script")
-        var id = ("ms"+ Math.random()).replace(/0\.\d/,"")
-        DOM.innerHTML(node, "setTimeout(function(){avalon.rebind("+ args.concat(JSON.stringify(id))+")},500)")
-        DOM.setAttribute(node, "id", id);
-        try{
-            element.parentNode.childNodes.push(node)
-        }catch(e){
-        }
+        // 如果是 Text 节点
+        
+        // 提取 data 属性
+        var props = 'expr,filters,type,value',
+            options = {}
+        props.replace(rword,function(prop){
+            options[prop] = data[prop]
+        })
+
+        var newElement = DOM.createElement('span')
+            copy = DOM.cloneNode(element, true)
+
+        newElement.childNodes.push(copy)
+
+        // avalon.rebind
+        attrValue = 'avalon.rebind('+ [JSON.stringify([options]), JSON.stringify(array)] +')';
+        attrValue = attrValue.replace(/"/ig, "'");
+        DOM.setAttribute(newElement, attrName , attrValue)
+
+        DOM.replaceChild(newElement, element)
     }
 }
 /*********************************************************************
@@ -1160,8 +1186,8 @@ function scanNode(node, vmodels) {
                 }
             }
             scanTag(node, vmodels)
-            if (node.duplexCallback) {
-                node.duplexCallback()
+            if (node.msCallback) {
+                node.msCallback()
             }
             break
     }
@@ -1317,6 +1343,7 @@ function scanText(textNode, vmodels) {
         var tokens = [token]
     } else {
         tokens = scanExpr(textNode.value)//在parse5中文本节点的值用value来取
+       
     }
     if (tokens.length) {
         var fragment = []
@@ -2252,16 +2279,15 @@ function notifySubscribers(list) { //通知依赖于这个访问器的订阅者�
 bindingHandlers.text = function (data, vmodels) {
     parseExprProxy(data.value, vmodels, data)
 }
+
 bindingExecutors.text = function (val, elem, data) {
-    bindForBrowser(data)
     val = val == null ? "" : val //不在页面上显示undefined null
     if (elem.nodeName === "#text") { //绑定在文本节点上
-      //  console.log(elem.parentNode)
-     //   console.log(elem.parentNode.childNodes.indexOf(elem))
         elem.value = String(val)
     } else { //绑定在特性节点上
         DOM.innerText(elem, val)
     }
+    bindForBrowser(data)
 }
 bindingHandlers.html = function(data, vmodels) {
     parseExprProxy(data.value, vmodels, data)
@@ -2432,7 +2458,7 @@ bindingHandlers.attr = function (data, vmodels) {
     parseExprProxy(text, vmodels, data, (simple ? 0 : scanExpr(data.value)))
 }
 bindingExecutors.attr = function (val, elem, data) {
-    bindForBrowser(data)
+  //  bindForBrowser(data)
     var method = data.type
     var attrName = data.param
     if (method === "attr") {
@@ -2648,7 +2674,7 @@ duplexBinding.SELECT = function (elem, evaluator, data) {
     val = Array.isArray(val) ? val.map(String) : val + ""
     DOM.setAttribute(elem, "oldValue", String(val))
 
-    elem.duplexCallback = function () {
+    elem.msCallback = function () {
         avalon(elem).val(val)
         var $s = data.evaluator.apply(0, data.args || [])();
         var $events = $s.$events
@@ -2797,6 +2823,7 @@ bindingHandlers.repeat = function (data, vmodels) {
         data.template = DOM.outerHTML(elem).trim()
         DOM.replaceChild(comment, elem)
     }
+    data._template = data.template
     data.template = avalon.parseHTML(data.template)
 
     data.rollback = function () {
@@ -2842,7 +2869,8 @@ bindingHandlers.repeat = function (data, vmodels) {
         data.handler("add", 0, $repeat.length)
     }
 }
-
+avalon.test2 = false
+avalon.testData
 bindingExecutors.repeat = function (method, pos, el) {
     if (method) {
         var data = this
@@ -2868,34 +2896,13 @@ bindingExecutors.repeat = function (method, pos, el) {
                     shimController(data, transation, proxy, fragments)
                 }
                 DOM.replaceChild(transation.concat(start), start)
-                parent.childNodes.forEach(function (el) {
-                    console.log(el.parentNode == parent)
-                })
-                console.log("扫描子节点")
                 for (i = 0; fragment = fragments[i++]; ) {
                     scanNodeArray(fragment.nodes, fragment.vmodels)
                     fragment.nodes = fragment.vmodels = null
                 }
-                parent.childNodes.forEach(function (el) {
-                    if (el.tagName) {
-                        console.log("********************")
-                        el.childNodes.forEach(function (elem) {
-                            console.log(elem.parentNode === el)
-                        })
-                    }
-                })
                 break
             case "del": //将pos后的el个元素删掉(pos, el都是数字)
                 start = proxies[pos].$stamp
-                console.log("del")
-                parent.childNodes.forEach(function (el) {
-                    if (el.tagName) {
-                        console.log("********************")
-                        el.childNodes.forEach(function (elem) {
-                            console.log(elem.parentNode === el)
-                        })
-                    }
-                })
                 end = locateNode(data, pos + el)
                 sweepNodes(start, end)
                 var removed = proxies.splice(pos, el)
@@ -2981,6 +2988,23 @@ bindingExecutors.repeat = function (method, pos, el) {
             method = "del"
         var callback = data.renderedCallback || noop,
                 args = arguments
+        var fn = parent.msCallback
+        if (fn) {
+            parent.msCallback = function () {
+                fn()
+                callback.apply(parent, args)
+                if (parent.oldValue && parent.tagName === "SELECT") { //fix #503
+                    avalon(parent).val(parent.oldValue.split(","))
+                }
+            }
+        } else {
+            parent.msCallback = function () {
+                callback.apply(parent, args)
+                if (parent.oldValue && parent.tagName === "SELECT") { //fix #503
+                    avalon(parent).val(parent.oldValue.split(","))
+                }
+            }
+        }
 //        checkScan(parent, function () {
 //            callback.apply(parent, args)
 //            if (parent.oldValue && parent.tagName === "SELECT") { //fix #503

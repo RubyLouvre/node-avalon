@@ -45,6 +45,7 @@ bindingHandlers.repeat = function (data, vmodels) {
         data.template = DOM.outerHTML(elem).trim()
         DOM.replaceChild(comment, elem)
     }
+    data._template = data.template
     data.template = avalon.parseHTML(data.template)
 
     data.rollback = function () {
@@ -90,7 +91,8 @@ bindingHandlers.repeat = function (data, vmodels) {
         data.handler("add", 0, $repeat.length)
     }
 }
-
+avalon.test2 = false
+avalon.testData
 bindingExecutors.repeat = function (method, pos, el) {
     if (method) {
         var data = this
@@ -116,34 +118,13 @@ bindingExecutors.repeat = function (method, pos, el) {
                     shimController(data, transation, proxy, fragments)
                 }
                 DOM.replaceChild(transation.concat(start), start)
-                parent.childNodes.forEach(function (el) {
-                    console.log(el.parentNode == parent)
-                })
-                console.log("扫描子节点")
                 for (i = 0; fragment = fragments[i++]; ) {
                     scanNodeArray(fragment.nodes, fragment.vmodels)
                     fragment.nodes = fragment.vmodels = null
                 }
-                parent.childNodes.forEach(function (el) {
-                    if (el.tagName) {
-                        console.log("********************")
-                        el.childNodes.forEach(function (elem) {
-                            console.log(elem.parentNode === el)
-                        })
-                    }
-                })
                 break
             case "del": //将pos后的el个元素删掉(pos, el都是数字)
                 start = proxies[pos].$stamp
-                console.log("del")
-                parent.childNodes.forEach(function (el) {
-                    if (el.tagName) {
-                        console.log("********************")
-                        el.childNodes.forEach(function (elem) {
-                            console.log(elem.parentNode === el)
-                        })
-                    }
-                })
                 end = locateNode(data, pos + el)
                 sweepNodes(start, end)
                 var removed = proxies.splice(pos, el)
@@ -229,6 +210,23 @@ bindingExecutors.repeat = function (method, pos, el) {
             method = "del"
         var callback = data.renderedCallback || noop,
                 args = arguments
+        var fn = parent.msCallback
+        if (fn) {
+            parent.msCallback = function () {
+                fn()
+                callback.apply(parent, args)
+                if (parent.oldValue && parent.tagName === "SELECT") { //fix #503
+                    avalon(parent).val(parent.oldValue.split(","))
+                }
+            }
+        } else {
+            parent.msCallback = function () {
+                callback.apply(parent, args)
+                if (parent.oldValue && parent.tagName === "SELECT") { //fix #503
+                    avalon(parent).val(parent.oldValue.split(","))
+                }
+            }
+        }
 //        checkScan(parent, function () {
 //            callback.apply(parent, args)
 //            if (parent.oldValue && parent.tagName === "SELECT") { //fix #503

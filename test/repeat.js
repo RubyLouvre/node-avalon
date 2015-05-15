@@ -1,7 +1,6 @@
 
 describe('测试ms-repeat', function () {
     it("sync", function () {
-        return
         var vm = avalon.define({
             $id: "test-repeat",
             array: [1, 2, 3, 4, 5],
@@ -42,8 +41,7 @@ describe('测试ms-repeat', function () {
     it("async", function (done) {
         var vm = avalon.define({
             $id: "test-repeat2",
-         //   array: ["a", "b", "c", "d", "e"]
-                     array: ["a", "b"]
+            array: ["a", "b", "c", "d", "e"]
         })
 
         var text = heredoc(function () {
@@ -62,20 +60,17 @@ describe('测试ms-repeat', function () {
         var dom = parser.parse(text)
         avalon.scan(dom, vm)
         var str = serializer.serialize(dom)
-        console.log(str)
         str = str.replace(/<!--\w+\d+(:end)?-->/g, "")
         var lis = avalon.getElementsTagName(dom, "li")
-        expect(lis.length).to.be(2)
-    //    expect(str.indexOf('<ul><li>a-0</li><li>b-1</li><li>c-2</li><li>d-3</li><li>e-4</li></ul>') !== -1).to.be(true)
-        console.log("vm.array.shift()")
+        expect(lis.length).to.be(5)
+        expect(str.indexOf('<ul><li>a-0</li><li>b-1</li><li>c-2</li><li>d-3</li><li>e-4</li></ul>') !== -1).to.be(true)
         vm.array.shift()
         setTimeout(function () {
             var lis = avalon.getElementsTagName(dom, "li")
-            expect(lis.length).to.be(1)
-        //    console.log( lis[0].childNodes )
+            expect(lis.length).to.be(4)
             var str = serializer.serialize(dom)
-         //   str = str.replace(/<!--\w+\d+(:end)?-->/g, "")
-            console.log(str)
+            str = str.replace(/<!--\w+\d+(:end)?-->/g, "")
+            expect(str.indexOf("<li>b-0</li>") !== -1).to.be(true)
             done()
         }, 500)
 
