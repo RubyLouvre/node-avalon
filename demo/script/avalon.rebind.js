@@ -30,12 +30,12 @@ new function () {
             injectBinding("attr", data, vmodels)
         },
         text: function (data, vmodels, elem) {
-            // 如果是插值表达式
-            // 将 node-avalon 生成的 span 元素用文本节点替换
-            var parent = elem.parentNode
-            var textNode = elem.childNodes[0].cloneNode(false)
-            parent.replaceChild(textNode, elem)
-            data.element = textNode
+            if (data.isInText) {
+                var node = elem.firstChild
+                elem.parentNode.replaceChild(node, elem)
+                data.element = node
+                delete data.isInText
+            }
             injectBinding("text", data, vmodels)
         },
         "if": function (data, vmodels, elem) {
