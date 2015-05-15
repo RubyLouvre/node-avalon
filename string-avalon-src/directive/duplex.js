@@ -163,4 +163,13 @@ duplexBinding.SELECT = function (elem, evaluator, data) {
             DOM.getAttribute(elem, "oldValue", val);
         }
     }
+    // option 元素添加 selected 属性
+//    elem.childNodes.some(function(item) {//optgroup
+//        if (item.nodeName === 'option') {
+//            if (DOM.getAttribute(item, 'value') == val) {
+//                DOM.setAttribute(item, 'selected', 'selected')
+//                return true
+//            }
+//        }
+//    })
 }
