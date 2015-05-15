@@ -5,10 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>attr</title>
 <script src="../script/avalon.browser.js"></script>
-<script src="../script/attr.js"></script>
+<script src="../script/css.js"></script>
 </head>
 <body ms-controller="test">
-    <p ms-attr-title="aaa" ms-attr-name="bbb">请观察此标签上的属性</p>
+    <p
+	    ms-css-background-color="color"
+	    ms-css-opacity="opacity"
+	    ms-css-z-index="zIndex"
+
+	    style="opacity: .5; z-index: 3!important;"
+	>
+	    heheda
+	</p>
 
     <button ms-click="change">change</button>
 </body>
