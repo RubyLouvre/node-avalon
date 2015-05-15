@@ -30,4 +30,6 @@ bindingExecutors["if"] = function (val, elem, data) {
             data.element = node
         }
     }
+
+    bindForBrowser(data)
 }

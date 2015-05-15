@@ -22,14 +22,12 @@ files.forEach(function (name) {
     var str = serializer.serialize(dom);
 
     var fileName = './public/' + name + '.html'
-    
-
     fs.writeFile(fileName, str, function (err) {
         if (err) {
-            console.log(fileName + '创建失败！')
+            console.log(fileName + ' 创建失败！')
             console.log(err)
         } else {
-            console.log(fileName + '创建成功！');
+            console.log(fileName + ' 创建成功！');
         }
     });
 })
