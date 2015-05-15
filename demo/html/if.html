@@ -3,21 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>attr</title>
+<title>if</title>
 <script src="../script/avalon.js"></script>
 <script src="../script/avalon.rebind.js"></script>
-<script src="../script/css.js"></script>
+<script src="../script/if.js"></script>
 </head>
 <body ms-controller="test">
-    <p
-	    ms-css-background-color="color"
-	    ms-css-opacity="opacity"
-	    ms-css-z-index="zIndex"
-
-	    style="opacity: .5; z-index: 3!important;"
-	>
-	    heheda
-	</p>
+    <p ms-if="aaa">ms-if</p>
 
     <button ms-click="change">change</button>
 </body>

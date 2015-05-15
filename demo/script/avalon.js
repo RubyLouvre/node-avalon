@@ -5,7 +5,7 @@
  http://weibo.com/jslouvre/
  
  Released under the MIT license
- avalon.js 1.43 built in 2015.5.12
+ avalon.js 1.43 built in 2015.5.14
  support IE6+ and other browsers
  ==================================================*/
 (function(global, factory) {
@@ -2273,9 +2273,10 @@ function scanNodeArray(nodes, vmodels) {
 function scanNode(node, nodeType, vmodels) {
     if (nodeType === 1) {
         scanTag(node, vmodels) //扫描元素节点
-        if(node.tagName === "SELECT" && node.duplexCallback){
-            node.duplexCallback()
-        }
+        if( node.msCallback){
+            node.msCallback()
+            node.msCallback = void 0
+       }
     } else if (nodeType === 3 && rexpr.test(node.data)){
         scanText(node, vmodels) //扫描文本节点
     } else if (kernel.commentInterpolate && nodeType === 8 && !rexpr.test(node.nodeValue)) {
@@ -3891,13 +3892,9 @@ duplexBinding.SELECT = function(element, evaluator, data) {
         }
     }
     data.bound("change", updateVModel)
-    element.duplexCallback = function() {
+    element.msCallback = function() {
         registerSubscriber(data)
         data.changed.call(element, evaluator(), data)
-        try {
-            element.duplexCallback = void 0
-            delete element.duplexCallback
-        } catch (e) {}
     }
 }
 // bindingHandlers.html 定义在if.js
@@ -5608,37 +5605,6 @@ avalon.config({
 avalon.ready(function() {
     avalon.scan(DOC.body)
 })
-
-
-/************************************************************************
- *               avalon.rebind node-avalon 恢复绑定                     *
- ************************************************************************/
-avalon.rebind = function(bindings, vmodelIds) {
-    var element = this,
-        vmodels = vmodelIds.map(function(id) {
-            return avalon.vmodels[id]
-        })
-
-    for (var i = 0, data; data = bindings[i++]; ) {
-        data.vmodels = vmodels
-
-        if (data.type === 'text') {
-            // 如果是插值表达式
-            // 将 node-avalon 生成的 span 元素用文本节点替换
-            var parent = element.parentNode,
-                textNode = element.childNodes[0].cloneNode(false)
-
-            parent.replaceChild(textNode, element)
-            data.element = textNode                
-        } else {
-            data.element = element
-        }
-        
-        // 重新渲染  data.type 绑定
-        avalon.bindingHandlers[data.type](data, vmodels)
-    }
-}
-
 
 // Register as a named AMD module, since avalon can be concatenated with other
 // files that may use define, but not via a proper concatenation script that
