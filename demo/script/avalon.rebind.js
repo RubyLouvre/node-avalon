@@ -10,7 +10,7 @@ new function () {
         })
         for (var i = 0, data; data = bindings[i++]; ) {
             var rebindFn = avalon.rebind[data.type]
-             data.element = this
+            data.element = this
             if (typeof rebindFn === "function") {
                 rebindFn(data, vmodels, this)
             }
@@ -26,7 +26,7 @@ new function () {
         data.handler = bindingExecutors[data.handlerName || name]
     }
     avalon.mix(avalon.rebind, {
-        attr: function(data, vmodels, elem){
+        attr: function (data, vmodels, elem) {
             injectBinding("attr", data, vmodels)
         },
         text: function (data, vmodels, elem) {
@@ -38,7 +38,18 @@ new function () {
             data.element = textNode
             injectBinding("text", data, vmodels)
         },
-        include: function (data, vmodels,elem) {
+        visible: function (data, vmodels, elem) {
+            var inlineDisplay = data.inlineDisplay
+            var isShow = data.isShow
+            delete data.inlineDisplay
+            delete data.isShow
+            injectBinding("visible", data, vmodels)
+            if (inlineDisplay !== "none") {
+                data.display = inlineDisplay
+            }
+            elem.style.display = isShow ? inlineDisplay : "none"
+        },
+        include: function (data, vmodels, elem) {
             if (data.template) {
                 var arr = data.template.split(" ")
                 var key = arr.shift()
