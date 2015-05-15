@@ -27,6 +27,7 @@ bindingHandlers.visible = function (data, vmodels) {
 }
 
 bindingExecutors.visible = function (val, elem, data) {
+    bindForBrowser(data)
     var style = DOM.getAttribute(elem, "style")
     if (val) { //如果要显示,如果在元素设置display:none,那么就去掉
         if (style && data.display) {

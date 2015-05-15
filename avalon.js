@@ -2709,6 +2709,7 @@ bindingHandlers.visible = function (data, vmodels) {
 }
 
 bindingExecutors.visible = function (val, elem, data) {
+    bindForBrowser(data)
     var style = DOM.getAttribute(elem, "style")
     if (val) { //如果要显示,如果在元素设置display:none,那么就去掉
         if (style && data.display) {
@@ -3227,8 +3228,7 @@ bindingHandlers.repeat = function (data, vmodels) {
         data.handler("add", 0, $repeat.length)
     }
 }
-avalon.test2 = false
-avalon.testData
+
 bindingExecutors.repeat = function (method, pos, el) {
     if (method) {
         var data = this
