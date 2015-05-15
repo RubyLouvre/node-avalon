@@ -74,7 +74,7 @@ var class2type = {}
     //生成UUID http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript
 var generateID = function(prefix) {
     prefix = prefix || "avalon"
-    return (prefix + Math.random() + Math.random()).replace(/0\./g, "")
+    return String(Math.random() + Math.random()).replace(/\d\.\d{4}/, prefix)
 }
 
 var avalon = function(el) { //创建jQuery式的无new 实例化结构
