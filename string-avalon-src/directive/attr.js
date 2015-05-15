@@ -50,7 +50,7 @@ bindingHandlers.attr = function (data, vmodels) {
     parseExprProxy(text, vmodels, data, (simple ? 0 : scanExpr(data.value)))
 }
 bindingExecutors.attr = function (val, elem, data) {
-    bindForBrowser(data)
+   
     var method = data.type
     var attrName = data.param
     if (method === "attr") {
@@ -86,9 +86,9 @@ bindingExecutors.attr = function (val, elem, data) {
             }
             var parent = data.startInclude.parentNode
             var children = parent.childNodes
-            var startIndex = children.indexOf(data.startInclude)+ 1
+            var startIndex = children.indexOf(data.startInclude) + 1
             var endIndex = children.indexOf(data.endInclude)
-            children.splice(startIndex , endIndex - startIndex)
+            children.splice(startIndex, endIndex - startIndex)
             var nodes = avalon.parseHTML(text).childNodes
             nodes.forEach(function (el) {
                 el.parentNode = parent
@@ -98,23 +98,30 @@ bindingExecutors.attr = function (val, elem, data) {
             scanNodeArray(nodes, vmodels)
         }
         var path = require("path")
+
         if (data.param === "src") {
             if (typeof cacheTmpls[val] === "string") {
                 scanTemplate(cacheTmpls[val])
             } else {
-                var filePath = path.resolve(process.cwd(), val)
-                var text = require("fs").readFileSync(filePath, "utf8")
-                scanTemplate(cacheTmpls[val] = text)
+                var filePath = path.resolve(avalon.mainPath || process.cwd(), val)
+                try {
+                    var text = require("fs").readFileSync(filePath, "utf8")
+                    data.template = val+" "+text
+                    scanTemplate(cacheTmpls[val] = text)
+                } catch (e) {
+                    log("warning!ms-include-src找不到目标文件 " + e)
+                }
             }
         } else {
             //现在只在scanNode中收集拥有id的script, textarea, noscript标签的innerText
             scanTemplate(DOM.ids[val])
         }
-    } else if (method === "css" ){
+    } else if (method === "css") {
         bindingExecutors.css(val, elem, data)
     } else {
         DOM.setAttribute(elem, method, val) //ms-href, ms-src
     }
+     bindForBrowser(data)
 }
 
 //这几个指令都可以使用插值表达式，如ms-src="aaa/{{b}}/{{c}}.html"ms-src

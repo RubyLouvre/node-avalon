@@ -18,7 +18,9 @@ function bindForBrowser(data){
         props.replace(rword,function(prop){
             options[prop] = data[prop]
         })
-        
+        if(data.type === "include"){
+            options.template = data.template
+        }
         // 检测是否存在 ms-scan-noderebind
         if (DOM.hasAttribute(element, attrName)) {
             // 如果已有
