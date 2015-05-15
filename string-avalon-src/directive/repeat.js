@@ -91,8 +91,7 @@ bindingHandlers.repeat = function (data, vmodels) {
         data.handler("add", 0, $repeat.length)
     }
 }
-avalon.test2 = false
-avalon.testData
+
 bindingExecutors.repeat = function (method, pos, el) {
     if (method) {
         var data = this
