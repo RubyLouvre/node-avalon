@@ -7,7 +7,7 @@
 <script src="../script/attr.js"></script>
 </head>
 <body ms-controller="test" ms-skip-ctrl="true">
-    <p name="this is name" title="this is title">请观察此标签上的属性</p>
+    <p ms-scan-331="avalon.rebind([{'name':'ms-attr-title','param':'title','priority':970,'type':'attr','value':'aaa'}, {'name':'ms-attr-name','param':'name','priority':970,'type':'attr','value':'bbb'}],['test','test'])" name="this is name" title="this is title">请观察此标签上的属性</p>
 
     <button ms-click="change">change</button>
 
