@@ -25,6 +25,9 @@ function bindForBrowser(data) {
             options.isShow = data.isShow
             options.inlineDisplay = data.inlineDisplay
         }
+         if (data.type === "if" ) {
+            options.isInDom = data.isInDom
+        }
         // 检测是否存在 ms-scan-noderebind
         if (DOM.hasAttribute(element, attrName)) {
             // 如果已有

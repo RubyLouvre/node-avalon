@@ -38,8 +38,17 @@ new function () {
             data.element = textNode
             injectBinding("text", data, vmodels)
         },
+        "if": function (data, vmodels, elem) {
+            var isInDom = data.isInDom
+            delete data.isInDom
+            if (!isInDom) {
+                data.element = avalon.parseHTML(elem.text).firstChild
+                elem.parentNode.replaceChild(data.element, elem)
+            }
+            bindingHandlers["if"](data, vmodels)
+        },
         visible: function (data, vmodels, elem) {
-            var inlineDisplay = data.inlineDisplay 
+            var inlineDisplay = data.inlineDisplay
             inlineDisplay = inlineDisplay === "none" ? "" : inlineDisplay
             var isShow = data.isShow
             delete data.inlineDisplay
