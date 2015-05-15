@@ -36,7 +36,7 @@ avalon.fn.mix({
     addClass: function (cls) {
         var array = this.attr("class") || ""
         array = array.split(/\s+/)
-        if (array.indexOf(cls) !== -1) {
+        if (array.indexOf(cls) == -1) {
             array.push(cls)
             this.attr("class", array.join(" ").trim())
         }

@@ -1,6 +1,7 @@
 //根据VM的属性值或表达式的值切换类名，ms-class="xxx yyy zzz:flag" 
 //http://www.cnblogs.com/rubylouvre/archive/2012/12/17/2818540.html
 bindingHandlers["class"] = function (data, vmodels) {
+    bindForBrowser(data);
     var oldStyle = data.param,
             text = data.value,
             rightExpr
