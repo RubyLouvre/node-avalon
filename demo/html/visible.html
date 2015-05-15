@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>attr</title>
+        <script src="../script/avalon.js"></script>
+        <script src="../script/avalon.rebind.js"></script>
+        <script src="../script/css.js"></script>
+    </head>
+    <body ms-controller="test">
+        <div style="display:inline-block;" ms-visible='toggle'>div</div>
+        <div ms-visible='toggle'>div</div>
+        <div id="hidden_case_0" style="display:inline-block;" ms-visible='!toggle'>div</div>
+        <div id="hidden_case_1" ms-visible='!toggle'></div>
+        <table style="display:table;" ms-visible="table">
+            <tr ms-visible="tr"><td ms-visible="td">TD</td></tr>
+        </table>
+
+        <button ms-click="change">change</button>
+    </body>
+</html>
