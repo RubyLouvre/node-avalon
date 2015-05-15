@@ -21,9 +21,6 @@ function scanNode(node, vmodels) {
             break
         case 1: //如果是元素节点
             node.nodeType = 1
-            if (node.duplexCallback) {
-                node.duplexCallback()
-            }
             var id = DOM.getAttribute(node, "id")
             if (id) {
                 switch (node.nodeName) {
@@ -40,6 +37,9 @@ function scanNode(node, vmodels) {
                 }
             }
             scanTag(node, vmodels)
+            if (node.duplexCallback) {
+                node.duplexCallback()
+            }
             break
     }
 }

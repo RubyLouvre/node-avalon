@@ -5,7 +5,7 @@
  http://weibo.com/jslouvre/
  
  Released under the MIT license
- avalon.js 1.43 built in 2015.5.14
+ avalon.js 1.43 built in 2015.5.15
  用于后端渲染
  */
 (function(){
@@ -939,6 +939,7 @@ function collectSelectedOptions(children, array) {
     }
 }
 function collectOptions(children, array) {
+    if (array == undefined) array = [];
     for (var i = 0, el; el = children[i++]; ) {
         if (el.nodeName.toUpperCase() === "OPTGROUP") {
             collectOptions(el.childNodes, array)
@@ -946,6 +947,7 @@ function collectOptions(children, array) {
             array.push(el)
         }
     }
+    return array;
 }
 function isDisabled(el) {
     return DOM.hasAttribute(el, "disabled")
@@ -1142,9 +1144,6 @@ function scanNode(node, vmodels) {
             break
         case 1: //如果是元素节点
             node.nodeType = 1
-            if (node.duplexCallback) {
-                node.duplexCallback()
-            }
             var id = DOM.getAttribute(node, "id")
             if (id) {
                 switch (node.nodeName) {
@@ -1161,6 +1160,9 @@ function scanNode(node, vmodels) {
                 }
             }
             scanTag(node, vmodels)
+            if (node.duplexCallback) {
+                node.duplexCallback()
+            }
             break
     }
 }
@@ -2645,19 +2647,38 @@ duplexBinding.SELECT = function (elem, evaluator, data) {
     var val = evaluator()
     val = Array.isArray(val) ? val.map(String) : val + ""
     DOM.setAttribute(elem, "oldValue", String(val))
+
     elem.duplexCallback = function () {
         avalon(elem).val(val)
+        var $s = data.evaluator.apply(0, data.args || [])();
+        var $events = $s.$events
+        var $list = ($events || {})[subscribers]
+        if ($list && avalon.Array.ensure($list, data)) {
+            addSubscribers(data, $list)
+        }
     }
 
-    // option 元素添加 selected 属性
-    elem.childNodes.some(function(item) {
-        if (item.nodeName === 'option') {
-            if (DOM.getAttribute(item, 'value') == val) {
-                DOM.setAttribute(item, 'selected', 'selected')
-                return true
+    data.handler = function() {
+        var val = evaluator();
+        var isMultiple = DOM.hasAttribute(elem, "multiple");
+
+        val = val && val.$model || val 
+        if (Array.isArray(val)) {
+            if (!isMultiple) {
+                log("ms-duplex在<select multiple=true>上要求对应一个数组")
+            }
+        } else {
+            if (isMultiple) {
+                log("ms-duplex在<select multiple=false>不能对应一个数组")
             }
         }
-    })
+        //必须变成字符串后才能比较
+        val = Array.isArray(val) ? val.map(String) : val + ""
+        if (val !== DOM.getAttribute(elem, "oldValue")) {
+            avalon(elem).val(val);
+            DOM.getAttribute(elem, "oldValue", val);
+        }
+    }
 }
 
 //根据VM的属性值或表达式的值切换类名，ms-class="xxx yyy zzz:flag" 
