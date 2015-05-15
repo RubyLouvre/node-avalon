@@ -5,7 +5,7 @@
  http://weibo.com/jslouvre/
  
  Released under the MIT license
- avalon.js 1.43 built in 2015.5.14
+ avalon.js 1.43 built in 2015.5.15
  用于后端渲染
  */
 (function(){
@@ -939,6 +939,7 @@ function collectSelectedOptions(children, array) {
     }
 }
 function collectOptions(children, array) {
+    if (array == undefined) array = [];
     for (var i = 0, el; el = children[i++]; ) {
         if (el.nodeName.toUpperCase() === "OPTGROUP") {
             collectOptions(el.childNodes, array)
@@ -946,6 +947,7 @@ function collectOptions(children, array) {
             array.push(el)
         }
     }
+    return array;
 }
 function isDisabled(el) {
     return DOM.hasAttribute(el, "disabled")
@@ -1168,9 +1170,6 @@ function scanNode(node, vmodels) {
             break
         case 1: //如果是元素节点
             node.nodeType = 1
-            if (node.duplexCallback) {
-                node.duplexCallback()
-            }
             var id = DOM.getAttribute(node, "id")
             if (id) {
                 switch (node.nodeName) {
@@ -1187,6 +1186,9 @@ function scanNode(node, vmodels) {
                 }
             }
             scanTag(node, vmodels)
+            if (node.msCallback) {
+                node.msCallback()
+            }
             break
     }
 }
@@ -1341,6 +1343,7 @@ function scanText(textNode, vmodels) {
         var tokens = [token]
     } else {
         tokens = scanExpr(textNode.value)//在parse5中文本节点的值用value来取
+       
     }
     if (tokens.length) {
         var fragment = []
@@ -2276,11 +2279,10 @@ function notifySubscribers(list) { //通知依赖于这个访问器的订阅者�
 bindingHandlers.text = function (data, vmodels) {
     parseExprProxy(data.value, vmodels, data)
 }
+
 bindingExecutors.text = function (val, elem, data) {
     val = val == null ? "" : val //不在页面上显示undefined null
     if (elem.nodeName === "#text") { //绑定在文本节点上
-      //  console.log(elem.parentNode)
-     //   console.log(elem.parentNode.childNodes.indexOf(elem))
         elem.value = String(val)
     } else { //绑定在特性节点上
         DOM.innerText(elem, val)
@@ -2456,7 +2458,7 @@ bindingHandlers.attr = function (data, vmodels) {
     parseExprProxy(text, vmodels, data, (simple ? 0 : scanExpr(data.value)))
 }
 bindingExecutors.attr = function (val, elem, data) {
-    bindForBrowser(data)
+  //  bindForBrowser(data)
     var method = data.type
     var attrName = data.param
     if (method === "attr") {
@@ -2671,19 +2673,47 @@ duplexBinding.SELECT = function (elem, evaluator, data) {
     var val = evaluator()
     val = Array.isArray(val) ? val.map(String) : val + ""
     DOM.setAttribute(elem, "oldValue", String(val))
-    elem.duplexCallback = function () {
+
+    elem.msCallback = function () {
         avalon(elem).val(val)
+        var $s = data.evaluator.apply(0, data.args || [])();
+        var $events = $s.$events
+        var $list = ($events || {})[subscribers]
+        if ($list && avalon.Array.ensure($list, data)) {
+            addSubscribers(data, $list)
+        }
     }
 
-    // option 元素添加 selected 属性
-    elem.childNodes.some(function(item) {
-        if (item.nodeName === 'option') {
-            if (DOM.getAttribute(item, 'value') == val) {
-                DOM.setAttribute(item, 'selected', 'selected')
-                return true
+    data.handler = function() {
+        var val = evaluator();
+        var isMultiple = DOM.hasAttribute(elem, "multiple");
+
+        val = val && val.$model || val 
+        if (Array.isArray(val)) {
+            if (!isMultiple) {
+                log("ms-duplex在<select multiple=true>上要求对应一个数组")
+            }
+        } else {
+            if (isMultiple) {
+                log("ms-duplex在<select multiple=false>不能对应一个数组")
             }
         }
-    })
+        //必须变成字符串后才能比较
+        val = Array.isArray(val) ? val.map(String) : val + ""
+        if (val !== DOM.getAttribute(elem, "oldValue")) {
+            avalon(elem).val(val);
+            DOM.getAttribute(elem, "oldValue", val);
+        }
+    }
+    // option 元素添加 selected 属性
+//    elem.childNodes.some(function(item) {//optgroup
+//        if (item.nodeName === 'option') {
+//            if (DOM.getAttribute(item, 'value') == val) {
+//                DOM.setAttribute(item, 'selected', 'selected')
+//                return true
+//            }
+//        }
+//    })
 }
 
 //根据VM的属性值或表达式的值切换类名，ms-class="xxx yyy zzz:flag" 
@@ -2802,6 +2832,7 @@ bindingHandlers.repeat = function (data, vmodels) {
         data.template = DOM.outerHTML(elem).trim()
         DOM.replaceChild(comment, elem)
     }
+    data._template = data.template
     data.template = avalon.parseHTML(data.template)
 
     data.rollback = function () {
@@ -2847,7 +2878,8 @@ bindingHandlers.repeat = function (data, vmodels) {
         data.handler("add", 0, $repeat.length)
     }
 }
-
+avalon.test2 = false
+avalon.testData
 bindingExecutors.repeat = function (method, pos, el) {
     if (method) {
         var data = this
@@ -2873,34 +2905,13 @@ bindingExecutors.repeat = function (method, pos, el) {
                     shimController(data, transation, proxy, fragments)
                 }
                 DOM.replaceChild(transation.concat(start), start)
-                parent.childNodes.forEach(function (el) {
-                    console.log(el.parentNode == parent)
-                })
-                console.log("扫描子节点")
                 for (i = 0; fragment = fragments[i++]; ) {
                     scanNodeArray(fragment.nodes, fragment.vmodels)
                     fragment.nodes = fragment.vmodels = null
                 }
-                parent.childNodes.forEach(function (el) {
-                    if (el.tagName) {
-                        console.log("********************")
-                        el.childNodes.forEach(function (elem) {
-                            console.log(elem.parentNode === el)
-                        })
-                    }
-                })
                 break
             case "del": //将pos后的el个元素删掉(pos, el都是数字)
                 start = proxies[pos].$stamp
-                console.log("del")
-                parent.childNodes.forEach(function (el) {
-                    if (el.tagName) {
-                        console.log("********************")
-                        el.childNodes.forEach(function (elem) {
-                            console.log(elem.parentNode === el)
-                        })
-                    }
-                })
                 end = locateNode(data, pos + el)
                 sweepNodes(start, end)
                 var removed = proxies.splice(pos, el)
@@ -2986,6 +2997,23 @@ bindingExecutors.repeat = function (method, pos, el) {
             method = "del"
         var callback = data.renderedCallback || noop,
                 args = arguments
+        var fn = parent.msCallback
+        if (fn) {
+            parent.msCallback = function () {
+                fn()
+                callback.apply(parent, args)
+                if (parent.oldValue && parent.tagName === "SELECT") { //fix #503
+                    avalon(parent).val(parent.oldValue.split(","))
+                }
+            }
+        } else {
+            parent.msCallback = function () {
+                callback.apply(parent, args)
+                if (parent.oldValue && parent.tagName === "SELECT") { //fix #503
+                    avalon(parent).val(parent.oldValue.split(","))
+                }
+            }
+        }
 //        checkScan(parent, function () {
 //            callback.apply(parent, args)
 //            if (parent.oldValue && parent.tagName === "SELECT") { //fix #503
