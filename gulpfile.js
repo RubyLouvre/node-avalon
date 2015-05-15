@@ -27,7 +27,6 @@ gulp.task('combo', function () {
     var files = [
         "inter",
         "variable",
-        "debug",
         "cache",
         "configuration",
         "core",
@@ -43,7 +42,8 @@ gulp.task('combo', function () {
         "EventBus",
         "modelFactory",
         "collection",
-        "dispatcher"
+        "dispatcher",
+        "filter"
     ]
     var directives = ["text", "html", "visible", "if", "attr", "data", "duplex", "class", "css", "repeat"]
     directives = directives.map(function (el) {
