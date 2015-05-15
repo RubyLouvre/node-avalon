@@ -76,6 +76,38 @@ describe('测试ms-repeat', function () {
 
 
     })
+      it("ms-with", function () {
+        var vm = avalon.define({
+            $id: "test-repeat3",
+            xxx:{
+                a: 1,
+                b: 2,
+                c: 3
+            }
+        })
+
+        var text = heredoc(function () {
+            /*
+             <!DOCTYPE html>
+             <html ms-controller="test-repeat3">
+             <head>
+             <title>测试repeat绑定的后端渲染</title>
+             </head>
+             <body>
+             <ul><li ms-xxx="array">{{$key}}-{{$val}}</li></ul>
+             </body>
+             </html>
+             */
+        })
+        var dom = parser.parse(text)
+        avalon.scan(dom, vm)
+        var str = serializer.serialize(dom)
+        str = str.replace(/<!--\w+\d+(:end)?-->/g, "")
+        var lis = avalon.getElementsTagName(dom, "li")
+       console.log(str)
+
+
+    })
 })
 
 

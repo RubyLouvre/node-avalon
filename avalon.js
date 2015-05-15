@@ -5,7 +5,7 @@
  http://weibo.com/jslouvre/
  
  Released under the MIT license
- avalon.js 1.43 built in 2015.5.14
+ avalon.js 1.43 built in 2015.5.15
  用于后端渲染
  */
 (function(){
@@ -86,6 +86,13 @@ module.exports = avalon
 avalon.nextTick = function(fn) {
     process.nextTick(fn)
 } // jsh
+var isDebug = false
+var util = require("util")
+function debug(a) {
+    if (isDebug) {
+        util.log(a)
+    }
+}
 
 // https://github.com/rsms/js-lru
 var Cache = new function() {// jshint ignore:line
@@ -1341,6 +1348,7 @@ function scanText(textNode, vmodels) {
         var tokens = [token]
     } else {
         tokens = scanExpr(textNode.value)//在parse5中文本节点的值用value来取
+       
     }
     if (tokens.length) {
         var fragment = []
@@ -2276,11 +2284,10 @@ function notifySubscribers(list) { //通知依赖于这个访问器的订阅者�
 bindingHandlers.text = function (data, vmodels) {
     parseExprProxy(data.value, vmodels, data)
 }
+
 bindingExecutors.text = function (val, elem, data) {
     val = val == null ? "" : val //不在页面上显示undefined null
     if (elem.nodeName === "#text") { //绑定在文本节点上
-      //  console.log(elem.parentNode)
-     //   console.log(elem.parentNode.childNodes.indexOf(elem))
         elem.value = String(val)
     } else { //绑定在特性节点上
         DOM.innerText(elem, val)
@@ -2671,19 +2678,19 @@ duplexBinding.SELECT = function (elem, evaluator, data) {
     var val = evaluator()
     val = Array.isArray(val) ? val.map(String) : val + ""
     DOM.setAttribute(elem, "oldValue", String(val))
-    elem.duplexCallback = function () {
+    elem.msCallback = function () {
         avalon(elem).val(val)
     }
 
     // option 元素添加 selected 属性
-    elem.childNodes.some(function(item) {
-        if (item.nodeName === 'option') {
-            if (DOM.getAttribute(item, 'value') == val) {
-                DOM.setAttribute(item, 'selected', 'selected')
-                return true
-            }
-        }
-    })
+//    elem.childNodes.some(function(item) {//optgroup
+//        if (item.nodeName === 'option') {
+//            if (DOM.getAttribute(item, 'value') == val) {
+//                DOM.setAttribute(item, 'selected', 'selected')
+//                return true
+//            }
+//        }
+//    })
 }
 
 //根据VM的属性值或表达式的值切换类名，ms-class="xxx yyy zzz:flag" 
@@ -2802,6 +2809,7 @@ bindingHandlers.repeat = function (data, vmodels) {
         data.template = DOM.outerHTML(elem).trim()
         DOM.replaceChild(comment, elem)
     }
+    data._template = data.template
     data.template = avalon.parseHTML(data.template)
 
     data.rollback = function () {
@@ -2847,7 +2855,8 @@ bindingHandlers.repeat = function (data, vmodels) {
         data.handler("add", 0, $repeat.length)
     }
 }
-
+avalon.test2 = false
+avalon.testData
 bindingExecutors.repeat = function (method, pos, el) {
     if (method) {
         var data = this
@@ -2873,34 +2882,13 @@ bindingExecutors.repeat = function (method, pos, el) {
                     shimController(data, transation, proxy, fragments)
                 }
                 DOM.replaceChild(transation.concat(start), start)
-                parent.childNodes.forEach(function (el) {
-                    console.log(el.parentNode == parent)
-                })
-                console.log("扫描子节点")
                 for (i = 0; fragment = fragments[i++]; ) {
                     scanNodeArray(fragment.nodes, fragment.vmodels)
                     fragment.nodes = fragment.vmodels = null
                 }
-                parent.childNodes.forEach(function (el) {
-                    if (el.tagName) {
-                        console.log("********************")
-                        el.childNodes.forEach(function (elem) {
-                            console.log(elem.parentNode === el)
-                        })
-                    }
-                })
                 break
             case "del": //将pos后的el个元素删掉(pos, el都是数字)
                 start = proxies[pos].$stamp
-                console.log("del")
-                parent.childNodes.forEach(function (el) {
-                    if (el.tagName) {
-                        console.log("********************")
-                        el.childNodes.forEach(function (elem) {
-                            console.log(elem.parentNode === el)
-                        })
-                    }
-                })
                 end = locateNode(data, pos + el)
                 sweepNodes(start, end)
                 var removed = proxies.splice(pos, el)
@@ -2986,6 +2974,23 @@ bindingExecutors.repeat = function (method, pos, el) {
             method = "del"
         var callback = data.renderedCallback || noop,
                 args = arguments
+        var fn = parent.msCallback
+        if (fn) {
+            parent.msCallback = function () {
+                fn()
+                callback.apply(parent, args)
+                if (parent.oldValue && parent.tagName === "SELECT") { //fix #503
+                    avalon(parent).val(parent.oldValue.split(","))
+                }
+            }
+        } else {
+            parent.msCallback = function () {
+                callback.apply(parent, args)
+                if (parent.oldValue && parent.tagName === "SELECT") { //fix #503
+                    avalon(parent).val(parent.oldValue.split(","))
+                }
+            }
+        }
 //        checkScan(parent, function () {
 //            callback.apply(parent, args)
 //            if (parent.oldValue && parent.tagName === "SELECT") { //fix #503
