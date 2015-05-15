@@ -189,6 +189,7 @@ function collectSelectedOptions(children, array) {
     }
 }
 function collectOptions(children, array) {
+    if (array == undefined) array = [];
     for (var i = 0, el; el = children[i++]; ) {
         if (el.nodeName.toUpperCase() === "OPTGROUP") {
             collectOptions(el.childNodes, array)
@@ -196,6 +197,7 @@ function collectOptions(children, array) {
             array.push(el)
         }
     }
+    return array;
 }
 function isDisabled(el) {
     return DOM.hasAttribute(el, "disabled")

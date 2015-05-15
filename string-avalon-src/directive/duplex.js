@@ -131,10 +131,38 @@ duplexBinding.SELECT = function (elem, evaluator, data) {
     var val = evaluator()
     val = Array.isArray(val) ? val.map(String) : val + ""
     DOM.setAttribute(elem, "oldValue", String(val))
+
     elem.msCallback = function () {
         avalon(elem).val(val)
+        var $s = data.evaluator.apply(0, data.args || [])();
+        var $events = $s.$events
+        var $list = ($events || {})[subscribers]
+        if ($list && avalon.Array.ensure($list, data)) {
+            addSubscribers(data, $list)
+        }
     }
 
+    data.handler = function() {
+        var val = evaluator();
+        var isMultiple = DOM.hasAttribute(elem, "multiple");
+
+        val = val && val.$model || val 
+        if (Array.isArray(val)) {
+            if (!isMultiple) {
+                log("ms-duplex在<select multiple=true>上要求对应一个数组")
+            }
+        } else {
+            if (isMultiple) {
+                log("ms-duplex在<select multiple=false>不能对应一个数组")
+            }
+        }
+        //必须变成字符串后才能比较
+        val = Array.isArray(val) ? val.map(String) : val + ""
+        if (val !== DOM.getAttribute(elem, "oldValue")) {
+            avalon(elem).val(val);
+            DOM.getAttribute(elem, "oldValue", val);
+        }
+    }
     // option 元素添加 selected 属性
 //    elem.childNodes.some(function(item) {//optgroup
 //        if (item.nodeName === 'option') {

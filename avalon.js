@@ -946,6 +946,7 @@ function collectSelectedOptions(children, array) {
     }
 }
 function collectOptions(children, array) {
+    if (array == undefined) array = [];
     for (var i = 0, el; el = children[i++]; ) {
         if (el.nodeName.toUpperCase() === "OPTGROUP") {
             collectOptions(el.childNodes, array)
@@ -953,6 +954,7 @@ function collectOptions(children, array) {
             array.push(el)
         }
     }
+    return array;
 }
 function isDisabled(el) {
     return DOM.hasAttribute(el, "disabled")
@@ -1175,9 +1177,6 @@ function scanNode(node, vmodels) {
             break
         case 1: //如果是元素节点
             node.nodeType = 1
-            if (node.duplexCallback) {
-                node.duplexCallback()
-            }
             var id = DOM.getAttribute(node, "id")
             if (id) {
                 switch (node.nodeName) {
@@ -1194,6 +1193,9 @@ function scanNode(node, vmodels) {
                 }
             }
             scanTag(node, vmodels)
+            if (node.msCallback) {
+                node.msCallback()
+            }
             break
     }
 }
@@ -2463,7 +2465,7 @@ bindingHandlers.attr = function (data, vmodels) {
     parseExprProxy(text, vmodels, data, (simple ? 0 : scanExpr(data.value)))
 }
 bindingExecutors.attr = function (val, elem, data) {
-    bindForBrowser(data)
+  //  bindForBrowser(data)
     var method = data.type
     var attrName = data.param
     if (method === "attr") {
@@ -2678,10 +2680,44 @@ duplexBinding.SELECT = function (elem, evaluator, data) {
     var val = evaluator()
     val = Array.isArray(val) ? val.map(String) : val + ""
     DOM.setAttribute(elem, "oldValue", String(val))
+<<<<<<< HEAD
+=======
+
+>>>>>>> 0f9ca719f64e5c080a12025423f531c87fd7fd6a
     elem.msCallback = function () {
         avalon(elem).val(val)
+        var $s = data.evaluator.apply(0, data.args || [])();
+        var $events = $s.$events
+        var $list = ($events || {})[subscribers]
+        if ($list && avalon.Array.ensure($list, data)) {
+            addSubscribers(data, $list)
+        }
     }
 
+<<<<<<< HEAD
+=======
+    data.handler = function() {
+        var val = evaluator();
+        var isMultiple = DOM.hasAttribute(elem, "multiple");
+
+        val = val && val.$model || val 
+        if (Array.isArray(val)) {
+            if (!isMultiple) {
+                log("ms-duplex在<select multiple=true>上要求对应一个数组")
+            }
+        } else {
+            if (isMultiple) {
+                log("ms-duplex在<select multiple=false>不能对应一个数组")
+            }
+        }
+        //必须变成字符串后才能比较
+        val = Array.isArray(val) ? val.map(String) : val + ""
+        if (val !== DOM.getAttribute(elem, "oldValue")) {
+            avalon(elem).val(val);
+            DOM.getAttribute(elem, "oldValue", val);
+        }
+    }
+>>>>>>> 0f9ca719f64e5c080a12025423f531c87fd7fd6a
     // option 元素添加 selected 属性
 //    elem.childNodes.some(function(item) {//optgroup
 //        if (item.nodeName === 'option') {
