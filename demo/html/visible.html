@@ -6,13 +6,13 @@
         <title>attr</title>
         <script src="../script/avalon.js"></script>
         <script src="../script/avalon.rebind.js"></script>
-        <script src="../script/css.js"></script>
+        <script src="../script/visible.js"></script>
     </head>
     <body ms-controller="test">
-        <div style="display:inline-block;" ms-visible='toggle'>div</div>
-        <div ms-visible='toggle'>div</div>
-        <div id="hidden_case_0" style="display:inline-block;" ms-visible='!toggle'>div</div>
-        <div id="hidden_case_1" ms-visible='!toggle'></div>
+        <div style="display:inline-block;" ms-visible='toggle'>div1</div>
+        <div ms-visible='toggle'>div2</div>
+        <div id="hidden_case_0" style="display:inline-block;" ms-visible='!toggle'>div3</div>
+        <div id="hidden_case_1" ms-visible='!toggle'>div4</div>
         <table style="display:table;" ms-visible="table">
             <tr ms-visible="tr"><td ms-visible="td">TD</td></tr>
         </table>
