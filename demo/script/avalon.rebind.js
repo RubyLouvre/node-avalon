@@ -10,7 +10,6 @@ new function () {
         })
         for (var i = 0, data; data = bindings[i++]; ) {
             var rebindFn = avalon.rebind[data.type]
-            console.log(typeof rebindFn)
             if (typeof rebindFn === "function") {
                 rebindFn(data, vmodels, this)
             }
@@ -42,6 +41,7 @@ new function () {
                 var key = arr.shift()
                 var val = arr.join(' ')
                 avalon.templateCache[key] = val
+                delete data.template
             }
             injectBinding("attr", data, vmodels)
             elem.removeChild(elem.firstChild)
