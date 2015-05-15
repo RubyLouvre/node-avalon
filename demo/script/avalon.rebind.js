@@ -10,6 +10,7 @@ new function () {
         })
         for (var i = 0, data; data = bindings[i++]; ) {
             var rebindFn = avalon.rebind[data.type]
+             data.element = this
             if (typeof rebindFn === "function") {
                 rebindFn(data, vmodels, this)
             }
@@ -25,6 +26,9 @@ new function () {
         data.handler = bindingExecutors[data.handlerName || name]
     }
     avalon.mix(avalon.rebind, {
+        attr: function(data, vmodels, elem){
+            injectBinding("attr", data, vmodels)
+        },
         text: function (data, vmodels, elem) {
             // 如果是插值表达式
             // 将 node-avalon 生成的 span 元素用文本节点替换
@@ -34,8 +38,7 @@ new function () {
             data.element = textNode
             injectBinding("text", data, vmodels)
         },
-        include: function (data, vmodels, elem) {
-            data.element = elem
+        include: function (data, vmodels,elem) {
             if (data.template) {
                 var arr = data.template.split(" ")
                 var key = arr.shift()

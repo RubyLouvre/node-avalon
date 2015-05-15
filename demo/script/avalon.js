@@ -3258,7 +3258,6 @@ bindingHandlers.attr = function(data, vmodels) {
 }
 
 bindingExecutors.attr = function(val, elem, data) {
-    console.log("xxxxxxxxxxx")
     var method = data.type,
         attrName = data.param
     if (method === "css") {
