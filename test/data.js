@@ -23,6 +23,7 @@ describe('测试ms-data', function () {
         var dom = parser.parse(text)
         avalon.scan(dom, vm)
         var str = serializer.serialize(dom);
+        console.log(str)
         expect(str.indexOf('data-a="11"') !== -1).to.be(true)
         expect(str.indexOf('data-b="123"') !== -1).to.be(true)
         expect(str.indexOf('data-c="false"') !== -1).to.be(true)
