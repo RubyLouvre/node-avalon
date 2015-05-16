@@ -22,6 +22,13 @@ function bindForBrowser(data) {
         switch (data.type) {
             case "include":
                 options.template = data.template
+
+//                if (data.includeReplace) {
+//                    options.includeReplace = true
+//                  //  var newElement = DOM.createElement('script')
+//                 //   DOM.replaceChild([element, newElement], element)
+//                //    newElement = element
+//                }
                 break
             case "visible":
                 options.isShow = data.isShow

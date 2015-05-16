@@ -1025,6 +1025,13 @@ function bindForBrowser(data) {
         switch (data.type) {
             case "include":
                 options.template = data.template
+
+//                if (data.includeReplace) {
+//                    options.includeReplace = true
+//                  //  var newElement = DOM.createElement('script')
+//                 //   DOM.replaceChild([element, newElement], element)
+//                //    newElement = element
+//                }
                 break
             case "visible":
                 options.isShow = data.isShow
@@ -2791,12 +2798,8 @@ bindingHandlers.attr = function (data, vmodels) {
         data.endInclude = DOM.createComment("ms-include-end")
         DOM.removeAttribute(elem, data.name)
         if (outer) {
-            var parent = elem.parentNode
-            data.startInclude.parentNode = data.endInclude.parentNode = parent
-            var children = parent.childNodes
-            var index = children.indexOf(elem)
-            data.element = data.startInclude
-            children.splice(index, 1, data.startInclude, elem, data.endInclude)
+         //   data.element = data.startInclude
+            DOM.replaceChild([data.startInclude, elem, data.endInclude], elem)
         } else {
             data.startInclude.parentNode = data.endInclude.parentNode = elem
             var children = elem.childNodes
@@ -2808,7 +2811,7 @@ bindingHandlers.attr = function (data, vmodels) {
     parseExprProxy(text, vmodels, data, (simple ? 0 : scanExpr(data.value)))
 }
 bindingExecutors.attr = function (val, elem, data) {
-   
+
     var method = data.type
     var attrName = data.param
     if (method === "attr") {
@@ -2842,17 +2845,16 @@ bindingExecutors.attr = function (val, elem, data) {
             if (rendered) {
                 console.log("不支持data-include-rendered")
             }
+
             var parent = data.startInclude.parentNode
             var children = parent.childNodes
-            var startIndex = children.indexOf(data.startInclude) + 1
+            var startIndex = children.indexOf(data.startInclude)
             var endIndex = children.indexOf(data.endInclude)
+            //除移从startInclude到endInclude之间的内容（包括startInclude，但留下endInclude）
             children.splice(startIndex, endIndex - startIndex)
             var nodes = avalon.parseHTML(text).childNodes
-            nodes.forEach(function (el) {
-                el.parentNode = parent
-            })
-            var args = [startIndex, 0].concat(nodes)
-            Array.prototype.splice.apply(children, args)
+            //插回startInclude，并在startInclude与endInclude之间添加新内容
+            DOM.replaceChild([data.startInclude].concat(nodes).concat(data.endInclude), data.endInclude)
             scanNodeArray(nodes, vmodels)
         }
         var path = require("path")
@@ -2864,7 +2866,7 @@ bindingExecutors.attr = function (val, elem, data) {
                 var filePath = path.resolve(avalon.mainPath || process.cwd(), val)
                 try {
                     var text = require("fs").readFileSync(filePath, "utf8")
-                    data.template = val+" "+text
+                    data.template = val + " " + text
                     scanTemplate(cacheTmpls[val] = text)
                 } catch (e) {
                     log("warning!ms-include-src找不到目标文件 " + e)
@@ -2879,7 +2881,7 @@ bindingExecutors.attr = function (val, elem, data) {
     } else {
         DOM.setAttribute(elem, method, val) //ms-href, ms-src
     }
-     bindForBrowser(data)
+    bindForBrowser(data)
 }
 
 //这几个指令都可以使用插值表达式，如ms-src="aaa/{{b}}/{{c}}.html"ms-src
