@@ -8,6 +8,15 @@ function bindForBrowser(data) {
     })
 
     var element = data.element
+//    if (DOM.nodeType(element) === 8) {
+//        if (data.type === "include") {
+//            var newElement = DOM.createElement('script')
+//            DOM.replaceChild([element, newElement], element)
+//            element = newElement
+//        } else {
+//            return
+//        }
+//    }
 
     if (DOM.nodeType(element) === 1) {
         // 如果是 Element 节点
@@ -21,14 +30,19 @@ function bindForBrowser(data) {
 
         switch (data.type) {
             case "include":
-                options.template = data.template
-
-//                if (data.includeReplace) {
-//                    options.includeReplace = true
-//                  //  var newElement = DOM.createElement('script')
-//                 //   DOM.replaceChild([element, newElement], element)
-//                //    newElement = element
+                options.template = data._template
+                if (data.includeReplace) {
+                    options.includeReplace = 1
+                }
+//                if (data._includeRendered) {
+//                    DOM.setAttribute(element, "data-include-rendered", data._includeRendered)
 //                }
+//                if (data._includeRendered) {
+//                    DOM.setAttribute(element, "data-include-loaded", data._includeLoaded)
+//                }
+//                delete  data._includeRendered
+//                delete data._includeLoaded
+                delete data._template
                 break
             case "visible":
                 options.isShow = data.isShow
@@ -39,6 +53,7 @@ function bindForBrowser(data) {
                 break
 
         }
+
         if (DOM.hasAttribute(element, attrName)) {
             // 检测是否存在 ms-scan-noderebind
             var newOptStr = JSON.stringify(options).replace(/"/ig, "'")

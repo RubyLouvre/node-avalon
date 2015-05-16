@@ -60,6 +60,7 @@ new function () {
             elem.style.display = isShow ? inlineDisplay : "none"
         },
         include: function (data, vmodels, elem) {
+
             if (data.template) {
                 var arr = data.template.split(" ")
                 var key = arr.shift()
@@ -68,10 +69,23 @@ new function () {
                 delete data.template
             }
             injectBinding("attr", data, vmodels)
-            elem.removeChild(elem.firstChild)
-            elem.removeChild(elem.lastChild)
-            data.startInclude = elem.firstChild
-            data.endInclude = elem.lastChild
+            if (data.includeReplace) {
+                var f = document.createDocumentFragment()
+                while (elem.firstChild) {
+                    f.appendChild(elem.firstChild)
+                }
+                f.removeChild(f.firstChild)
+                f.removeChild(f.lastChild)
+                var parent = elem.parentNode
+                parent.replaceChild(f, elem)
+            } else {
+                elem.removeChild(elem.firstChild)
+                elem.removeChild(elem.lastChild)
+                data.startInclude = elem.firstChild
+                data.endInclude = elem.lastChild
+            }
+
+
         }
     })
     "title,alt,src,value,css,href".replace(avalon.rword, function (name) {

@@ -26,21 +26,23 @@ bindingHandlers.attr = function (data, vmodels) {
         data.includeRendered = getBindingCallback(elem, "data-include-rendered", vmodels)
         data.includeLoaded = getBindingCallback(elem, "data-include-loaded", vmodels)
         var outer = data.includeReplace = !!avalon(elem).data("includeReplace")
+//        data._includeRendered = avalon(elem).attr("data-include-rendered")
+//        data._includeLoaded = avalon(elem).attr("data-include-loaded")
         if (avalon(elem).data("includeCache")) {
             data.templateCache = {}
         }
         data.startInclude = DOM.createComment("ms-include")
         data.endInclude = DOM.createComment("ms-include-end")
         DOM.removeAttribute(elem, data.name)
-        if (outer) {
-         //   data.element = data.startInclude
-            DOM.replaceChild([data.startInclude, elem, data.endInclude], elem)
-        } else {
+   //     if (outer) {
+       //     data.element = data.startInclude
+       //     DOM.replaceChild([data.startInclude, elem, data.endInclude], elem)
+      //  } else {
             data.startInclude.parentNode = data.endInclude.parentNode = elem
             var children = elem.childNodes
             children.unshift(data.startInclude)
             children.push(data.endInclude)
-        }
+    //    }
     }
     data.handlerName = "attr" //handleName用于处理多种绑定共用同一种bindingExecutor的情况
     parseExprProxy(text, vmodels, data, (simple ? 0 : scanExpr(data.value)))
@@ -96,12 +98,13 @@ bindingExecutors.attr = function (val, elem, data) {
 
         if (data.param === "src") {
             if (typeof cacheTmpls[val] === "string") {
+                data._template = val + " " + text
                 scanTemplate(cacheTmpls[val])
             } else {
                 var filePath = path.resolve(avalon.mainPath || process.cwd(), val)
                 try {
                     var text = require("fs").readFileSync(filePath, "utf8")
-                    data.template = val + " " + text
+                    data._template = val + " " + text
                     scanTemplate(cacheTmpls[val] = text)
                 } catch (e) {
                     log("warning!ms-include-src找不到目标文件 " + e)
