@@ -35,16 +35,23 @@ bindingHandlers.repeat = function (data, vmodels) {
     var signature = generateID(type)
     var comment = data.element = DOM.createComment(signature + ":end")
     data.clone = DOM.createComment(signature)
+    //生成一个<script type="avalon">xxxx</script>占据原来的位置
+    var node = DOM.createElement("script")
+    DOM.setAttribute(node, "type", "avalon")
     //   hyperspace.appendChild(comment)
     if (type === "each" || type === "with") {
         data.template = DOM.innerHTML(elem).trim()
+        DOM.innerText(node, data.template)
         var children = elem.childNodes
-        comment.parentNode = elem
-        children.splice(0, children.length, comment)
+        comment.parentNode = node.parentNode = elem
+        children.splice(0, children.length, node, comment)
     } else {
         data.template = DOM.outerHTML(elem).trim()
-        DOM.replaceChild(comment, elem)
+        DOM.innerText(node, data.template)
+        DOM.replaceChild([node, comment], elem)
     }
+    data.element = node
+    bindForBrowser(data)
     data._template = data.template
     data.template = avalon.parseHTML(data.template)
 
@@ -97,6 +104,8 @@ bindingExecutors.repeat = function (method, pos, el) {
         var data = this
         var end = data.element
         var parent = end.parentNode
+        end = parent.childNodes
+        end = data.element = end[end.length - 1]
         var proxies = data.proxies
         var transation = []
         //string-avalon特有

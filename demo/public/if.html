@@ -7,8 +7,8 @@
         <script src="../script/if.js"></script>
     </head>
     <body ms-controller="test" ms-skip-ctrl="true">
-        <script type="avalon" ms-scan-331="avalon.rebind([{'name':'ms-if','param':'','priority':10,'type':'if','value':'aaa','isInDom':false}],['test','test'])"><h1>aaa</h1></script>
-        <p ms-scan-331="avalon.rebind([{'name':'ms-if','param':'','priority':10,'type':'if','value':'!aaa','isInDom':true}],['test','test'])">bbb</p>
+        <script type="avalon" ms-scan-331="avalon.rebind([{'a':'if=aaa','isInDom':false}],['test'])"><h1>aaa</h1></script>
+        <p ms-scan-331="avalon.rebind([{'a':'if=!aaa','isInDom':true}],['test'])">bbb</p>
         <button ms-click="change">change</button>
     
 

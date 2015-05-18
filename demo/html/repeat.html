@@ -9,11 +9,6 @@
 <script src="../script/repeat.js"></script>
 </head>
 <body ms-controller="test">
-    <ul><li ms-repeat="array">{{el}}-{{$first}}-{{$last}}-{{$index}}</li></ul>
-	<ol ms-each="array"><li>{{el}}</li></ol>
-	<div ms-with="object"><strong>{{$key}}-{{$val}}</strong></div>
-	<map>X<area ms-repeat="object" ms-attr-title="$key"></map>
-
-    <button ms-click="change">change</button>
+    <ul><li ms-repeat="array">{{$index}}</li></ul>
 </body>
 </html>

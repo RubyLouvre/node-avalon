@@ -1,5 +1,6 @@
 var files = ["attr"] // ["attr","css","if","expression","visible","include"]
-
+var userDefine = process.argv[2] && process.argv[2].split(",")
+if(userDefine) files = userDefine
 var parse5 = require('parse5'),
     parser = new parse5.Parser(),
     serializer = new parse5.Serializer(),

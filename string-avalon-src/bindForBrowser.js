@@ -12,7 +12,6 @@ function bindForBrowser(data) {
     })
 
     var element = data.element
-
     if (DOM.nodeType(element) === 1) {
         // 如果是 Element 节点
 
