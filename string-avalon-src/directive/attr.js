@@ -33,24 +33,19 @@ bindingHandlers.attr = function (data, vmodels) {
         data.endInclude = DOM.createComment("ms-include-end")
         DOM.removeAttribute(elem, data.name)
         if (outer) {
-            var parent = elem.parentNode
-            data.startInclude.parentNode = data.endInclude.parentNode = parent
-            var children = parent.childNodes
-            var index = children.indexOf(elem)
-            data.element = data.startInclude
-            children.splice(index, 1, data.startInclude, elem, data.endInclude)
-        } else {
-            data.startInclude.parentNode = data.endInclude.parentNode = elem
-            var children = elem.childNodes
-            children.unshift(data.startInclude)
-            children.push(data.endInclude)
+            log("warning!node-avalon不处理data-include-replace=true的情况，但rebind后会与前端avalon保持一致")
         }
+
+        data.startInclude.parentNode = data.endInclude.parentNode = elem
+        var children = elem.childNodes
+        children.unshift(data.startInclude)
+        children.push(data.endInclude)
     }
     data.handlerName = "attr" //handleName用于处理多种绑定共用同一种bindingExecutor的情况
     parseExprProxy(text, vmodels, data, (simple ? 0 : scanExpr(data.value)))
 }
 bindingExecutors.attr = function (val, elem, data) {
-    bindForBrowser(data)
+
     var method = data.type
     var attrName = data.param
     if (method === "attr") {
@@ -84,37 +79,44 @@ bindingExecutors.attr = function (val, elem, data) {
             if (rendered) {
                 console.log("不支持data-include-rendered")
             }
+
             var parent = data.startInclude.parentNode
             var children = parent.childNodes
-            var startIndex = children.indexOf(data.startInclude)+ 1
+            var startIndex = children.indexOf(data.startInclude)
             var endIndex = children.indexOf(data.endInclude)
-            children.splice(startIndex , endIndex - startIndex)
+            //除移从startInclude到endInclude之间的内容（包括startInclude，但留下endInclude）
+            children.splice(startIndex, endIndex - startIndex)
             var nodes = avalon.parseHTML(text).childNodes
-            nodes.forEach(function (el) {
-                el.parentNode = parent
-            })
-            var args = [startIndex, 0].concat(nodes)
-            Array.prototype.splice.apply(children, args)
+            //插回startInclude，并在startInclude与endInclude之间添加新内容
+            DOM.replaceChild([data.startInclude].concat(nodes).concat(data.endInclude), data.endInclude)
             scanNodeArray(nodes, vmodels)
         }
         var path = require("path")
+
         if (data.param === "src") {
             if (typeof cacheTmpls[val] === "string") {
+                data._template = val + " " + cacheTmpls[val]
                 scanTemplate(cacheTmpls[val])
             } else {
-                var filePath = path.resolve(process.cwd(), val)
-                var text = require("fs").readFileSync(filePath, "utf8")
-                scanTemplate(cacheTmpls[val] = text)
+                var filePath = path.resolve(avalon.mainPath || process.cwd(), val)
+                try {
+                    var text = require("fs").readFileSync(filePath, "utf8")
+                    data._template = val + " " + text
+                    scanTemplate(cacheTmpls[val] = text)
+                } catch (e) {
+                    log("warning!ms-include-src找不到目标文件 " + e)
+                }
             }
         } else {
             //现在只在scanNode中收集拥有id的script, textarea, noscript标签的innerText
             scanTemplate(DOM.ids[val])
         }
-    } else if (method === "css" ){
+    } else if (method === "css") {
         bindingExecutors.css(val, elem, data)
     } else {
         DOM.setAttribute(elem, method, val) //ms-href, ms-src
     }
+    bindForBrowser(data)
 }
 
 //这几个指令都可以使用插值表达式，如ms-src="aaa/{{b}}/{{c}}.html"ms-src

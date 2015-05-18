@@ -1,27 +1,28 @@
 <!DOCTYPE html>
 <html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>插值表达式 {{text}}</title>
-<script src="../script/avalon.js"></script>
-<script src="../script/avalon.rebind.js"></script>
-<script src="../script/expression.js"></script>
-</head>
-<body ms-controller="test">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>插值表达式 {{text}}</title>
+        <script src="../script/avalon.js"></script>
+        <script src="../script/avalon.rebind.js"></script>
+        <script src="../script/expression.js"></script>
+    </head>
+    <body ms-controller="test">
 
-    {{text1}}
+        {{text1}}
 
-	<p>{{text2}}</p>
+        <p>{{text2}}</p>
 
-    <p>
-        前面的文字 - 
-        {{text3}}
-         - 后面的文字
-    </p>
-    
-	<p>
-        <button ms-click="change">change</button>
-    </p>
-</body>
+        <p>
+            前面的文字 - 
+            {{text3}}
+            - 后面的文字
+        </p>
+        <p>{{num1}}+{{num2}}={{num1+num2}}</p>
+
+        <p>
+            <button ms-click="change">change</button>
+        </p>
+    </body>
 </html>
