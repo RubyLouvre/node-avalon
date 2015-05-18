@@ -3,14 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>include</title>
+<title>repeat</title>
 <script src="../script/avalon.js"></script>
 <script src="../script/avalon.rebind.js"></script>
-<script src="../script/include.js"></script>
+<script src="../script/repeat.js"></script>
 </head>
 <body ms-controller="test">
-    <div ms-include-src="aaa"></div>
-    <div ms-include-src="aaa" data-include-replace="true"></div>
+    <ul><li ms-repeat="array">{{el}}-{{$first}}-{{$last}}-{{$index}}</li></ul>
+	<ol ms-each="array"><li>{{el}}</li></ol>
+	<div ms-with="object"><strong>{{$key}}-{{$val}}</strong></div>
+	<map>X<area ms-repeat="object" ms-attr-title="$key"></map>
+
     <button ms-click="change">change</button>
 </body>
 </html>
