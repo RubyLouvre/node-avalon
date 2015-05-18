@@ -5,7 +5,7 @@ new function () {
     var bindingExecutors = avalon.bindingExecutors
     var bindingHandlers = avalon.bindingHandlers
     avalon.rebind = function (bindings, vmodelIds) {
-        var  vmodels = vmodelIds.map(function (id) {
+        var vmodels = vmodelIds.map(function (id) {
             return avalon.vmodels[id]
         })
         for (var i = 0, data; data = bindings[i++]; ) {
@@ -70,6 +70,9 @@ new function () {
         },
         html: function(data, vmodels, elem) {
             injectBinding("html", data, vmodels)
+        },
+        data: function (data, vmodels, elem) {
+            injectBinding("data", data, vmodels)
         },
         if: function (data, vmodels, elem) {
             var isInDom = data.isInDom
