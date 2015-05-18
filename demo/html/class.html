@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="../script/avalon.js"></script>
+        <script src="../script/avalon.rebind.js"></script>
+        <script src="../script/class.js"></script>
+        <style>
+            .ms-class div{
+                display:inline-block;
+                width:200px;
+                height:100px;
+                border: 1px solid  black;
+            }
+            .active{
+                background: black;
+                color: white;
+            }
+            .bgRed {
+                background:palegoldenrod;
+            }
+            .hover{
+                background: red;
+                color: white;
+            }
+            .green{
+                background: green;
+            }
+        </style>
+    </head>
+    <body ms-controller="test" class="ms-class">
+<!--        <div ms-active="active" >测试:active</div>
+        <div ms-hover="hover" >测试:hover</div>
+        <div ms-class="bgRed width{{w}} height{{h}}" ms-css-width="h">
+            类名通过插值表达式生成<br/>
+            {{w}} * {{h}}<br/>
+            <input data-duplex-event="change" ms-duplex="h">
+        </div>
+        <p><button type="button" ms-class="test{{num}}" ms-click="changeClassName">{{className}}</button></p>-->
+        <div ms-class="green: array.length">
+            <button ms-click="add" type="button">add</button><button ms-click="remove" type="button">remove</button>
+        </div>
+    </body>
+</html>

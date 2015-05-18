@@ -59,6 +59,9 @@ new function () {
         attr: function (data, vmodels, elem) {
             injectBinding("attr", data, vmodels)
         },
+        class: function (data, vmodels, elem) {
+            injectBinding("class", data, vmodels)
+        },
         text: function (data, vmodels, elem) {
             if (data.isInText) {
                 var node = elem.firstChild
