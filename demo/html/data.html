@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>if</title>
+        <script src="../script/avalon.js"></script>
+        <script src="../script/avalon.rebind.js"></script>
+        <script src="../script/data.js"></script>
+    </head>
+    <body ms-controller="test">
+        <div ms-data-number="number"
+             ms-data-number2="number2"
+             ms-data-bool="bool"
+             ms-data-bool2="bool2"
+             ms-data-void="vv"
+             ms-data-null="nn"
+             >{{number}}|{{number2}}|{{bool}}</div>
+        <button ms-click="change">change</button>
+    </body>
+</html>
