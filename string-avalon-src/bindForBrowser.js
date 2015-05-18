@@ -23,7 +23,7 @@ function bindForBrowser(data) {
 //            options[prop] = data[prop]
 //        })
         var options = {
-            a: data.type + data.param + "=" + data.value
+            a: data.type + "-" + data.param + "=" + data.value
         }
         switch (data.type) {
             case "include":

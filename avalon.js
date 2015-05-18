@@ -1026,7 +1026,7 @@ function bindForBrowser(data) {
 //            options[prop] = data[prop]
 //        })
         var options = {
-            a: data.type + data.param + "=" + data.value
+            a: data.type + "-" + data.param + "=" + data.value
         }
         switch (data.type) {
             case "include":
@@ -2700,6 +2700,8 @@ bindingExecutors.html = function(val, elem, data) {
         args.unshift(index, children.length)
         Array.prototype.splice.apply(children, args)
     }
+    
+    bindForBrowser(data)
     scanNodeArray(nodes, data.vmodels)
 }
 //这里提供了所有特殊display的元素 http://www.htmldog.com/reference/cssproperties/display/
