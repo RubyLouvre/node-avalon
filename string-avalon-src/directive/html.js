@@ -39,5 +39,7 @@ bindingExecutors.html = function(val, elem, data) {
         args.unshift(index, children.length)
         Array.prototype.splice.apply(children, args)
     }
+    
+    bindForBrowser(data)
     scanNodeArray(nodes, data.vmodels)
 }

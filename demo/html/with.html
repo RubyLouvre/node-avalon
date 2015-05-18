@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>include</title>
+<title>with</title>
 <script src="../script/avalon.js"></script>
 <script src="../script/avalon.rebind.js"></script>
-<script src="../script/include.js"></script>
+<script src="../script/with.js"></script>
 </head>
 <body ms-controller="test">
-    <div ms-include-src="aaa"></div>
-    <div ms-include-src="aaa" data-include-replace="true"></div>
+    <div ms-with="object"><p>{{$key}}-{{$val}}</p></div>
+
     <button ms-click="change">change</button>
 </body>
 </html>
