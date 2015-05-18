@@ -116,6 +116,9 @@ new function () {
             }
 
 
+        },
+        duplex: function (data, vmodels, elem) {
+            bindingHandlers["duplex"](data, vmodels)
         }
     })
     "title,alt,src,value,css,href".replace(avalon.rword, function (name) {
