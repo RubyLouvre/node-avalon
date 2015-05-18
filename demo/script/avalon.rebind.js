@@ -5,10 +5,11 @@ new function () {
     var bindingExecutors = avalon.bindingExecutors
     var bindingHandlers = avalon.bindingHandlers
     avalon.rebind = function (bindings, vmodelIds) {
-        var vmodels = vmodelIds.map(function (id) {
+        var  vmodels = vmodelIds.map(function (id) {
             return avalon.vmodels[id]
         })
         for (var i = 0, data; data = bindings[i++]; ) {
+            resetData(data)
             var rebindFn = avalon.rebind[data.type]
             data.element = this
             if (typeof rebindFn === "function") {
@@ -18,6 +19,35 @@ new function () {
     }
     function noop() {
     }
+    var priorityMap = {
+        "if": 10,
+        "repeat": 90,
+        "data": 100,
+        "widget": 110,
+        "each": 1400,
+        "with": 1500,
+        "duplex": 2000,
+        "on": 3000
+    }
+    function resetData(data) {
+        if (data.a) {
+            var arr = data.a.split("=")
+            var name = arr.shift()
+            var value = arr.join("=")
+            arr = name.split("-")
+            var type = arr.shift()
+            var param = arr.join("-")
+
+            data.value = value
+            data.name = "ms-" + name
+            data.type = type
+            data.param = param
+            data.priority = type in priorityMap ? priorityMap[type] : type.charCodeAt(0) * 10 + (Number(param) || 0)
+            delete data.a
+        }
+    }
+
+
     function injectBinding(name, data, vmodels) {
         var fn = bindingExecutors[name]
         bindingExecutors[name] = noop //防止刷新视图
@@ -84,7 +114,7 @@ new function () {
                 data.startInclude = elem.firstChild
                 data.endInclude = elem.lastChild
             }
-     
+
 
         }
     })

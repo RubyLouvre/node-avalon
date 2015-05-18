@@ -8,16 +8,19 @@
     </head>
     <body ms-controller="test" ms-skip-ctrl="true">
 
-        <span ms-scan-331="avalon.rebind([{'expr':true,'filters':'','type':'text','value':'text1','isInText':true}],['test','test'])">孤立的插值表达式</span>
+        <span ms-scan-331="avalon.rebind([{'expr':true,'filters':'','type':'text','value':'text1','isInText':true}],['test'])">孤立的插值表达式</span>
 
-        <p><span ms-scan-331="avalon.rebind([{'expr':true,'filters':'','type':'text','value':'text2','isInText':true}],['test','test'])">元素中的插值表达式</span></p>
+        <p><span ms-scan-331="avalon.rebind([{'expr':true,'filters':'','type':'text','value':'text2','isInText':true}],['test'])">元素中的插值表达式</span></p>
 
         <p>
             前面的文字 - 
-            <span ms-scan-331="avalon.rebind([{'expr':true,'filters':'','type':'text','value':'text3','isInText':true}],['test','test'])">元素中的前后有字符的插值表达式</span>
+            <span ms-scan-331="avalon.rebind([{'expr':true,'filters':'','type':'text','value':'text3','isInText':true}],['test'])">元素中的前后有字符的插值表达式</span>
             - 后面的文字
         </p>
-        <p><span ms-scan-331="avalon.rebind([{'expr':true,'filters':'','type':'text','value':'num1','isInText':true}],['test','test'])">1</span>+<span ms-scan-331="avalon.rebind([{'expr':true,'filters':'','type':'text','value':'num2','isInText':true}],['test','test'])">2</span>=<span ms-scan-331="avalon.rebind([{'expr':true,'filters':'','type':'text','value':'num1+num2','isInText':true}],['test','test'])">3</span></p>
+        
+        <p>html 过滤器：含有<strong>加粗标签</strong></p>
+        
+        <p><span ms-scan-331="avalon.rebind([{'expr':true,'filters':'','type':'text','value':'num1','isInText':true}],['test'])">1</span>+<span ms-scan-331="avalon.rebind([{'expr':true,'filters':'','type':'text','value':'num2','isInText':true}],['test'])">2</span>=<span ms-scan-331="avalon.rebind([{'expr':true,'filters':'','type':'text','value':'num1+num2','isInText':true}],['test'])">3</span></p>
 
         <p>
             <button ms-click="change">change</button>
