@@ -117,24 +117,37 @@ console.log(str)
         expect(html.indexOf('<!--ms-include--><strong>这是模板</strong><!--ms-include-end-->')).to.be.above(-1);
     })
 
-    it("外链Include绑定", function () {
+    it("外链Include绑定, replace=true", function () {
         var html = getHtmlOutput(function() {
             /*
              <!DOCTYPE html>
              <html ms-controller="attr1">
              <head></head>
              <body>
-                <script id='tmpl' type="avalon"><strong>这是模板</strong></script>
                 <blockquote ms-include-src="tt" data-include-replace='true'>这个元素会被替换掉</blockquote>
              </body>
              </html>
              */
         });
-        expect(html.indexOf("<script id='tmpl' type=\"avalon\"><strong>这是模板</strong></script>")).to.be(-1);
-        expect(html.indexOf('<!--ms-include--><strong>这是模板</strong><!--ms-include-end-->')).to.be.above(-1);
-
-        expect(str.indexOf('<blockquote ms-include-src="tt" data-include-replace=\'true\'>这个元素会被替换掉</blockquote>')).to.be(-1)
-        expect(str.indexOf('<div>\n   这是另一个文件\n</div>')).to.be.above(-1)
+        expect(html.indexOf('这个元素会被替换掉')).to.be(-1)
+        expect(html.indexOf('<blockquote data-include-replace="true">')).to.be.above(-1)
+        expect(html.indexOf('<div>\n   这是另一个文件\n</div>')).to.be.above(-1)
+    })
+    it("外链Include绑定, replace=false", function () {
+        var html = getHtmlOutput(function() {
+            /*
+             <!DOCTYPE html>
+             <html ms-controller="attr1">
+             <head></head>
+             <body>
+                <blockquote ms-include-src="tt" data-include-replace='false'>这个元素会被替换掉</blockquote>
+             </body>
+             </html>
+             */
+        });
+        expect(html.indexOf('这个元素会被替换掉')).to.be(-1)
+        expect(html.indexOf('<blockquote data-include-replace="false">')).to.be.above(-1)
+        expect(html.indexOf('<div>\n   这是另一个文件\n</div>')).to.be.above(-1)
     })
 
     it("ms-skip", function () {
