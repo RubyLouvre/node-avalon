@@ -49,6 +49,7 @@ bindingExecutors.attr = function (val, elem, data) {
     var method = data.type
     var attrName = data.param
     if (method === "attr") {
+        bindForBrowser(data)
         // ms-attr-class="xxx" vm.xxx="aaa bbb ccc"将元素的className设置为aaa bbb ccc
         // ms-attr-class="xxx" vm.xxx=false  清空元素的所有类名
         // ms-attr-name="yyy"  vm.yyy="ooo" 为元素设置name属性
@@ -111,12 +112,14 @@ bindingExecutors.attr = function (val, elem, data) {
             //现在只在scanNode中收集拥有id的script, textarea, noscript标签的innerText
             scanTemplate(DOM.ids[val])
         }
+        bindForBrowser(data)
     } else if (method === "css") {
         bindingExecutors.css(val, elem, data)
+        bindForBrowser(data)
     } else {
         DOM.setAttribute(elem, method, val) //ms-href, ms-src
+        bindForBrowser(data)
     }
-    bindForBrowser(data)
 }
 
 //这几个指令都可以使用插值表达式，如ms-src="aaa/{{b}}/{{c}}.html"ms-src

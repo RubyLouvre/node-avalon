@@ -36,7 +36,7 @@ new function () {
             var value = arr.join("=")
             arr = name.split("-")
             var type = arr.shift()
-            var param = arr.join("-")
+            var param = arr.join("-") || ""
 
             data.value = value
             data.name = "ms-" + name
