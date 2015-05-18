@@ -59,7 +59,7 @@ new function () {
         attr: function (data, vmodels, elem) {
             injectBinding("attr", data, vmodels)
         },
-        "class": function (data, vmodels, elem) {
+        class: function (data, vmodels, elem) {
             injectBinding("class", data, vmodels)
         },
         text: function (data, vmodels, elem) {
@@ -71,10 +71,13 @@ new function () {
             }
             injectBinding("text", data, vmodels)
         },
+        html: function(data, vmodels, elem) {
+            injectBinding("html", data, vmodels)
+        },
         data: function (data, vmodels, elem) {
             injectBinding("data", data, vmodels)
         },
-        "if": function (data, vmodels, elem) {
+        if: function (data, vmodels, elem) {
             var isInDom = data.isInDom
             delete data.isInDom
             if (!isInDom) {
