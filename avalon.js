@@ -5,7 +5,7 @@
  http://weibo.com/jslouvre/
  
  Released under the MIT license
- avalon.js 1.43 built in 2015.5.16
+ avalon.js 1.43 built in 2015.5.18
  用于后端渲染
  */
 (function(){
@@ -1006,8 +1006,12 @@ function bindForBrowser(data) {
             attrValue = ''
 
     // 提取 vmodels id
-    var array = data.vmodels.map(function (el) {
-        return el.$id
+    var array = [], uniq = {}
+    data.vmodels.map(function (el) {
+        if (!uniq[el.$id]) {
+            uniq[el.$id] = 1
+            array.push(el.$id)
+        }
     })
 
     var element = data.element
@@ -1016,12 +1020,14 @@ function bindForBrowser(data) {
         // 如果是 Element 节点
 
         // 提取 data 属性
-        var props = 'name,param,priority,type,value',
-                options = {}
-        props.replace(rword, function (prop) {
-            options[prop] = data[prop]
-        })
-
+//        var props = 'name,param,priority,type,value',
+//                options = {}
+//        props.replace(rword, function (prop) {
+//            options[prop] = data[prop]
+//        })
+        var options = {
+            a: data.type + data.param + "=" + data.value
+        }
         switch (data.type) {
             case "include":
                 options.template = data._template
