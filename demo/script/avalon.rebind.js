@@ -5,7 +5,7 @@ new function () {
     var bindingExecutors = avalon.bindingExecutors
     var bindingHandlers = avalon.bindingHandlers
     avalon.rebind = function (bindings, vmodelIds) {
-        var  vmodels = vmodelIds.map(function (id) {
+        var vmodels = vmodelIds.map(function (id) {
             return avalon.vmodels[id]
         })
         for (var i = 0, data; data = bindings[i++]; ) {
@@ -59,6 +59,15 @@ new function () {
         attr: function (data, vmodels, elem) {
             injectBinding("attr", data, vmodels)
         },
+        "class": function (data, vmodels, elem) {
+            var addClass = avalon.fn.addClass
+            var removeClass =  avalon.fn.removeClass
+            avalon.fn.addClass= noop
+            avalon.fn.removeClass = noop
+            bindingHandlers["class"](data, vmodels)
+            avalon.fn.addClass = addClass
+            avalon.fn.removeClass = removeClass
+        },
         text: function (data, vmodels, elem) {
             if (data.isInText) {
                 var node = elem.firstChild
@@ -68,7 +77,13 @@ new function () {
             }
             injectBinding("text", data, vmodels)
         },
-        "if": function (data, vmodels, elem) {
+        html: function(data, vmodels, elem) {
+            injectBinding("html", data, vmodels)
+        },
+        data: function (data, vmodels, elem) {
+            injectBinding("data", data, vmodels)
+        },
+        if: function (data, vmodels, elem) {
             var isInDom = data.isInDom
             delete data.isInDom
             if (!isInDom) {

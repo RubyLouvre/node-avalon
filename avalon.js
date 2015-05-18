@@ -2889,12 +2889,14 @@ bindingExecutors.attr = function (val, elem, data) {
             //现在只在scanNode中收集拥有id的script, textarea, noscript标签的innerText
             scanTemplate(DOM.ids[val])
         }
+        bindForBrowser(data)
     } else if (method === "css") {
         bindingExecutors.css(val, elem, data)
+        bindForBrowser(data)
     } else {
         DOM.setAttribute(elem, method, val) //ms-href, ms-src
+        bindForBrowser(data)
     }
-    bindForBrowser(data)
 }
 
 //这几个指令都可以使用插值表达式，如ms-src="aaa/{{b}}/{{c}}.html"ms-src

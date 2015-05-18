@@ -1,4 +1,5 @@
 var files = ["attr"]
+//var files = ["attr","css","if","expression","visible","include","data","class","html"]
 
 var parse5 = require('parse5'),
     parser = new parse5.Parser(),
@@ -7,6 +8,7 @@ var parse5 = require('parse5'),
     // 引入 node-avalon
     avalon = require('../avalon')
 
+fs.mkdir('./public', function(){})
 files.forEach(function(name) {
     // 引入 js 文件，以字符串形式
     var scriptStr = fs.readFileSync('./script/' + name + '.js', 'utf-8')
