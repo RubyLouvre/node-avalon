@@ -20,22 +20,23 @@ bindingHandlers.visible = function (data, vmodels) {
     if (style) { //如果用户在元素上设置了display
         var array = style.match(rdisplay) || []
         if (array[1]) {
-            data.display = array[1]
+            data.inlineDisplay = array[1]
         }
     }
     parseExprProxy(data.value, vmodels, data)
 }
 
 bindingExecutors.visible = function (val, elem, data) {
-    bindForBrowser(data)
     var style = DOM.getAttribute(elem, "style")
     if (val) { //如果要显示,如果在元素设置display:none,那么就去掉
-        if (style && data.display) {
-            var replaced = data.display === "none" ? "" : ["display:", data.display, ";"].join("")
+        if (style && data.inlineDisplay) {
+            var replaced = data.inlineDisplay === "none" ? "" : ["display:", data.inlineDisplay, ";"].join("")
             DOM.setAttribute(elem, "style", style.replace(rdisplay, replaced))
         }
     } else {  //如果要隐藏
         var cssText = !style ? "display:none;" : style.replace(rdisplay, "display:none;")
         DOM.setAttribute(elem, "style", cssText)
     }
+    data.isShow = val
+    bindForBrowser(data)
 }

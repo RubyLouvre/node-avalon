@@ -1,4 +1,5 @@
-var files = ["attr","css","if","expression","visible","include"]
+var files = ["attr","css","if","expression","visible","include","repeat","with"]
+// var files = ["attr","css","if","expression","visible","include"]
 
 var parse5 = require('parse5'),
     parser = new parse5.Parser(),
@@ -14,6 +15,8 @@ files.forEach(function (name) {
     var scriptStr = fs.readFileSync('./script/' + name + '.js', 'utf-8')
     // 引入 html 文件，以字符串形式
     var htmlStr = fs.readFileSync('./html/' + name + '.html', 'utf-8')
+
+    avalon.mainPath = "./html/"
     // 在服务器上执行浏览器的脚本
     eval(scriptStr)
 

@@ -1,11 +1,11 @@
 var vm = avalon.define({
-	$id: 'test',
-
+    $id: 'test',
     text1: '孤立的插值表达式',
     text2: '元素中的插值表达式',
     text3: '元素中的前后有字符的插值表达式',
-
     text4: '含有<strong>加粗标签</strong>',
+    num1: 1,
+    num2: 2,
 
     change: function() {
         var randomNum = Math.random()
@@ -14,5 +14,8 @@ var vm = avalon.define({
         vm.text2 = '元素中的插值表达式' + randomNum
         vm.text3 = '元素中的前后有字符的插值表达式' + randomNum
         vm.text4 = '含有<strong>加粗标签</strong>' + randomNum
+
+        vm.num1 = Math.floor(randomNum * 10)
+        vm.num2 = Math.floor(Math.random() * 60)
     }
 })

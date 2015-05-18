@@ -5,7 +5,7 @@
  http://weibo.com/jslouvre/
  
  Released under the MIT license
- avalon.js 1.43 built in 2015.5.15
+ avalon.js 1.43 built in 2015.5.16
  用于后端渲染
  */
 (function(){
@@ -1001,65 +1001,76 @@ var valHooks = {
         }
     }
 }
-function bindForBrowser(data){
+function bindForBrowser(data) {
     var attrName = 'ms-scan-331',
-        attrValue = ''
+            attrValue = ''
 
     // 提取 vmodels id
-    var array = data.vmodels.map(function(el){
+    var array = data.vmodels.map(function (el) {
         return el.$id
     })
 
     var element = data.element
 
-    if(DOM.nodeType(element) === 1){
+    if (DOM.nodeType(element) === 1) {
         // 如果是 Element 节点
-        
+
         // 提取 data 属性
         var props = 'name,param,priority,type,value',
-            options = {}
-        props.replace(rword,function(prop){
+                options = {}
+        props.replace(rword, function (prop) {
             options[prop] = data[prop]
         })
-        
-        // 检测是否存在 ms-scan-noderebind
+
+        switch (data.type) {
+            case "include":
+                options.template = data._template
+                delete data._template
+                if (data.includeReplace) {
+                    options.includeReplace = 1
+                }
+                break
+            case "visible":
+                options.isShow = data.isShow
+                options.inlineDisplay = data.inlineDisplay
+                break
+            case "if":
+                options.isInDom = data.isInDom
+                break
+
+        }
+
         if (DOM.hasAttribute(element, attrName)) {
-            // 如果已有
+            // 检测是否存在 ms-scan-noderebind
             var newOptStr = JSON.stringify(options).replace(/"/ig, "'")
-            
             attrValue = DOM.getAttribute(element, attrName)
             attrValue = attrValue.replace('avalon.rebind([', 'avalon.rebind([' + newOptStr + ', ')
 
         } else {
             // 如果没有
-            attrValue = 'avalon.rebind('+ [JSON.stringify([options]), JSON.stringify(array)] +')';
+            attrValue = 'avalon.rebind(' + [JSON.stringify([options]), JSON.stringify(array)] + ')';
             // 将 Stringify 产生的双引号转换为单引号
             attrValue = attrValue.replace(/"/ig, "'");
         }
+        DOM.setAttribute(element, attrName, attrValue)
 
-        DOM.setAttribute(element, attrName , attrValue)
-
-    }else{
-        // 如果是 Text 节点
-        
+    } else {//如果是文本节点
         // 提取 data 属性
         var props = 'expr,filters,type,value',
-            options = {}
-        props.replace(rword,function(prop){
+                options = {}
+        props.replace(rword, function (prop) {
             options[prop] = data[prop]
         })
-
+        options.isInText = true
+        //将原内容包含到一个span标签上
         var newElement = DOM.createElement('span')
-            copy = DOM.cloneNode(element, true)
-
-        newElement.childNodes.push(copy)
-
-        // avalon.rebind
-        attrValue = 'avalon.rebind('+ [JSON.stringify([options]), JSON.stringify(array)] +')';
-        attrValue = attrValue.replace(/"/ig, "'");
-        DOM.setAttribute(newElement, attrName , attrValue)
-
         DOM.replaceChild(newElement, element)
+        DOM.innerText(newElement, element.value)
+        element = newElement
+        // avalon.rebind
+        attrValue = 'avalon.rebind(' + [JSON.stringify([options]), JSON.stringify(array)] + ')';
+        attrValue = attrValue.replace(/"/ig, "'");
+        DOM.setAttribute(element, attrName, attrValue)
     }
 }
 /*********************************************************************
@@ -2683,8 +2694,6 @@ bindingExecutors.html = function(val, elem, data) {
         args.unshift(index, children.length)
         Array.prototype.splice.apply(children, args)
     }
-    
-    bindForBrowser(data)
     scanNodeArray(nodes, data.vmodels)
 }
 //这里提供了所有特殊display的元素 http://www.htmldog.com/reference/cssproperties/display/
@@ -2709,58 +2718,46 @@ bindingHandlers.visible = function (data, vmodels) {
     if (style) { //如果用户在元素上设置了display
         var array = style.match(rdisplay) || []
         if (array[1]) {
-            data.display = array[1]
+            data.inlineDisplay = array[1]
         }
     }
     parseExprProxy(data.value, vmodels, data)
 }
 
 bindingExecutors.visible = function (val, elem, data) {
-    bindForBrowser(data)
     var style = DOM.getAttribute(elem, "style")
     if (val) { //如果要显示,如果在元素设置display:none,那么就去掉
-        if (style && data.display) {
-            var replaced = data.display === "none" ? "" : ["display:", data.display, ";"].join("")
+        if (style && data.inlineDisplay) {
+            var replaced = data.inlineDisplay === "none" ? "" : ["display:", data.inlineDisplay, ";"].join("")
             DOM.setAttribute(elem, "style", style.replace(rdisplay, replaced))
         }
     } else {  //如果要隐藏
         var cssText = !style ? "display:none;" : style.replace(rdisplay, "display:none;")
         DOM.setAttribute(elem, "style", cssText)
     }
+    data.isShow = val
+    bindForBrowser(data)
 }
 bindingHandlers["data"] = bindingHandlers["if"] = function (data, vmodels) {
     parseExprProxy(data.value, vmodels, data)
 }
 
 bindingExecutors["if"] = function (val, elem, data) {
-    if (val) { //插回DOM树
-        if (elem.nodeName === "#comment") {
-            var node = parser.parseFragment(elem.data).childNodes[0]
-            var parent = elem.parentNode
-            node.nodeType = 1
-            node.parentNode = parent
-            var children = elem.childNodes
-            var index = children.indexOf(elem)
-            children.splice(index, 1, node)
-            elem = data.element = node
-        }
+    if (val) {
         if (DOM.getAttribute(elem, data.name)) {
             DOM.removeAttribute(elem, data.name)
-            scanAttr(elem, data.vmodels)
+            scanAttr(elem, data.vmodels) //继续往下扫描
         }
-    } else { //移出DOM树，并用注释节点占据原位置
-        if (elem.tagName) {
-            var parent = elem.parentNode
-            var children = parent.childNodes
-            var node = DOM.createComment(DOM.outerHTML(elem))
-            node.nodeType = 8
-            node.parentNode = parent
-            var index = children.indexOf(elem)
-            children.splice(index, 1, node)
-            data.element = node
-        }
+    } else {
+        //生成一个<script type="avalon">xxxx</script>占据原来的位置
+        var node = DOM.createElement("script")
+        DOM.setAttribute(node, "type", "avalon")
+         DOM.removeAttribute(elem, data.name)
+        DOM.innerText(node, DOM.outerHTML(elem))
+        DOM.replaceChild(node, elem)
+        data.element = node
     }
-
+    data.isInDom = !!val
     bindForBrowser(data)
 }
 
@@ -2799,24 +2796,19 @@ bindingHandlers.attr = function (data, vmodels) {
         data.endInclude = DOM.createComment("ms-include-end")
         DOM.removeAttribute(elem, data.name)
         if (outer) {
-            var parent = elem.parentNode
-            data.startInclude.parentNode = data.endInclude.parentNode = parent
-            var children = parent.childNodes
-            var index = children.indexOf(elem)
-            data.element = data.startInclude
-            children.splice(index, 1, data.startInclude, elem, data.endInclude)
-        } else {
-            data.startInclude.parentNode = data.endInclude.parentNode = elem
-            var children = elem.childNodes
-            children.unshift(data.startInclude)
-            children.push(data.endInclude)
+            log("warning!node-avalon不处理data-include-replace=true的情况，但rebind后会与前端avalon保持一致")
         }
+
+        data.startInclude.parentNode = data.endInclude.parentNode = elem
+        var children = elem.childNodes
+        children.unshift(data.startInclude)
+        children.push(data.endInclude)
     }
     data.handlerName = "attr" //handleName用于处理多种绑定共用同一种bindingExecutor的情况
     parseExprProxy(text, vmodels, data, (simple ? 0 : scanExpr(data.value)))
 }
 bindingExecutors.attr = function (val, elem, data) {
-    bindForBrowser(data)
+
     var method = data.type
     var attrName = data.param
     if (method === "attr") {
@@ -2850,37 +2842,44 @@ bindingExecutors.attr = function (val, elem, data) {
             if (rendered) {
                 console.log("不支持data-include-rendered")
             }
+
             var parent = data.startInclude.parentNode
             var children = parent.childNodes
-            var startIndex = children.indexOf(data.startInclude)+ 1
+            var startIndex = children.indexOf(data.startInclude)
             var endIndex = children.indexOf(data.endInclude)
-            children.splice(startIndex , endIndex - startIndex)
+            //除移从startInclude到endInclude之间的内容（包括startInclude，但留下endInclude）
+            children.splice(startIndex, endIndex - startIndex)
             var nodes = avalon.parseHTML(text).childNodes
-            nodes.forEach(function (el) {
-                el.parentNode = parent
-            })
-            var args = [startIndex, 0].concat(nodes)
-            Array.prototype.splice.apply(children, args)
+            //插回startInclude，并在startInclude与endInclude之间添加新内容
+            DOM.replaceChild([data.startInclude].concat(nodes).concat(data.endInclude), data.endInclude)
             scanNodeArray(nodes, vmodels)
         }
         var path = require("path")
+
         if (data.param === "src") {
             if (typeof cacheTmpls[val] === "string") {
+                data._template = val + " " + cacheTmpls[val]
                 scanTemplate(cacheTmpls[val])
             } else {
-                var filePath = path.resolve(process.cwd(), val)
-                var text = require("fs").readFileSync(filePath, "utf8")
-                scanTemplate(cacheTmpls[val] = text)
+                var filePath = path.resolve(avalon.mainPath || process.cwd(), val)
+                try {
+                    var text = require("fs").readFileSync(filePath, "utf8")
+                    data._template = val + " " + text
+                    scanTemplate(cacheTmpls[val] = text)
+                } catch (e) {
+                    log("warning!ms-include-src找不到目标文件 " + e)
+                }
             }
         } else {
             //现在只在scanNode中收集拥有id的script, textarea, noscript标签的innerText
             scanTemplate(DOM.ids[val])
         }
-    } else if (method === "css" ){
+    } else if (method === "css") {
         bindingExecutors.css(val, elem, data)
     } else {
         DOM.setAttribute(elem, method, val) //ms-href, ms-src
     }
+    bindForBrowser(data)
 }
 
 //这几个指令都可以使用插值表达式，如ms-src="aaa/{{b}}/{{c}}.html"ms-src
