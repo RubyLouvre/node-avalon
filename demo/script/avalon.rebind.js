@@ -77,10 +77,13 @@ new function () {
             }
             injectBinding("text", data, vmodels)
         },
+        html: function(data, vmodels, elem) {
+            injectBinding("html", data, vmodels)
+        },
         data: function (data, vmodels, elem) {
             injectBinding("data", data, vmodels)
         },
-        "if": function (data, vmodels, elem) {
+        if: function (data, vmodels, elem) {
             var isInDom = data.isInDom
             delete data.isInDom
             if (!isInDom) {
