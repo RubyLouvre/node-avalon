@@ -1,0 +1,15 @@
+<!DOCTYPE html><html><head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>if</title>
+        <script src="../script/avalon.js"></script>
+        <script src="../script/avalon.rebind.js"></script>
+        <script src="../script/if.js"></script>
+    </head>
+    <body ms-controller="test" ms-skip-ctrl="true">
+        <script type="avalon" ms-scan-331="avalon.rebind([{'a':'if=aaa','isInDom':false}],['test'])"><h1>aaa</h1></script>
+        <p ms-scan-331="avalon.rebind([{'a':'if=!aaa','isInDom':true}],['test'])">bbb</p>
+        <button ms-click="change">change</button>
+    
+
+</body></html>
