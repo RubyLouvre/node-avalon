@@ -8,9 +8,19 @@ describe('测试ms-attr', function () {
         tt: "./template1.html"
     })
 
+    var getHtmlOutput = function (heredocFn) {
+        var text = heredoc(heredocFn);
+        var dom = parser.parse(text)
+        avalon.scan(dom, vm)
+        var str = serializer.serialize(dom);
+        str = removeMSScan(removeComment(str))
+console.log(str)
+        return str;
+    }
+
 
     it("<html ms-controller=\"attr1\">controller绑定", function() {
-        var text = heredoc(function () {
+        var str = getHtmlOutput(function () {
             /*
              <!DOCTYPE html>
              <html ms-controller="attr1">
@@ -21,16 +31,12 @@ describe('测试ms-attr', function () {
              </html>
              */
         })
-        var dom = parser.parse(text)
-        avalon.scan(dom, vm)
-        var str = serializer.serialize(dom);
-        str = str.replace(/ms-scan-\d+="[^"]+"/g,"").replace(/<!--\w+\d+(:end)?-->/g, "")
  
         expect(str.indexOf('<html ms-controller="attr1" ms-skip-ctrl="true">')).to.be.above(-1)
     })
 
     it("<div ms-attr-title='aaa'></div>ms-attr-title绑定", function () {
-        var text = heredoc(function () {
+        var str = getHtmlOutput(function () {
             /*
              <!DOCTYPE html>
              <html ms-controller="attr1">
@@ -41,43 +47,124 @@ describe('测试ms-attr', function () {
              </html>
              */
         })
-        var dom = parser.parse(text)
-        avalon.scan(dom, vm)
-         var str = serializer.serialize(dom);
-         str = str.replace(/ms-scan-\d+="[^"]+"/g,"")
-         expect(str.indexOf('title="111"')).to.be.above(-1)
-         console.log(str)
-       // expect(/ms-scan-\d*=\"avalon\.rebind\(\{'name':'ms-attr-title','param':'title','priority':\d*,'type':'attr','value':'aaa'\},\['attr1'\],false\)\"/.test(str)).to.be.ok()
+
+        expect(str.indexOf('title="111"')).to.be.above(-1)
     })
 
-    // it("<input ms-value=\"bbb\"/>Input value绑定", function () {
-    //     expect(str.indexOf('<input value="222">')).to.be.above(-1)
-    // })
+    it("<input ms-value=\"bbb\"/>Input value绑定", function () {
+        var str = getHtmlOutput(function () {
+            /*
+             <!DOCTYPE html>
+             <html ms-controller="attr1">
+             <head></head>
+             <body>
+                <input ms-value="bbb"/>
+             </body>
+             </html>
+             */
+        })
 
-    // it("<a ms-href=\"{{aaa}}ss/{{bbb}}.html\">link</a>A href绑定", function () {
-    //     expect(str.indexOf('<a href="111ss/222.html">link</a>')).to.be.above(-1)
-    // })
+        expect(str.indexOf('<input value="222">')).to.be.above(-1)
+    })
 
-    // it("<option ms-selected=\"ccc\">aaa</option>selected绑定", function () {
-    //     expect(str.indexOf('<option selected="selected">aaa</option>')).to.be.above(-1)
-    // })
+    it("<a ms-href=\"{{aaa}}ss/{{bbb}}.html\">link</a>A href绑定", function () {
+        var str = getHtmlOutput(function () {
+            /*
+             <!DOCTYPE html>
+             <html ms-controller="attr1">
+             <head></head>
+             <body>
+                <a ms-href="{{aaa}}ss/{{bbb}}.html">link</a>
+             </body>
+             </html>
+             */
+        })
 
-    // it("内联Include绑定", function () {
-    //     expect(str.indexOf('<script id=\'tmpl\' type="avalon"><strong>这是模板</strong></script>')).to.be(-1)
-    //     expect(str.indexOf('<!--ms-include--><strong>这是模板</strong><!--ms-include-end-->')).to.be.above(-1)
-    // })
+        expect(str.indexOf('<a href="111ss/222.html">link</a>')).to.be.above(-1)
+    })
 
-    // it("外链Include绑定", function () {
-    //     expect(str.indexOf('<blockquote ms-include-src="tt" data-include-replace=\'true\'>这个元素会被替换掉</blockquote>')).to.be(-1)
-    //     expect(str.indexOf('<div>\n   这是另一个文件\n</div>')).to.be.above(-1)
-    // })
+    it("<option ms-selected=\"ccc\">aaa</option>selected绑定", function () {
+        expect(getHtmlOutput(function() {
+            /*
+             <!DOCTYPE html>
+             <html ms-controller="attr1">
+             <head></head>
+             <body>
+                <select>
+                    <option ms-selected="ccc">aaa</option>
+                    <option>bbb</option>
+                </select>
+             </body>
+             </html>
+             */
+        }).indexOf('<option selected="selected">aaa</option>')).to.be.above(-1)
+    })
 
-    // it("ms-skip", function () {
-    //     expect(str.indexOf('id="skip-test" ms-skip')).to.be.above(-1)
-    // })
+    it("内联Include绑定", function () {
+        var html = getHtmlOutput(function() {
+            /*
+             <!DOCTYPE html>
+             <html ms-controller="attr1">
+             <head></head>
+             <body>
+                <script id='tmpl' type="avalon"><strong>这是模板</strong></script>
+                <div ms-include="'tmpl'">这里的内容会被替换掉</div>
+             </body>
+             </html>
+             */
+        });
+        expect(html.indexOf("<script id='tmpl' type=\"avalon\"><strong>这是模板</strong></script>")).to.be(-1);
+        expect(html.indexOf('<!--ms-include--><strong>这是模板</strong><!--ms-include-end-->')).to.be.above(-1);
+    })
 
-    // it("ms-attr-name", function () {
-    //     expect(str.indexOf('<label name="qunar power"></label>')).to.be.above(-1)
-    // })
+    it("外链Include绑定", function () {
+        var html = getHtmlOutput(function() {
+            /*
+             <!DOCTYPE html>
+             <html ms-controller="attr1">
+             <head></head>
+             <body>
+                <script id='tmpl' type="avalon"><strong>这是模板</strong></script>
+                <blockquote ms-include-src="tt" data-include-replace='true'>这个元素会被替换掉</blockquote>
+             </body>
+             </html>
+             */
+        });
+        expect(html.indexOf("<script id='tmpl' type=\"avalon\"><strong>这是模板</strong></script>")).to.be(-1);
+        expect(html.indexOf('<!--ms-include--><strong>这是模板</strong><!--ms-include-end-->')).to.be.above(-1);
+
+        expect(str.indexOf('<blockquote ms-include-src="tt" data-include-replace=\'true\'>这个元素会被替换掉</blockquote>')).to.be(-1)
+        expect(str.indexOf('<div>\n   这是另一个文件\n</div>')).to.be.above(-1)
+    })
+
+    it("ms-skip", function () {
+        var html = getHtmlOutput(function() {
+            /*
+             <!DOCTYPE html>
+             <html ms-controller="attr1">
+             <head></head>
+             <body>
+                <div id='skip-test' ms-skip></div>
+             </body>
+             </html>
+             */
+        });
+        expect(html.indexOf('id="skip-test" ms-skip')).to.be.above(-1)
+    })
+
+    it("ms-attr-name", function () {
+        var html = getHtmlOutput(function() {
+            /*
+             <!DOCTYPE html>
+             <html ms-controller="attr1">
+             <head></head>
+             <body>
+                <label ms-attr-name="labelName"></label>
+             </body>
+             </html>
+             */
+        });
+        expect(html.indexOf('<label name="qunar power"></label>')).to.be.above(-1)
+    })
 })
 
