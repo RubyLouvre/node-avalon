@@ -60,7 +60,13 @@ new function () {
             injectBinding("attr", data, vmodels)
         },
         "class": function (data, vmodels, elem) {
-            injectBinding("class", data, vmodels)
+            var addClass = avalon.fn.addClass
+            var removeClass =  avalon.fn.removeClass
+            avalon.fn.addClass= noop
+            avalon.fn.removeClass = noop
+            bindingHandlers["class"](data, vmodels)
+            avalon.fn.addClass = addClass
+            avalon.fn.removeClass = removeClass
         },
         text: function (data, vmodels, elem) {
             if (data.isInText) {
