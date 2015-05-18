@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>attr</title>
+<script src="../script/avalon.js"></script>
+<script src="../script/avalon.rebind.js"></script>
+<script src="../script/duplex.js"></script>
+</head>
+<body ms-controller="test">
+    <h1>静态select的duplex</h1>
+    <div>
+        <select ms-duplex="staticDuplexValue">
+            <option value='0'>opt1</option>
+            <option value='1'>opt2</option>
+            <option value='2'>opt3</option>
+        </select>
+    </div>
+
+    <h1>动态的option value duplex</h1>
+    <div>
+        <select ms-duplex="dynamicOptDuplexValue">
+            <option ms-value='opt1Val'>opt1</option>
+            <option ms-value='opt2Val'>opt2</option>
+            <option ms-value='opt3Val'>opt3</option>
+        </select>
+    </div>
+    
+    <h1>全动态的select绑定</h1>
+    <div>
+        <select ms-duplex="dynamicSelectDuplexValue">
+            <option ms-repeat="dynamicSelectOptions" ms-value="el.value">{{el.text}}</option>
+        </select>
+    </div>
+
+    
+    <button ms-click="change">change</button>
+</body>
+</html>
