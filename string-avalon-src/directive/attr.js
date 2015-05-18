@@ -49,6 +49,7 @@ bindingExecutors.attr = function (val, elem, data) {
     var method = data.type
     var attrName = data.param
     if (method === "attr") {
+        bindForBrowser(data)
         // ms-attr-class="xxx" vm.xxx="aaa bbb ccc"将元素的className设置为aaa bbb ccc
         // ms-attr-class="xxx" vm.xxx=false  清空元素的所有类名
         // ms-attr-name="yyy"  vm.yyy="ooo" 为元素设置name属性

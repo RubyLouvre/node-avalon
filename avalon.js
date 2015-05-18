@@ -1025,10 +1025,16 @@ function bindForBrowser(data) {
 //        props.replace(rword, function (prop) {
 //            options[prop] = data[prop]
 //        })
-        var options = {
-            a: data.type + "-" + data.param + "=" + data.value
+        var type = data.type
+        var dataName = type
+        if (data.param) {
+            dataName += "-" + data.param
         }
-        switch (data.type) {
+
+        var options = {
+            a: dataName + "=" + data.value
+        }
+        switch (type) {
             case "include":
                 options.template = data._template
                 delete data._template
@@ -2820,6 +2826,7 @@ bindingExecutors.attr = function (val, elem, data) {
     var method = data.type
     var attrName = data.param
     if (method === "attr") {
+        bindForBrowser(data)
         // ms-attr-class="xxx" vm.xxx="aaa bbb ccc"将元素的className设置为aaa bbb ccc
         // ms-attr-class="xxx" vm.xxx=false  清空元素的所有类名
         // ms-attr-name="yyy"  vm.yyy="ooo" 为元素设置name属性

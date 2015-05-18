@@ -22,10 +22,16 @@ function bindForBrowser(data) {
 //        props.replace(rword, function (prop) {
 //            options[prop] = data[prop]
 //        })
-        var options = {
-            a: data.type + "-" + data.param + "=" + data.value
+        var type = data.type
+        var dataName = type
+        if (data.param) {
+            dataName += "-" + data.param
         }
-        switch (data.type) {
+
+        var options = {
+            a: dataName + "=" + data.value
+        }
+        switch (type) {
             case "include":
                 options.template = data._template
                 delete data._template
