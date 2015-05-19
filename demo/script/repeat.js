@@ -1,6 +1,10 @@
 var vm = avalon.define({
     $id: 'test',
     array: [1, 2, 3, 4, 5],
+    depth: [
+        [1, 2, 3],
+        ["a", "b", "c"]
+    ],
     object: {
         a: 1,
         b: 2,

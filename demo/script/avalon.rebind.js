@@ -172,13 +172,18 @@ new function () {
             injectBinding("data", data, vmodels)
         },
         if: function (data, vmodels, elem) {
-            var isInDom = data.isInDom
-            console.log(elem.outerHTML)
+            var isInDom = data.isInDom,
+                loopIf = "ms-if-loop"
             delete data.isInDom
             if (!isInDom) {
                 data.element = avalon.parseHTML(elem.text).firstChild
+                // loopIf的执行是在scan之前，所以其实模板是没有scan的，恢复属性先
+                if(data.name == loopIf) {
+                    data.element.setAttribute(loopIf, data.value)
+                }
                 elem.parentNode.replaceChild(data.element, elem)
             }
+            data.vmodels = vmodels
             bindingHandlers["if"](data, vmodels)
         },
         visible: function (data, vmodels, elem) {
