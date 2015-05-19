@@ -69,16 +69,16 @@ new function () {
             avalon.fn.removeClass = removeClass
         },
         text: function (data, vmodels, elem) {
-            if (data.isInText) {
-                var node = elem.firstChild
-                elem.parentNode.replaceChild(node, elem)
-                data.element = node
-                delete data.isInText
-            }
+
+            // 将 node-avalon 添加的 span 元素去除
+            var node = elem.firstChild
+            elem.parentNode.replaceChild(node, elem)
+            data.element = node
+
             injectBinding("text", data, vmodels)
         },
         html: function(data, vmodels, elem) {
-            if (data.isInText) {
+            if (data.filter) {
                 // html 过滤器
                 var nodes = elem.childNodes,
                     len = nodes.length,
@@ -100,7 +100,7 @@ new function () {
 
                 data.element = node
                 data.group = len
-                delete data.isInText
+                delete data.filter
             }
             injectBinding("html", data, vmodels)
         },
