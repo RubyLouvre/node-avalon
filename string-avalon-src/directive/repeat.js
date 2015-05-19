@@ -40,7 +40,7 @@ bindingHandlers.repeat = function (data, vmodels) {
     data.sortedCallback = getBindingCallback(elem, "data-with-sorted", vmodels)
     data.renderedCallback = getBindingCallback(elem, "data-" + type + "-rendered", vmodels)
     var signature = data.signature = generateID(type)
-    // comment => script node
+    // 回调
     var cbEle = makeAScriptNode(signature + ":end")
     bindForBrowser({
         element: cbEle,

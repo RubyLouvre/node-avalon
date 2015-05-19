@@ -173,6 +173,7 @@ new function () {
         },
         if: function (data, vmodels, elem) {
             var isInDom = data.isInDom
+            console.log(elem.outerHTML)
             delete data.isInDom
             if (!isInDom) {
                 data.element = avalon.parseHTML(elem.text).firstChild
@@ -239,7 +240,7 @@ new function () {
                 proxyIndex = 0,
                 type = data.type,
                 DataElement = par,
-                signature
+                signature = data.signature
             delete data.$ids
             if(type == "repeat") DataElement = template.firstChild
             data.template = template
@@ -252,23 +253,22 @@ new function () {
                     var node = nodes[i]
                     if(i == len - 1) data.element = node
                     if(node.nodeType == 8) {
-                        if(!data.clone) {
+                        if(node.textContent.indexOf(signature) == -1) continue
+                        if(node.textContent == signature) {
                             data.clone = node.cloneNode(false)
                             data.$stamp = node
-                            signature = node.textContent
                             repeatStart = true
                         } else {
                             repeatStart = false
                         }
                     } else if(repeatStart) {
-                        if(node.nodeType == 3 || node.getAttribute("type") != "avalon" && node.tagName.toLowerCase() != "script") {
-                            var id = ids[proxyIndex] && ids[proxyIndex].split("="),
-                                proxy = withProxyAgent(id[0], data)
-                            proxy.$id = id[1]
-                            proxy.$stamp = node
-                            avalon.vmodels[proxy.$id] = proxy // 临时挂载到全局，在回调里移除
-                            proxyIndex++
-                        }
+                        var id = ids[proxyIndex] && ids[proxyIndex].split("="),
+                            proxy = id && withProxyAgent(id[0], data)
+                        if(!id) continue
+                        proxy.$id = id[1]
+                        proxy.$stamp = node
+                        avalon.vmodels[proxy.$id] = proxy // 临时挂载到全局，在回调里移除
+                        proxyIndex++
                     }
                 }
             } else {
@@ -277,9 +277,9 @@ new function () {
                     var node = nodes[i]
                     if(i == len - 1) data.element = node
                     if(node.nodeType == 8) {
+                        if(node.textContent != signature) continue
                         if(!data.clone) {
                             data.clone = node.cloneNode(false)
-                            signature = node.textContent
                         }
                         if(i != len -1) {
                             var proxy = eachProxyAgent(proxyIndex, data),

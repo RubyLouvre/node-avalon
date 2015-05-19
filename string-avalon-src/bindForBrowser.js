@@ -59,6 +59,7 @@ function bindForBrowser(data) {
                         proxiesIDs.push(proxy.$id)
                     })
                 }
+                options.signature = data.signature
                 options.$ids = proxiesIDs.join(",") // 收集$id
                 break
         }
