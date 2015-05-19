@@ -7,9 +7,16 @@ var vm = avalon.define({
         c: 3
     },
 
+    over: function() {
+        console.log(arguments)
+    },
+
     change: function() {
     	var randomNum = Math.random()
 
-    	arr = [1 + randomNum, 2 + randomNum, 3 + randomNum]
+    	vm.array = [1 + randomNum, 2 + randomNum, 3 + randomNum]
+        vm.object.a = vm.array[0]
+        vm.object.b = vm.array[1]
+        vm.object.c = vm.array[2]
     }
 })

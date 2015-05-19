@@ -45,7 +45,22 @@ function bindForBrowser(data) {
             case "if":
                 options.isInDom = data.isInDom
                 break
-
+            case "repeat":
+            case "each":
+            case "with":
+                var proxiesIDs = []
+                if(data.pool) {
+                    for(var i in data.pool) {
+                        var proxy = data.pool[i]
+                        proxiesIDs.push(proxy.$key + "=" + proxy.$id)
+                    }
+                } else {
+                    data.proxies.forEach(function(proxy) {
+                        proxiesIDs.push(proxy.$id)
+                    })
+                }
+                options.$ids = proxiesIDs.join(",") // 收集$id
+                break
         }
 
         if (DOM.hasAttribute(element, attrName)) {

@@ -1,3 +1,10 @@
+function makeAScriptNode(text) {
+    var node = DOM.createElement("script")
+    DOM.setAttribute(node, "type", "avalon")
+    if(text) DOM.innerText(node, text)
+    return node
+}
+
 bindingHandlers.repeat = function (data, vmodels) {
     var type = data.type
     parseExprProxy(data.value, vmodels, data, 0, 1)
@@ -32,26 +39,33 @@ bindingHandlers.repeat = function (data, vmodels) {
 
     data.sortedCallback = getBindingCallback(elem, "data-with-sorted", vmodels)
     data.renderedCallback = getBindingCallback(elem, "data-" + type + "-rendered", vmodels)
-    var signature = generateID(type)
+    var signature = data.signature = generateID(type)
+    // comment => script node
+    var cbEle = makeAScriptNode(signature + ":end")
+    bindForBrowser({
+        element: cbEle,
+        vmodels: [],
+        type: "cb",
+        value: signature
+    })
     var comment = data.element = DOM.createComment(signature + ":end")
-    data.clone = DOM.createComment(signature)
+    // data.clone = DOM.createComment(signature)
+    var clone = data.clone = makeAScriptNode(signature)
+    clone.data = signature
     //生成一个<script type="avalon">xxxx</script>占据原来的位置
-    var node = DOM.createElement("script")
-    DOM.setAttribute(node, "type", "avalon")
+    var node = makeAScriptNode()
     //   hyperspace.appendChild(comment)
     if (type === "each" || type === "with") {
         data.template = DOM.innerHTML(elem).trim()
         DOM.innerText(node, data.template)
         var children = elem.childNodes
-        comment.parentNode = node.parentNode = elem
-        children.splice(0, children.length, node, comment)
+        comment.parentNode = node.parentNode = cbEle.parentNode = elem
+        children.splice(0, children.length, node, cbEle, comment)
     } else {
         data.template = DOM.outerHTML(elem).trim()
         DOM.innerText(node, data.template)
-        DOM.replaceChild([node, comment], elem)
+        DOM.replaceChild([node, cbEle, comment], elem)
     }
-    data.element = node
-    bindForBrowser(data)
     data._template = data.template
     data.template = avalon.parseHTML(data.template)
 
@@ -97,6 +111,8 @@ bindingHandlers.repeat = function (data, vmodels) {
     } else if ($repeat.length) {
         data.handler("add", 0, $repeat.length)
     }
+    data.element = node
+    bindForBrowser(data)
 }
 
 bindingExecutors.repeat = function (method, pos, el) {
@@ -105,7 +121,7 @@ bindingExecutors.repeat = function (method, pos, el) {
         var end = data.element
         var parent = end.parentNode
         end = parent.childNodes
-        end = data.element = end[end.length - 1]
+        end = data.element = end[end.length - 2] // 还原end
         var proxies = data.proxies
         var transation = []
         //string-avalon特有
@@ -206,12 +222,13 @@ bindingExecutors.repeat = function (method, pos, el) {
                     }
                 }
 
-                var comment = data.$stamp = data.clone
+                var comment = data.$stamp = DOM.createComment(data.clone.data)
                 DOM.replaceChild([comment].concat(transation, end), end)
                 for (i = 0; fragment = fragments[i++]; ) {
                     scanNodeArray(fragment.nodes, fragment.vmodels)
                     fragment.nodes = fragment.vmodels = null
                 }
+                data.pool = pool
                 break
         }
         if (method === "clear")

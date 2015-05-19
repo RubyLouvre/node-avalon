@@ -4,6 +4,70 @@
 new function () {
     var bindingExecutors = avalon.bindingExecutors
     var bindingHandlers = avalon.bindingHandlers
+
+    var subscribers = avalon.subscribers,
+        eachProxyAgent = _injectTer("eachProxyAgent"),
+        withProxyAgent = _injectTer("withProxyAgent"),
+        addSubscribers = _injectTer("addSubscribers"),
+        getBindingCallback = _injectTer("getBindingCallback"),
+        callbackHash = {}
+    var bindingHandlersRepeat = function (data, vmodels) {
+        var type = data.type
+        avalon.parseExprProxy(data.value, vmodels, data, 0, 1)
+        data.proxies = []
+        var freturn = false
+        try {
+            var $repeat = data.$repeat = data.evaluator.apply(0, data.args || [])
+            var xtype = avalon.type($repeat)
+            if (xtype !== "object" && xtype !== "array") {
+                freturn = true
+                avalon.log("warning:" + data.value + "只能是对象或数组")
+            }
+        } catch (e) {
+            freturn = true
+        }
+
+        var arr = data.value.split(".") || []
+        if (arr.length > 1) {
+            arr.pop()
+            var n = arr[0]
+            for (var i = 0, v; v = vmodels[i++]; ) {
+                if (v && v.hasOwnProperty(n)) {
+                    var events = v[n].$events || {}
+                    events[subscribers] = events[subscribers] || []
+                    events[subscribers].push(data)
+                    break
+                }
+            }
+        }
+        if (freturn) {
+            return
+        }
+        data.handler = bindingExecutors.repeat
+        data.$outer = {}
+        var check0 = "$key"
+        var check1 = "$val"
+        if (Array.isArray($repeat)) {
+            check0 = "$first"
+            check1 = "$last"
+        }
+        for (i = 0; v = vmodels[i++]; ) {
+            if (v.hasOwnProperty(check0) && v.hasOwnProperty(check1)) {
+                data.$outer = v
+                break
+            }
+        }
+        var $events = $repeat.$events
+        var $list = ($events || {})[subscribers]
+        if ($list && avalon.Array.ensure($list, data)) {
+            addSubscribers(data, $list)
+        }
+
+        if (xtype === "object") {
+            data.$with = true
+        }
+        data.vmodels = vmodels
+    }
     avalon.rebind = function (bindings, vmodelIds) {
         var  vmodels = vmodelIds.map(function (id) {
             return avalon.vmodels[id]
@@ -116,7 +180,114 @@ new function () {
             }
 
 
+        },
+        // repeat的回调补丁
+        cb: function(data, vmodels, elem) {
+            var signature = data.value,
+                callback = callbackHash[signature]
+            elem.parentNode.removeChild(elem)
+            if(!callback) return
+            callback()
+            delete callbackHash[signature]
+        },
+        repeat: function(data, vmodels, elem) {
+            var templateString = elem.text,
+                template = avalon.parseHTML(templateString),
+                par = elem.parentNode,
+                nodes = par.childNodes,
+                len = nodes.length,
+                ids = data.$ids.split(","),
+                proxyIndex = 0,
+                type = data.type,
+                DataElement = par,
+                signature
+            delete data.$ids
+            if(type == "repeat") DataElement = template.firstChild
+            data.template = template
+            data.sortedCallback = getBindingCallback(DataElement, "data-with-sorted", vmodels)
+            data.renderedCallback = getBindingCallback(DataElement, "data-" + type + "-rendered", vmodels)
+            bindingHandlersRepeat(data, vmodels)
+            if(data.$with) {
+                var repeatStart
+                for(var i = 0; i < len; i++) {
+                    var node = nodes[i]
+                    if(i == len - 1) data.element = node
+                    if(node.nodeType == 8) {
+                        if(!data.clone) {
+                            data.clone = node.cloneNode(false)
+                            data.$stamp = node
+                            signature = node.textContent
+                            repeatStart = true
+                        } else {
+                            repeatStart = false
+                        }
+                    } else if(repeatStart) {
+                        if(node.nodeType == 3 || node.getAttribute("type") != "avalon" && node.tagName.toLowerCase() != "script") {
+                            var id = ids[proxyIndex] && ids[proxyIndex].split("="),
+                                proxy = withProxyAgent(id[0], data)
+                            proxy.$id = id[1]
+                            proxy.$stamp = node
+                            avalon.vmodels[proxy.$id] = proxy // 临时挂载到全局，在回调里移除
+                            proxyIndex++
+                        }
+                    }
+                }
+            } else {
+                var proxies = data.proxies = data.proxies || []
+                for(var i = 0; i < len; i++) {
+                    var node = nodes[i]
+                    if(i == len - 1) data.element = node
+                    if(node.nodeType == 8) {
+                        if(!data.clone) {
+                            data.clone = node.cloneNode(false)
+                            signature = node.textContent
+                        }
+                        if(i != len -1) {
+                            var proxy = eachProxyAgent(proxyIndex, data),
+                                id = ids[proxyIndex] && ids[proxyIndex].split("=")
+                            proxy.$id = type == "with" ? id[1] : id[0]
+                            proxy.$stamp = node
+                            avalon.vmodels[proxy.$id] = proxy // 临时挂载到全局，在回调里移除
+                            proxies.splice(proxyIndex, 0, proxy)
+                            proxyIndex++
+                        }
+                    }
+                }
+            }
+            // 回调
+            var cb = data.renderedCallback,
+                resetVmodels = function() {
+                    avalon.each(ids, function(i, id) {
+                        delete avalon.vmodels[id]
+                    })
+                    resetVmodels = null
+                }
+            data.renderedCallback = function() {
+                // resetVmodels && resetVmodels()
+                cb && cb.apply(this, Array.prototype.slice.call(arguments))
+            }
+            callbackHash[signature] = function() {
+                data.renderedCallback.apply(par, [type == "with" ? "append" : "add", 0, proxyIndex])
+            }
+            data.rollback = function() {
+                var elem = data.element
+                if (!elem)
+                    return
+                bindingExecutors.repeat.call(data, "clear")
+                var parentNode = elem.parentNode
+                var content = data.template
+                var target = content.firstChild
+                parentNode.replaceChild(content, elem)
+                var start = data.$stamp
+                start && start.parentNode && start.parentNode.removeChild(start)
+                target = data.element = data.type === "repeat" ? target : parentNode
+            }
+            par.removeChild(elem)
+            console.log(data)
         }
+    })
+    "with,each".replace(avalon.rword, function(name) {
+        avalon.rebind[name] = avalon.rebind.repeat
     })
     "title,alt,src,value,css,href".replace(avalon.rword, function (name) {
         avalon.rebind[name] = avalon.rebind.attr
