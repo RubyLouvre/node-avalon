@@ -69,7 +69,7 @@ new function () {
         data.vmodels = vmodels
     }
     avalon.rebind = function (bindings, vmodelIds) {
-        var  vmodels = vmodelIds.map(function (id) {
+        var vmodels = vmodelIds.map(function (id) {
             return avalon.vmodels[id]
         })
         for (var i = 0, data; data = bindings[i++]; ) {
@@ -123,6 +123,15 @@ new function () {
         attr: function (data, vmodels, elem) {
             injectBinding("attr", data, vmodels)
         },
+        "class": function (data, vmodels, elem) {
+            var addClass = avalon.fn.addClass
+            var removeClass =  avalon.fn.removeClass
+            avalon.fn.addClass= noop
+            avalon.fn.removeClass = noop
+            bindingHandlers["class"](data, vmodels)
+            avalon.fn.addClass = addClass
+            avalon.fn.removeClass = removeClass
+        },
         text: function (data, vmodels, elem) {
             if (data.isInText) {
                 var node = elem.firstChild
@@ -132,7 +141,37 @@ new function () {
             }
             injectBinding("text", data, vmodels)
         },
-        "if": function (data, vmodels, elem) {
+        html: function(data, vmodels, elem) {
+            if (data.isInText) {
+                // html 过滤器
+                var nodes = elem.childNodes,
+                    len = nodes.length,
+                    parentNode = elem.parentNode,
+                    nextNode = elem.nextSibling,
+                    node
+
+                // 将 node-avalon 添加的 span 元素去除
+                parentNode.removeChild(elem)
+
+                while (nodes[0]) {
+                    // 提取第一个节点，绑定用
+                    if (!node) {
+                        node = nodes[0]
+                    }
+                    // 将 span 元素的子元素提取加入 dom
+                    parentNode.insertBefore(nodes[0], nextNode)
+                }
+
+                data.element = node
+                data.group = len
+                delete data.isInText
+            }
+            injectBinding("html", data, vmodels)
+        },
+        data: function (data, vmodels, elem) {
+            injectBinding("data", data, vmodels)
+        },
+        if: function (data, vmodels, elem) {
             var isInDom = data.isInDom
             delete data.isInDom
             if (!isInDom) {
@@ -284,6 +323,9 @@ new function () {
             }
             par.removeChild(elem)
             console.log(data)
+        },
+        duplex: function (data, vmodels, elem) {
+            bindingHandlers["duplex"](data, vmodels)
         }
     })
     "with,each".replace(avalon.rword, function(name) {

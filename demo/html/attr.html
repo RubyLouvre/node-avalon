@@ -9,62 +9,64 @@
 <script src="../script/attr.js"></script>
 </head>
 <body ms-controller="test">
-    <h1>class绑定</h1>
-    <div>
-        <p ms-class="{{c1}}">ms-class测试</p>
-        <p ms-attr-class="c1">ms-attr测试</p>
-        <p ms-class-1="{{c1}}" ms-class-2="{{c2}}">ms-class-0 ms-class-1测试</p>
-    </div>
+    <div class="node-avalon-case-panel">
+        <h1>class绑定</h1>
+        <div>
+            <p ms-class="{{c1}}" id="classCase1">ms-class测试</p>
+            <p ms-attr-class="c1" id="classCase2">ms-attr测试</p>
+            <p ms-class-1="{{c1}}" ms-class-2="{{c2}}" id="classCase3">ms-class-0 ms-class-1测试</p>
+        </div>
 
-    <h1>value绑定</h1>
-    <div>
-        ms-value测试<input ms-value="{{c1}}" type="text" />
-        ms-attr-value测试<input ms-attr-value="{{c1}}" type="text" />
-        ms-duplex测试<input ms-duplex="c1" type="text" />
-    </div>
+        <h1>value绑定</h1>
+        <div>
+            ms-value测试<input ms-value="{{c1}}" type="text" id="valueCase1" />
+            ms-attr-value测试<input ms-attr-value="{{c1}}" type="text" id="valueCase2" />
+            ms-duplex测试<input ms-duplex="c1" type="text" id="valueCase3" />
+        </div>
 
-    <h1>alt、src、title绑定</h1>
-    <div>
-        ms-alt & ms-src测试<img ms-alt="{{altMsg}}" ms-src="{{imgSrc}}" ms-title="{{imgTitle}}" /><br />
-        ms-attr-alt & ms-attr-src测试<img ms-attr-alt="{{altMsg}}" ms-attr-src="{{imgSrc}}" ms-attr-title="{{imgTitle}}" />
-    </div>
+        <h1>alt、src、title绑定</h1>
+        <div>
+            ms-alt & ms-src测试<img ms-alt="{{altMsg}}" ms-src="{{imgSrc}}" ms-title="{{imgTitle}}" /><br />
+            ms-attr-alt & ms-attr-src测试<img ms-attr-alt="{{altMsg}}" ms-attr-src="{{imgSrc}}" ms-attr-title="{{imgTitle}}" />
+        </div>
 
-    <h1>src绑定</h1>
-    <div>
-        <a ms-href="http://www.qunar.com/{{hrefRouter}}">LINK</a>
-        <a ms-attr-href="http://www.qunar.com/{{hrefRouter}}">LINK</a>
-    </div>
+        <h1>src绑定</h1>
+        <div>
+            <a ms-href="http://www.qunar.com/{{hrefRouter}}">LINK</a>
+            <a ms-attr-href="http://www.qunar.com/{{hrefRouter}}">LINK</a>
+        </div>
 
-    <h1>readonly、disabled、enabled绑定</h1>
-    <div>
-        <input type="text" ms-readonly="{{readonly}}" ms-enabled="enabled" ms-value="{{c1}}" />
-        <input type="text" ms-disabled="!enabled" ms-value="{{c1}}" />
-        <input type="text" ms-attr-readonly="readonly" ms-attr-disabled="!enabled" ms-value="{{c1}}" />
-    </div>
+        <h1>readonly、disabled、enabled绑定</h1>
+        <div>
+            <input type="text" ms-readonly="{{readonly}}" ms-enabled="enabled" ms-value="{{c1}}" />
+            <input type="text" ms-disabled="!enabled" ms-value="{{c1}}" />
+            <input type="text" ms-attr-readonly="readonly" ms-attr-disabled="!enabled" ms-value="{{c1}}" />
+        </div>
 
-    <h1>selected、checked</h1>
-    <div>
-        <input type="checkbox" ms-checked="readonly" />
-        <input type="checkbox" ms-attr-checked="readonly" />
-        <select multiple>
-            <option ms-selected="opt1Selected">opt1</option>
-            <option ms-selected="opt2Selected">opt2</option>
-            <option ms-selected="opt3Selected">opt3</option>
-            <option ms-selected="opt4Selected">opt4</option>
-        </select>
-        <select multiple>
-            <option ms-attr-selected="opt1Selected">opt1</option>
-            <option ms-attr-selected="opt2Selected">opt2</option>
-            <option ms-attr-selected="opt3Selected">opt3</option>
-            <option ms-attr-selected="opt4Selected">opt4</option>
-        </select>
-        <!-- <int -->
-    </div>
+        <h1>selected、checked</h1>
+        <div>
+            <input type="checkbox" ms-checked="readonly" />
+            <input type="checkbox" ms-attr-checked="readonly" />
+            <select multiple>
+                <option ms-selected="opt1Selected">opt1</option>
+                <option ms-selected="opt2Selected">opt2</option>
+                <option ms-selected="opt3Selected">opt3</option>
+                <option ms-selected="opt4Selected">opt4</option>
+            </select>
+            <select multiple>
+                <option ms-attr-selected="opt1Selected">opt1</option>
+                <option ms-attr-selected="opt2Selected">opt2</option>
+                <option ms-attr-selected="opt3Selected">opt3</option>
+                <option ms-attr-selected="opt4Selected">opt4</option>
+            </select>
+            <!-- <int -->
+        </div>
 
-    <h1>name, colspan, tabindex</h1>
-    <p ms-attr-name="bbb" ms-attr-tabindex="tabIndex">请观察此标签上的name和tabindex属性</p>
-    <table><tr><td ms-attr-colspan="colspan">TABLE CELL。看colspan属性</td></tr></table>
-    
-    <button ms-click="change">change</button>
+        <h1>name, colspan, tabindex</h1>
+        <p ms-attr-name="bbb" ms-attr-tabindex="tabIndex">请观察此标签上的name和tabindex属性</p>
+        <table><tr><td ms-attr-colspan="colspan">TABLE CELL。看colspan属性</td></tr></table>
+        
+        <button ms-click="change">change</button>
+    </div>
 </body>
 </html>

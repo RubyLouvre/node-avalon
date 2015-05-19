@@ -2,3 +2,6 @@
 
 node_modules/
 demo/public/
+/demo/public
+/demo/public
+/demo/testcases/*.html
