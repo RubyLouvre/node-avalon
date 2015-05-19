@@ -5,6 +5,6 @@ var vm = avalon.define({
     change: function() {
         var randomNum = Math.random()
 
-        vm.aaa = '含有<strong>加粗标签</strong>' + randomNum
+        vm.aaa = '含有<strong>加粗标签' + randomNum + '</strong>'
     }
 })

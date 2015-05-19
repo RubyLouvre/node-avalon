@@ -5,7 +5,7 @@
  http://weibo.com/jslouvre/
  
  Released under the MIT license
- avalon.js 1.43 built in 2015.5.18
+ avalon.js 1.43 built in 2015.5.19
  用于后端渲染
  */
 (function(){
@@ -1020,11 +1020,11 @@ function bindForBrowser(data) {
         // 如果是 Element 节点
 
         // 提取 data 属性
-//        var props = 'name,param,priority,type,value',
-//                options = {}
-//        props.replace(rword, function (prop) {
-//            options[prop] = data[prop]
-//        })
+        // var props = 'name,param,priority,type,value',
+        //     options = {}
+        // props.replace(rword, function(prop) {
+        //     options[prop] = data[prop]
+        // })
         var type = data.type
         var dataName = type
         if (data.param) {
@@ -1066,23 +1066,32 @@ function bindForBrowser(data) {
         }
         DOM.setAttribute(element, attrName, attrValue)
 
-    } else {//如果是文本节点
+    } else {
+        // 如果是 Text 节点
+    
         // 提取 data 属性
         var props = 'expr,filters,type,value',
-                options = {}
-        props.replace(rword, function (prop) {
+            options = {}
+        props.replace(rword,function(prop){
             options[prop] = data[prop]
         })
+        
         options.isInText = true
-        //将原内容包含到一个span标签上
+
         var newElement = DOM.createElement('span')
-        DOM.replaceChild(newElement, element)
-        DOM.innerText(newElement, element.value)
-        element = newElement
+            copy = DOM.cloneNode(element, true)
+
+        newElement.childNodes.push(copy)
+        copy.parentNode = newElement
+
+        data.element = newElement
+
         // avalon.rebind
         attrValue = 'avalon.rebind(' + [JSON.stringify([options]), JSON.stringify(array)] + ')';
         attrValue = attrValue.replace(/"/ig, "'");
-        DOM.setAttribute(element, attrName, attrValue)
+        DOM.setAttribute(newElement, attrName , attrValue)
+
+        DOM.replaceChild(newElement, element)
     }
 }
 /*********************************************************************
@@ -2669,11 +2678,13 @@ bindingHandlers.html = function(data, vmodels) {
     parseExprProxy(data.value, vmodels, data)
 }
 bindingExecutors.html = function(val, elem, data) {
+    bindForBrowser(data)
     val = val == null ? "" : val
-    var isHtmlFilter = "group" in data
-    var parent = isHtmlFilter ? elem.parentNode : elem
-    if (!parent)
+    var parent = data.element
+
+    if (!parent) {
         return
+    }
     if (typeof val === "string") {
         var nodes = avalon.parseHTML(val).childNodes
     } else if (val) {
@@ -2694,20 +2705,11 @@ bindingExecutors.html = function(val, elem, data) {
         return node
     })
     var children = parent.childNodes
-    //插入占位符, 如果是过滤器,需要有节制地移除指定的数量,如果是html指令,直接清空
-    if (isHtmlFilter) {
-        data.group = nodes.length
-        data.element = nodes[0]
-
-        var index = children.indexOf(elem)
-        args.unshift(index, data.group)
-        Array.prototype.splice.apply(children, args)
-    } else {
-        args.unshift(index, children.length)
-        Array.prototype.splice.apply(children, args)
-    }
     
-    bindForBrowser(data)
+    var index = children.indexOf(elem)
+    args.unshift(index, children.length)
+    Array.prototype.splice.apply(children, args)
+    
     scanNodeArray(nodes, data.vmodels)
 }
 //这里提供了所有特殊display的元素 http://www.htmldog.com/reference/cssproperties/display/

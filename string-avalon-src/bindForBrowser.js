@@ -17,11 +17,11 @@ function bindForBrowser(data) {
         // 如果是 Element 节点
 
         // 提取 data 属性
-//        var props = 'name,param,priority,type,value',
-//                options = {}
-//        props.replace(rword, function (prop) {
-//            options[prop] = data[prop]
-//        })
+        // var props = 'name,param,priority,type,value',
+        //     options = {}
+        // props.replace(rword, function(prop) {
+        //     options[prop] = data[prop]
+        // })
         var type = data.type
         var dataName = type
         if (data.param) {
@@ -63,22 +63,31 @@ function bindForBrowser(data) {
         }
         DOM.setAttribute(element, attrName, attrValue)
 
-    } else {//如果是文本节点
+    } else {
+        // 如果是 Text 节点
+    
         // 提取 data 属性
         var props = 'expr,filters,type,value',
-                options = {}
-        props.replace(rword, function (prop) {
+            options = {}
+        props.replace(rword,function(prop){
             options[prop] = data[prop]
         })
+        
         options.isInText = true
-        //将原内容包含到一个span标签上
+
         var newElement = DOM.createElement('span')
-        DOM.replaceChild(newElement, element)
-        DOM.innerText(newElement, element.value)
-        element = newElement
+            copy = DOM.cloneNode(element, true)
+
+        newElement.childNodes.push(copy)
+        copy.parentNode = newElement
+
+        data.element = newElement
+
         // avalon.rebind
         attrValue = 'avalon.rebind(' + [JSON.stringify([options]), JSON.stringify(array)] + ')';
         attrValue = attrValue.replace(/"/ig, "'");
-        DOM.setAttribute(element, attrName, attrValue)
+        DOM.setAttribute(newElement, attrName , attrValue)
+
+        DOM.replaceChild(newElement, element)
     }
 }

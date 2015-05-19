@@ -1,4 +1,5 @@
-var files = ["attr","css","if","expression","visible","include","data","class","ms-html"]
+// var files = ["ms-html"]
+var files = ["expression", "ms-html", "expression-html"]
 
 var parse5 = require('parse5'),
     parser = new parse5.Parser(),
