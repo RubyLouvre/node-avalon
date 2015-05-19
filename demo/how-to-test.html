@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Node-Avalon测试手册</title>
+    <style type="text/css">
+    strong.code {
+        font-style: italic;
+        color: #f290f3;
+    }
+    body {
+        padding: 20px 60px;
+        font-family: "Microsoft YaHei";
+        font-size: 14px;
+    }
+    h1 {
+        font-size: 24px;
+        padding-top: 40px;
+    }
+    h3 {
+        font-size: 18px;
+    }
+    p {
+        width: 800px;
+    }
+    p.sample {
+        color: red;
+        font-style: italic;
+    }
+    </style>
+</head>
+<body>
+    <h1>环境依赖</h1>
+    <p>
+        需要在全局安装mocha, phantomjs, mocha-phantomjs三个npm组件<br />
+        <strong class="code">npm install -g mocha</strong><br />
+        <strong class="code">npm install -g phantomjs</strong><br />
+        <strong class="code">npm install -g mocha-phantomjs</strong><br />
+    </p>
+
+    <h1>测试过程</h1>
+    <h3>第一步，撰写html模板，配置test.js</h3>
+    <p>
+        demo目录下的html文件夹专门放置测试用的模板。开始测试前应将html模板放入此目录。<br />
+        修改test.js的files数组，将html的文件名加入数组中。html模板的要求参看<a href="#template">模板要求</a>
+    </p>
+    <p class="sample">
+        例：在html目录下存在了一个attr.html文件
+    </p>
+    <h3>第二步，执行test命令</h3>
+    <p>
+        <strong class="code">cd path-to-demo</strong><br />
+        <strong class="code">node test.js</strong><br />
+        test.js文件会从demo目录下的html文件夹读取服务器模板，并为每一个服务器模板生成两个html输出文件。<br />第一个html文件作为浏览器可视的html文档供直观的查看，并放置在public文件夹下。<br />
+        第二个html文件作为phantomjs的执行器，放置在testcases目录下。<br />
+    </p>
+    <p class="sample">
+        例：test.js的files里加入了“attr”；命令执行结束后，在public和testcases目录下，各生成了一个attr.html文件。
+    </p>
+    <h3>第三步，加入测试脚本</h3>
+    <p>
+        在testcases目录下，为你的phantomjs执行器加入测试脚本。文件名必须和html同名。
+    </p>
+    <p class="sample">
+        例：在testcases目录下，建立一个attr.js测试脚本。
+    </p>
+    <p>
+        在attr.js内建立你的编写你的测试脚本内容。这里的脚本可以访问document、window等各种浏览器下的全局属性；也可以通过avalon.vmodels获得vm。因此你可以很容易的通过document.getElement和修改vm属性来编写测试case。
+    </p>
+
+
+    <h1><a name="template"></a>模板要求</h1>
+    <p>复制下面的代码，并填入模板内容</p>
+    <p>
+        &lt;!DOCTYPE html&gt;<br/>
+        &lt;html&gt;<br/>
+        &lt;head&gt;<br/>
+        &lt;meta charset="utf-8"&gt;<br/>
+        &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;<br/>
+        &lt;title&gt;attr&lt;/title&gt;<br/>
+        &lt;script src="../script/avalon.js"&gt;&lt;/script&gt;<br/>
+        &lt;script src="../script/avalon.rebind.js"&gt;&lt;/script&gt;<br/>
+        &lt;script src="../script/attr.js"&gt;&lt;/script&gt;<br/>
+        &lt;/head&gt;<br/>
+        &lt;body ms-controller="test"&gt;<br/>
+            &lt;div class="node-avalon-case-panel"&gt;<br/>
+                #########此处放入模板的具体内容########<br/>
+            &lt;/div&gt;<br/>
+        &lt;/body&gt;<br/>
+        &lt;/html&gt;<br/>
+    </p>
+</body>
+</html>
