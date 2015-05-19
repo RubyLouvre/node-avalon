@@ -78,6 +78,30 @@ new function () {
             injectBinding("text", data, vmodels)
         },
         html: function(data, vmodels, elem) {
+            if (data.isInText) {
+                // html 过滤器
+                var nodes = elem.childNodes,
+                    len = nodes.length,
+                    parentNode = elem.parentNode,
+                    nextNode = elem.nextSibling,
+                    node
+
+                // 将 node-avalon 添加的 span 元素去除
+                parentNode.removeChild(elem)
+
+                while (nodes[0]) {
+                    // 提取第一个节点，绑定用
+                    if (!node) {
+                        node = nodes[0]
+                    }
+                    // 将 span 元素的子元素提取加入 dom
+                    parentNode.insertBefore(nodes[0], nextNode)
+                }
+
+                data.element = node
+                data.group = len
+                delete data.isInText
+            }
             injectBinding("html", data, vmodels)
         },
         data: function (data, vmodels, elem) {
