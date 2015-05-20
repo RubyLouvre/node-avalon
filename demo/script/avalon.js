@@ -5636,6 +5636,11 @@ avalon.ready(function() {
     if (noGlobal === void 0) {
         window.avalon = avalon
     }
+
+    window._injectTer = function(code) {
+        return eval(code)
+    }
+
     return avalon
 
 }));

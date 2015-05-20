@@ -1,5 +1,6 @@
 var files = ['expression', 'expression-html', 'html', 'class']
-// var files = ["attr","css","if","expression","expression-html","visible","include","data","class","html"]
+var userDefine = process.argv[2] && process.argv[2].split(",")
+if(userDefine) files = userDefine
 
 var parse5 = require('parse5'),
     parser = new parse5.Parser(),
