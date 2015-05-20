@@ -71,7 +71,9 @@ function scanAttr(elem, vmodels) {
     }
     executeBindings(bindings, vmodels)
     if (scanNode && !stopScan[elem.tagName]) {
-        scanNodeArray(elem.childNodes, vmodels) //扫描子孙元素
+        // 为什么用elem.childNodes会有问题，，，shit
+        // 意思不能直接操作dom树
+        scanNodeArray(elem.childNodes.slice(0), vmodels, elem.tagName == "li") //扫描子孙元素
     }
 }
 var rnoscanAttrBinding = /^if|widget|repeat$/

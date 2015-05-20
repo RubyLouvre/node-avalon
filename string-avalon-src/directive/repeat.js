@@ -370,6 +370,7 @@ function eachProxyAgent(index, data) {
     proxy.$host = host
     proxy.$outer = data.$outer
     proxy.$stamp = DOM.createComment(data.clone.data) //data.clone.cloneNode(false)
+    proxy.$stamp.nodeType = 8
     proxy.$remove = function () {
         return host.removeAt(proxy.$index)
     }

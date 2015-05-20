@@ -299,7 +299,7 @@ new function () {
                 }
             }
             // 回调
-            var cb = data.renderedCallback,
+            var cb = data.renderedCallback/*,
                 resetVmodels = function() {
                     avalon.each(ids, function(i, id) {
                         delete avalon.vmodels[id]
@@ -309,9 +309,12 @@ new function () {
             data.renderedCallback = function() {
                 // resetVmodels && resetVmodels()
                 cb && cb.apply(this, Array.prototype.slice.call(arguments))
-            }
-            callbackHash[signature] = function() {
-                data.renderedCallback.apply(par, [type == "with" ? "append" : "add", 0, proxyIndex])
+            }*/
+            // 由于ms-if-loop，不能在回调里从vmodels上移除proxy
+            if(cb) {
+                callbackHash[signature] = function() {
+                    data.renderedCallback.apply(par, [type == "with" ? "append" : "add", 0, proxyIndex])
+                }
             }
             data.rollback = function() {
                 var elem = data.element
