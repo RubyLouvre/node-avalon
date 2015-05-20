@@ -1,6 +1,7 @@
 function makeAScriptNode(text) {
     var node = DOM.createElement("script")
     DOM.setAttribute(node, "type", "avalon")
+    node.nodeType = 1
     if(text) DOM.innerText(node, text)
     return node
 }
@@ -121,7 +122,15 @@ bindingExecutors.repeat = function (method, pos, el) {
         var end = data.element
         var parent = end.parentNode
         end = parent.childNodes
-        end = data.element = end[end.length - 2] // 还原end
+        var cbEle
+        // 排除空白节点
+        for(var i = end.length - 2; i > -1; i--) {
+            cbEle = end[i]
+            if(cbEle.nodeType == 1 && cbEle.tagName == "script") {
+                end = data.element = cbEle
+                break
+            }
+        }
         var proxies = data.proxies
         var transation = []
         //string-avalon特有

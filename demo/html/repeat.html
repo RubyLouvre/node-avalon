@@ -9,7 +9,7 @@
 <script src="../script/repeat.js"></script>
 </head>
 <body ms-controller="test">
-    <ul><li ms-repeat="array" 
+    <!-- <ul><li ms-repeat="array" 
             ms-if-loop="el>2" 
             data-repeat-rendered="over">{{el}}-{{$first}}-{{$last}}-{{$index}}</li></ul>
     <ul ms-each="array"><li
@@ -17,10 +17,11 @@
     <div ms-with="object"><strong 
                 ms-if-loop="$val>2">{{$key}}-{{$val}} </strong></div>
     <map>X<area ms-repeat="object" 
-                ms-if-loop="$val>2" ms-attr-title="$key+$val"></map>
+                ms-if-loop="$val>2" ms-attr-title="$key+$val"></map> -->
     <ul>
         <li 
             ms-repeat-level1="depth">
+            level1 - {{level1.length}}
             <p 
                ms-repeat="level1">level2-{{$index}}-{{el}}</p>
             </li>
