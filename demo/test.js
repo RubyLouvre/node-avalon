@@ -1,4 +1,4 @@
-var files = ["attr","css","if","expression","expression-html","visible","include","data","class","html"]
+var files = ['expression', 'expression-html', 'html', 'class']
 var userDefine = process.argv[2] && process.argv[2].split(",")
 if(userDefine) files = userDefine
 

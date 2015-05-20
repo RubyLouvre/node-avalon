@@ -81,14 +81,16 @@ function bindForBrowser(data) {
     } else {
         // 如果是 Text 节点
     
-        // 提取 data 属性
-        var props = 'expr,filters,type,value',
-            options = {}
-        props.replace(rword,function(prop){
-            options[prop] = data[prop]
-        })
-        
-        options.isInText = true
+        var type = data.type
+        var options = {
+            a: type + '=' + data.value
+        }
+
+        // 如果是带有 html 过滤器的插值表达式
+        if (type === 'html') {
+            // 添加标志与 ms-html 进行区分
+            options.filter = true
+        }
 
         var newElement = DOM.createElement('span')
             copy = DOM.cloneNode(element, true)
