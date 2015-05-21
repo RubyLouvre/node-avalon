@@ -1201,7 +1201,7 @@ function scanTag(elem, vmodels) {
         scanNodeArray(elem.childNodes, vmodels)
     }
 }
-function scanNodeArray(nodes, vmodels) {
+function scanNodeArray(nodes, vmodels, getP) {
     var len = nodes.length,
         i = 0;
     for (; i < len; i++) {
@@ -1319,7 +1319,7 @@ function scanAttr(elem, vmodels) {
     }
     executeBindings(bindings, vmodels)
     if (scanNode && !stopScan[elem.tagName]) {
-        scanNodeArray(elem.childNodes, vmodels) //扫描子孙元素
+        scanNodeArray(elem.childNodes.slice(0), vmodels, elem.tagName == "li") //扫描子孙元素
     }
 }
 var rnoscanAttrBinding = /^if|widget|repeat$/
@@ -3552,6 +3552,7 @@ function eachProxyAgent(index, data) {
     proxy.$host = host
     proxy.$outer = data.$outer
     proxy.$stamp = DOM.createComment(data.clone.data) //data.clone.cloneNode(false)
+    proxy.$stamp.nodeType = 8
     proxy.$remove = function () {
         return host.removeAt(proxy.$index)
     }
