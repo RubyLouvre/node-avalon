@@ -4,69 +4,64 @@
 new function () {
     var bindingExecutors = avalon.bindingExecutors
     var bindingHandlers = avalon.bindingHandlers
-
-    var subscribers = avalon.subscribers,
-        eachProxyAgent = _injectTer("eachProxyAgent"),
-        withProxyAgent = _injectTer("withProxyAgent"),
-        addSubscribers = _injectTer("addSubscribers"),
-        getBindingCallback = _injectTer("getBindingCallback"),
-        callbackHash = {}
-    var bindingHandlersRepeat = function (data, vmodels) {
-        var type = data.type
-        avalon.parseExprProxy(data.value, vmodels, data, 0, 1)
-        data.proxies = []
-        var freturn = false
-        try {
-            var $repeat = data.$repeat = data.evaluator.apply(0, data.args || [])
-            var xtype = avalon.type($repeat)
-            if (xtype !== "object" && xtype !== "array") {
-                freturn = true
-                avalon.log("warning:" + data.value + "只能是对象或数组")
-            }
-        } catch (e) {
-            freturn = true
-        }
-
-        var arr = data.value.split(".") || []
-        if (arr.length > 1) {
-            arr.pop()
-            var n = arr[0]
-            for (var i = 0, v; v = vmodels[i++]; ) {
-                if (v && v.hasOwnProperty(n)) {
-                    var events = v[n].$events || {}
-                    events[subscribers] = events[subscribers] || []
-                    events[subscribers].push(data)
-                    break
+    var getBindingCallback = function(elem, name, vmodels) {
+        var callback = elem.getAttribute(name)
+        if (callback) {
+            for (var i = 0, vm; vm = vmodels[i++]; ) {
+                if (vm.hasOwnProperty(callback) && typeof vm[callback] === "function") {
+                    return vm[callback]
                 }
             }
         }
-        if (freturn) {
-            return
-        }
-        data.handler = bindingExecutors.repeat
-        data.$outer = {}
-        var check0 = "$key"
-        var check1 = "$val"
-        if (Array.isArray($repeat)) {
-            check0 = "$first"
-            check1 = "$last"
-        }
-        for (i = 0; v = vmodels[i++]; ) {
-            if (v.hasOwnProperty(check0) && v.hasOwnProperty(check1)) {
-                data.$outer = v
-                break
+    }
+    function getVmodel(expr, vmodels) {
+        for (var i = 0, el; el = vmodels[i++]; ) {
+            var v = el.$model 
+            if (v) {
+                var arr = expr.split(".")
+                while (v = v[arr.shift()]) {
+                }
+                if (arr.length === 0)
+                    return el
             }
         }
-        var $events = $repeat.$events
-        var $list = ($events || {})[subscribers]
-        if ($list && avalon.Array.ensure($list, data)) {
-            addSubscribers(data, $list)
+    }
+    function getProxy(proxies, proxyIndex) {
+        var proxies = proxies.proxies
+        return proxies && proxies[proxyIndex]
+    }
+    var callbackHash = {}, tmp
+    bindingHandlers._getproxy = function(data, vmodels) {
+        var elem = data.element,
+            par = elem.parentNode
+        tmp = tmp || {}
+        if(par && vmodels[0] && vmodels[0].$key) {
+            tmp[vmodels[0].$key] = vmodels[0]
         }
-
-        if (xtype === "object") {
-            data.$with = true
+    }
+    var bindingHandlersRepeat = function (data, vmodels) {
+        var expr = data.value,
+            targetVM = getVmodel(expr, vmodels),
+            elem = data.element,
+            par = elem.parentNode,
+            type = data.type
+        if(targetVM) {
+            // 可监听
+            var div = document.createElement("div")
+            div.innerHTML ="<i><b ms-_getproxy></b></i>"
+            var loop = div.childNodes[0]
+            var t = type == "repeat" ? loop : div
+            t.setAttribute(data.name, expr)
+            div.style.display = "none"
+            par.appendChild(div)
+            avalon.scan(t, vmodels)
+            var arr = targetVM[expr]
+            var proxyArray = arr.$events[avalon.subscribers].pop()
+            if(proxyArray.$with) proxyArray.proxies = tmp
+            tmp = {}
+            par.removeChild(div)
+            return [proxyArray, arr]
         }
-        data.vmodels = vmodels
     }
     avalon.rebind = function (bindings, vmodelIds) {
         var vmodels = vmodelIds.map(function (id) {
@@ -90,6 +85,7 @@ new function () {
         "widget": 110,
         "each": 1400,
         "with": 1500,
+        "_getproxy": 1501,
         "duplex": 2000,
         "on": 3000
     }
@@ -251,31 +247,30 @@ new function () {
             data.template = template
             data.sortedCallback = getBindingCallback(DataElement, "data-with-sorted", vmodels)
             data.renderedCallback = getBindingCallback(DataElement, "data-" + type + "-rendered", vmodels)
-            bindingHandlersRepeat(data, vmodels)
-            if(data.$with) {
-                var repeatStart
+            var proxyArray = bindingHandlersRepeat(data, vmodels)
+            if(!proxyArray) return
+            var repeatTarget = proxyArray[1]
+            proxyArray = proxyArray[0]
+            if(proxyArray.$with) {
                 for(var i = 0; i < len; i++) {
                     var node = nodes[i]
                     if(i == len - 1) data.element = node
                     if(node.nodeType == 8) {
                         if(node.textContent.indexOf(signature) == -1) continue
                         if(node.textContent == signature) {
-                            data.clone = node.cloneNode(false)
+                            data.clone = data.$with = node.cloneNode(false)
                             data.$stamp = node
-                            repeatStart = true
-                        } else {
-                            repeatStart = false
                         }
-                    } else if(repeatStart) {
-                        var id = ids[proxyIndex] && ids[proxyIndex].split("="),
-                            proxy = id && withProxyAgent(id[0], data)
-                        if(!id) continue
-                        proxy.$id = id[1]
-                        proxy.$stamp = node
-                        avalon.vmodels[proxy.$id] = proxy // 临时挂载到全局，在回调里移除
-                        proxyIndex++
                     }
                 }
+                avalon.each(ids, function(i, id) {
+                    id = id.split("=")
+                    var vm = proxyArray.proxies[id[0]]
+                    if(vm) {
+                        vm.$id = id[1]
+                        avalon.vmodels[id[1]] = vm
+                    }
+                })
             } else {
                 var proxies = data.proxies = data.proxies || []
                 for(var i = 0; i < len; i++) {
@@ -287,17 +282,21 @@ new function () {
                             data.clone = node.cloneNode(false)
                         }
                         if(i != len -1) {
-                            var proxy = eachProxyAgent(proxyIndex, data),
-                                id = ids[proxyIndex] && ids[proxyIndex].split("=")
-                            proxy.$id = type == "with" ? id[1] : id[0]
-                            proxy.$stamp = node
-                            avalon.vmodels[proxy.$id] = proxy // 临时挂载到全局，在回调里移除
-                            proxies.splice(proxyIndex, 0, proxy)
-                            proxyIndex++
+                            var proxy = getProxy(proxyArray, proxyIndex),
+                                id = ids[proxyIndex] && ids[proxyIndex]
+                            if(proxy) {
+                                proxy.$id = id
+                                proxy.$stamp = node
+                                avalon.vmodels[proxy.$id] = proxy // 临时挂载到全局，在回调里移除
+                                proxies.splice(proxyIndex, 0, proxy)
+                                proxyIndex++
+                            }
                         }
                     }
                 }
             }
+            avalon.mix(proxyArray, data)
+            repeatTarget.$events[avalon.subscribers].push(proxyArray)
             // 回调
             var cb = data.renderedCallback/*,
                 resetVmodels = function() {
@@ -316,21 +315,7 @@ new function () {
                     data.renderedCallback.apply(par, [type == "with" ? "append" : "add", 0, proxyIndex])
                 }
             }
-            data.rollback = function() {
-                var elem = data.element
-                if (!elem)
-                    return
-                bindingExecutors.repeat.call(data, "clear")
-                var parentNode = elem.parentNode
-                var content = data.template
-                var target = content.firstChild
-                parentNode.replaceChild(content, elem)
-                var start = data.$stamp
-                start && start.parentNode && start.parentNode.removeChild(start)
-                target = data.element = data.type === "repeat" ? target : parentNode
-            }
             par.removeChild(elem)
-            console.log(data)
         },
         duplex: function (data, vmodels, elem) {
             bindingHandlers["duplex"](data, vmodels)

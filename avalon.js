@@ -5,7 +5,7 @@
  http://weibo.com/jslouvre/
  
  Released under the MIT license
- avalon.js 1.43 built in 2015.5.20
+ avalon.js 1.43 built in 2015.5.21
  用于后端渲染
  */
 (function(){
@@ -1201,7 +1201,7 @@ function scanTag(elem, vmodels) {
         scanNodeArray(elem.childNodes, vmodels)
     }
 }
-function scanNodeArray(nodes, vmodels, getP) {
+function scanNodeArray(nodes, vmodels) {
     var len = nodes.length,
         i = 0;
     for (; i < len; i++) {
@@ -1319,6 +1319,8 @@ function scanAttr(elem, vmodels) {
     }
     executeBindings(bindings, vmodels)
     if (scanNode && !stopScan[elem.tagName]) {
+        // 为什么用elem.childNodes会有问题，，，shit
+        // 意思不能直接操作dom树
         scanNodeArray(elem.childNodes.slice(0), vmodels, elem.tagName == "li") //扫描子孙元素
     }
 }
