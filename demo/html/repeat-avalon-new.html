@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>repeat</title>
+<script src="../script/avalon-new.js"></script>
+<script src="../script/avalon.rebind.js"></script>
+<script src="../script/repeat.js"></script>
+</head>
+<body ms-controller="test">
+    <ul><li ms-repeat="array" 
+            ms-if-loop="el>2" 
+            data-repeat-rendered="over">{{el}}-{{$first}}-{{$last}}-{{$index}}</li></ul>
+    <ul ms-each="array"><li
+            ms-if-loop="el>2" >{{el}}</li></ul>
+    <div ms-with="object"><strong 
+                ms-if-loop="$val>2">{{$key}}-{{$val}} </strong></div>
+    <map>X<area ms-repeat="object" 
+                ms-if-loop="$val>2" ms-attr-title="$key+$val"></map>
+    <ul>
+        <li 
+            ms-repeat-level="depth">level1 - {{level.length}}
+            <p 
+               ms-repeat="level">{{el}}</p>
+            </li>
+    </ul>
+    <ul>
+        <li 
+            ms-repeat-level="depth">{{level.length}} - level1
+            <p 
+               ms-repeat="level">{{el}}</p>
+            </li>
+    </ul>
+    <ul>
+        <li 
+            ms-repeat-level="depth">level1 - {{level.length}}<p 
+               ms-repeat="level">{{el}}</p>
+            </li>
+    </ul>
+    <button ms-click="change">change</button>
+</body>
+</html>

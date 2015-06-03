@@ -27,7 +27,7 @@ new function () {
         }
     }
     function getProxy(proxies, proxyIndex) {
-        var proxies = proxies.proxies
+        var proxies = proxies.proxies || proxies.$repeat && proxies.$repeat.$proxy // 新版
         return proxies && proxies[proxyIndex]
     }
     var callbackHash = {}, tmp
@@ -47,20 +47,26 @@ new function () {
             type = data.type
         if(targetVM) {
             // 可监听
-            var div = document.createElement("div")
-            div.innerHTML ="<i><b ms-_getproxy></b></i>"
-            var loop = div.childNodes[0]
-            var t = type == "repeat" ? loop : div
-            t.setAttribute(data.name, expr)
-            div.style.display = "none"
-            par.appendChild(div)
-            avalon.scan(t, vmodels)
-            var arr = targetVM[expr]
-            var proxyArray = arr.$events[avalon.subscribers].pop()
-            if(proxyArray.$with) proxyArray.proxies = tmp
-            tmp = {}
-            par.removeChild(div)
-            return [proxyArray, arr]
+            try {
+                var div = document.createElement("div")
+                var arr = targetVM[expr] || targetVM.$map && targetVM.el // 新版avalon内proxy没有expr属性鸟
+                var isWith = !(targetVM[expr] && (targetVM[expr] instanceof Array))
+                div.innerHTML ="<i>" + (isWith ? "<b ms-_getproxy></b>" : "") + "</i>"
+                var loop = div.childNodes[0]
+                var t = type == "repeat" ? loop : div
+                t.setAttribute(data.name, expr)
+                div.style.display = "none"
+                par.appendChild(div)
+                avalon.scan(t, vmodels)
+                var proxyArray = arr.$events[avalon.subscribers].pop()
+                // 新版，如果没有$proxy属性才采用猥琐方式tmp获取
+                if(proxyArray.$with) proxyArray.proxies = proxyArray.$repeat && proxyArray.$repeat.$proxy || tmp
+                tmp = {}
+                par.removeChild(div)
+                return [proxyArray, arr]
+            } catch(e) {
+                avalon.log(e)
+            }
         }
     }
     avalon.rebind = function (bindings, vmodelIds) {
